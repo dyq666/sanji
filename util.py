@@ -1,18 +1,19 @@
 __all__ = (
-    'ipython_shell',
-    'regular_shell',
+    'run_shell'
 )
 
+import warnings
 from typing import NoReturn, Optional
 
 
-def regular_shell(context: Optional[dict] = None) -> NoReturn:
-    """预置变量的常规交互终端"""
-    import code
-    code.interact(local=context)
-
-
-def ipython_shell(context: Optional[dict] = None) -> NoReturn:
-    """预置变量的ipython 的交互终端"""
-    import IPython
-    IPython.start_ipython(user_ns=context)
+def run_shell(context: Optional[dict] = None, plain: bool = False) -> NoReturn:
+    """启动预置变量的交互 shell"""
+    if plain:
+        import code
+        code.interact(local=context)
+    else:
+        try:
+            import IPython
+            IPython.start_ipython(user_ns=context)
+        except ImportError:
+            warnings.warn('Must install ipython')
