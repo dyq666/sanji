@@ -1,9 +1,12 @@
 __all__ = (
-    'run_shell'
+    'run_shell',
+    'temporary_chdir',
 )
 
+import os
 import warnings
-from typing import NoReturn, Optional
+from typing import NoReturn, Optional, ContextManager
+from contextlib import contextmanager
 
 
 def run_shell(context: Optional[dict] = None, plain: bool = False) -> NoReturn:
@@ -17,3 +20,13 @@ def run_shell(context: Optional[dict] = None, plain: bool = False) -> NoReturn:
             IPython.start_ipython(user_ns=context)
         except ImportError:
             warnings.warn('Must install ipython')
+
+
+@contextmanager
+def temporary_chdir(path: str) -> ContextManager:
+    cwd = os.getcwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(cwd)
