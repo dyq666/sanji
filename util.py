@@ -1,4 +1,5 @@
 __all__ = (
+    'cls_fields',
     'run_shell',
     'temporary_chdir',
 )
@@ -30,3 +31,8 @@ def temporary_chdir(path: str) -> ContextManager:
         yield
     finally:
         os.chdir(cwd)
+
+
+def cls_fields(cls: type) -> dict:
+    """返回所有类属性"""
+    return { k: v for k, v in cls.__dict__.items() if not k.startswith('__') }
