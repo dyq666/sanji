@@ -1,3 +1,5 @@
+"""一些工具函数, 绝大部分都不依赖第三方包, 小部分依赖的包也在 doc 中标注了."""
+
 __all__ = (
     'Memoize',
     'cls_fields',
@@ -12,7 +14,9 @@ from contextlib import contextmanager
 
 
 def run_shell(context: Optional[dict] = None, plain: bool = False) -> NoReturn:
-    """启动预置变量的交互 shell"""
+    """启动预置变量的交互 shell
+    Require: ipython
+    """
     if plain:
         import code
         code.interact(local=context)
