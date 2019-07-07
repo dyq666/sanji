@@ -2,6 +2,7 @@
 
 __all__ = (
     'Memoize',
+    'clean_textarea',
     'cls_fields',
     'run_shell',
     'temporary_chdir',
@@ -9,7 +10,7 @@ __all__ = (
 
 import os
 import warnings
-from typing import NoReturn, Optional, ContextManager
+from typing import ContextManager, List, NoReturn, Optional, Union
 from contextlib import contextmanager
 
 
@@ -42,6 +43,11 @@ def temporary_chdir(path: str) -> ContextManager:
 def cls_fields(cls: type) -> dict:
     """返回所有类属性"""
     return { k: v for k, v in cls.__dict__.items() if not k.startswith('__') }
+
+
+def clean_textarea(value: str, keep_inline_space: bool=True) -> Union[List[str], List[List[str]]]:
+    rows = [r.strip() for r in value.splitlines() if r and not r.isspace()]
+    return rows if keep_inline_space else [r.split() for r in rows]
 
 
 class Memoize:

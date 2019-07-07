@@ -2,7 +2,7 @@ __all__ = ()
 
 import os
 
-from util import Memoize, cls_fields, temporary_chdir
+from util import Memoize, clean_textarea, cls_fields, temporary_chdir
 
 
 def test_temporary_chdir():
@@ -44,3 +44,22 @@ def test_Memoize():
 
     f.id = 2
     assert f.foo == 1
+
+
+def test_clean_textarea():
+    textarea = """
+    1
+
+    2
+    3
+
+    """
+    assert clean_textarea(textarea) == ['1', '2', '3']
+
+    textarea = """
+    1 a
+    2\t\t b
+    \t
+    3      c 
+    """
+    assert clean_textarea(textarea, keep_inline_space=False) == [['1', 'a'], ['2', 'b'], ['3', 'c']]
