@@ -26,6 +26,7 @@ def run_shell(context: Optional[dict] = None, plain: bool = False) -> NoReturn:
 
 @contextmanager
 def temporary_chdir(path: str) -> ContextManager:
+    """在 with 环境下修改工作目录"""
     cwd = os.getcwd()
     os.chdir(path)
     try:
