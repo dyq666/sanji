@@ -6,12 +6,16 @@ __all__ = (
     'cls_fields',
     'run_shell',
     'temporary_chdir',
+    'upload',
 )
 
 import os
 import warnings
-from typing import ContextManager, List, NoReturn, Optional, Union
+from typing import ContextManager, List, NoReturn, Optional, TYPE_CHECKING, Union
 from contextlib import contextmanager
+
+if TYPE_CHECKING:
+    from requests import Response
 
 
 def run_shell(context: Optional[dict] = None, plain: bool = False) -> NoReturn:
@@ -43,6 +47,22 @@ def temporary_chdir(path: str) -> ContextManager:
 def cls_fields(cls: type) -> dict:
     """返回所有类属性"""
     return { k: v for k, v in cls.__dict__.items() if not k.startswith('__') }
+
+
+def upload(url: str, file_path: str, file_name: str=None) -> 'Response':
+    """上传文件
+
+    file_name: 上传后的文件名, 如果不指定则从 file_path 中提取
+    """
+    import requests
+
+    file_name = os.path.split(file_path)[1] if file_name is None else file_name
+
+    r = requests.post(
+        url=url,
+        files={'file': (file_name, open(file_path))}
+    )
+    return r
 
 
 def clean_textarea(value: str, keep_inline_space: bool=True) -> Union[List[str], List[List[str]]]:
