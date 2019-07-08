@@ -7,12 +7,15 @@ __all__ = (
     'run_shell',
     'temporary_chdir',
     'upload',
+    'write_csv',
 )
 
+import csv
 import os
 import warnings
-from typing import ContextManager, IO, List, NoReturn, Optional, TYPE_CHECKING, Union
 from contextlib import contextmanager
+from io import StringIO
+from typing import ContextManager, IO, List, NoReturn, Optional, TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
     from requests import Response
@@ -68,6 +71,24 @@ def upload(url: str, file: Union[str, IO[str]], file_name: str=None) -> 'Respons
 
     r = requests.post(url=url, files={'file': (file_name, file)})
     return r
+
+
+def write_csv(header: List[str], rows: List[List[str]], file_path: Optional[str]=None) -> Union[NoReturn, StringIO]:
+    """将数据写入 csv
+
+    file_path: 如果不传入此参数, 则会返回一个 StringIO.
+    """
+    file = StringIO() if file_path is None else open(file_path, 'w')
+    csv_f = csv.writer(file)
+    csv_f.writerow(header)
+    csv_f.writerows(rows)
+
+    if file_path is None:
+        file.seek(0)
+        return file
+    else:
+        file.close()
+        return
 
 
 def clean_textarea(value: str, keep_inline_space: bool=True) -> Union[List[str], List[List[str]]]:

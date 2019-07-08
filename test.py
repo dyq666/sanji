@@ -2,7 +2,7 @@ __all__ = ()
 
 import os
 
-from util import Memoize, clean_textarea, cls_fields, temporary_chdir
+from util import Memoize, clean_textarea, cls_fields, temporary_chdir, write_csv
 
 
 def test_temporary_chdir():
@@ -63,3 +63,8 @@ def test_clean_textarea():
     3      c 
     """
     assert clean_textarea(textarea, keep_inline_space=False) == [['1', 'a'], ['2', 'b'], ['3', 'c']]
+
+
+def test_write_csv():
+    file = write_csv(['name', 'sex'], [['dyq', 'male'], ['yqd', 'female']])
+    assert file.getvalue().replace('\r\n', '\n') == '\n'.join(['name,sex', 'dyq,male', 'yqd,female', ''])
