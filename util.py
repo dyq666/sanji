@@ -11,7 +11,7 @@ __all__ = (
 
 import os
 import warnings
-from typing import ContextManager, List, NoReturn, Optional, TYPE_CHECKING, Union
+from typing import ContextManager, IO, List, NoReturn, Optional, TYPE_CHECKING, Union
 from contextlib import contextmanager
 
 if TYPE_CHECKING:
@@ -49,19 +49,24 @@ def cls_fields(cls: type) -> dict:
     return { k: v for k, v in cls.__dict__.items() if not k.startswith('__') }
 
 
-def upload(url: str, file_path: str, file_name: str=None) -> 'Response':
+def upload(url: str, file: Union[str, IO[str]], file_name: str=None) -> 'Response':
     """上传文件
 
-    file_name: 上传后的文件名, 如果不指定则从 file_path 中提取
+    file: 可以是一个 str 代表文件路径, 也可以是一个类文件对象, 比如 io.StringIO.
+
+    file_name: 上传的文件名, 如果不指定并且 ``file`` 是 str 则从 ``file`` 中提取,
+               如果 ``file`` 不是 str 则必须指定.
     """
     import requests
 
-    file_name = os.path.split(file_path)[1] if file_name is None else file_name
+    if isinstance(file, str):
+        file_name = os.path.split(file)[1] if file_name is None else file_name
+        file = open(file)
+    else:
+        if file_name is None:
+            raise ValueError('You must specify file_name arg, if file type is str')
 
-    r = requests.post(
-        url=url,
-        files={'file': (file_name, open(file_path))}
-    )
+    r = requests.post(url=url, files={'file': (file_name, file)})
     return r
 
 
