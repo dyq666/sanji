@@ -2,7 +2,9 @@ __all__ = ()
 
 import os
 
-from util import Memoize, clean_textarea, cls_fields, temporary_chdir, write_csv
+import pytest
+
+from util import Memoize, clean_textarea, cls_fields, make_accessors, temporary_chdir, write_csv
 
 
 def test_temporary_chdir():
@@ -68,3 +70,30 @@ def test_clean_textarea():
 def test_write_csv():
     file = write_csv(['name', 'sex'], [['dyq', 'male'], ['yqd', 'female']])
     assert file.getvalue().replace('\r\n', '\n') == '\n'.join(['name,sex', 'dyq,male', 'yqd,female', ''])
+
+
+def test_make_accessor():
+    class Foo:
+        def __init__(self, status):
+            self.status = status
+        def _is_status(self, status) -> bool:
+            return status == self.status
+    class Status:
+        A = 0
+        B = 1
+    make_accessors(Foo, 'is_%s', Foo._is_status, Status)
+
+    assert Foo(0).is_a() and Foo(1).is_b()
+    assert not Foo(0).is_b() and not Foo(1).is_a()
+
+    with pytest.raises(ValueError):
+        # is_a 重复
+        class Foo:
+            def _is_status(self, status) -> bool:
+                return status == self.status
+            def is_a(self):
+                pass
+        class Status:
+            A = 0
+            B = 1
+        make_accessors(Foo, 'is_%s', Foo._is_status, Status)

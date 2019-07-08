@@ -4,6 +4,7 @@ __all__ = (
     'Memoize',
     'clean_textarea',
     'cls_fields',
+    'make_accessors',
     'run_shell',
     'temporary_chdir',
     'upload',
@@ -14,8 +15,10 @@ import csv
 import os
 import warnings
 from contextlib import contextmanager
+from functools import partialmethod
+from inspect import signature
 from io import StringIO
-from typing import ContextManager, IO, List, NoReturn, Optional, TYPE_CHECKING, Union
+from typing import Callable, ContextManager, IO, List, NoReturn, Optional, TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
     from requests import Response
@@ -94,6 +97,17 @@ def write_csv(header: List[str], rows: List[List[str]], file_path: Optional[str]
 def clean_textarea(value: str, keep_inline_space: bool=True) -> Union[List[str], List[List[str]]]:
     rows = [r.strip() for r in value.splitlines() if r and not r.isspace()]
     return rows if keep_inline_space else [r.split() for r in rows]
+
+
+def make_accessors(cls: type, target_pattern: str, func: Callable, const_owner: type) -> NoReturn:
+    for field, value in cls_fields(const_owner).items():
+        target_name = target_pattern % field.lower()
+        if target_name in cls.__dict__:
+            raise ValueError('field %s is exist' % target_name)
+        param_name = list(signature(func).parameters.keys())[-1]
+        # 如果用 partial 那么方法就会变成函数, 失去 self 绑定的功能.
+        wrapped = partialmethod(func, **{param_name: value})
+        setattr(cls, target_name, wrapped)
 
 
 class Memoize:
