@@ -15,7 +15,7 @@ import csv
 import os
 import warnings
 from contextlib import contextmanager
-from functools import partialmethod
+from functools import partial
 from inspect import signature
 from io import StringIO
 from typing import Callable, ContextManager, IO, List, NoReturn, Optional, TYPE_CHECKING, Union
@@ -122,8 +122,7 @@ def make_accessors(cls: type, target_pattern: str, func: Callable, const_owner: 
         if target_name in cls.__dict__:
             raise ValueError('field %s is exist' % target_name)
         param_name = list(signature(func).parameters.keys())[-1]
-        # 如果用 partial 那么方法就会变成函数, 失去 self 绑定的功能.
-        wrapped = partialmethod(func, **{param_name: value})
+        wrapped = property(partial(func, **{param_name: value}))
         setattr(cls, target_name, wrapped)
 
 

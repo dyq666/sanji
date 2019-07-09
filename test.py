@@ -83,8 +83,8 @@ def test_make_accessor():
         B = 1
     make_accessors(Foo, 'is_%s', Foo._is_status, Status)
 
-    assert Foo(0).is_a() and Foo(1).is_b()
-    assert not Foo(0).is_b() and not Foo(1).is_a()
+    assert Foo(0).is_a and Foo(1).is_b
+    assert not Foo(0).is_b and not Foo(1).is_a
 
     # 如果新生成的方法名与现有的重复就会报错.
     with pytest.raises(ValueError):
@@ -106,5 +106,5 @@ def test_make_accessor():
         A_C = 2
     make_accessors(Foo3, 'is_%s', Foo3._is_status, Status2, const_prefix='S_')
 
-    assert Foo(0).is_a() and Foo(1).is_b()
+    assert Foo(0).is_a and Foo(1).is_b
     assert not hasattr(Foo, 'is_c')
