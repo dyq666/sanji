@@ -7,27 +7,6 @@ import pytest
 from util import Memoize, clean_textarea, cls_fields, make_accessors, temporary_chdir, write_csv
 
 
-def test_temporary_chdir():
-    with temporary_chdir('/'):
-        assert os.getcwd() == '/'
-    assert os.getcwd()[-4:] == 'util'
-
-
-def test_cls_fields():
-    class Foo:
-        bar = 1
-        _a = 2
-
-        def __init__(self):
-            pass
-
-        def foo(self):
-            pass
-
-
-    assert set(dict(cls_fields(Foo)).keys()) == {'bar', 'foo', '_a'}
-
-
 def test_Memoize():
     class Foo:
 
@@ -67,9 +46,19 @@ def test_clean_textarea():
     assert clean_textarea(textarea, keep_inline_space=False) == [['1', 'a'], ['2', 'b'], ['3', 'c']]
 
 
-def test_write_csv():
-    file = write_csv(['name', 'sex'], [['dyq', 'male'], ['yqd', 'female']])
-    assert file.getvalue().replace('\r\n', '\n') == '\n'.join(['name,sex', 'dyq,male', 'yqd,female', ''])
+def test_cls_fields():
+    class Foo:
+        bar = 1
+        _a = 2
+
+        def __init__(self):
+            pass
+
+        def foo(self):
+            pass
+
+
+    assert set(dict(cls_fields(Foo)).keys()) == {'bar', 'foo', '_a'}
 
 
 def test_make_accessor():
@@ -108,3 +97,14 @@ def test_make_accessor():
     assert Foo3(0).is_a and Foo3(1).is_b
     assert hasattr(Foo3, 'is_a')
     assert not hasattr(Foo3, 'is_c')
+
+
+def test_temporary_chdir():
+    with temporary_chdir('/'):
+        assert os.getcwd() == '/'
+    assert os.getcwd()[-4:] == 'util'
+
+
+def test_write_csv():
+    file = write_csv(['name', 'sex'], [['dyq', 'male'], ['yqd', 'female']])
+    assert file.getvalue().replace('\r\n', '\n') == '\n'.join(['name,sex', 'dyq,male', 'yqd,female', ''])

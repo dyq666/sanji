@@ -24,6 +24,66 @@ if TYPE_CHECKING:
     from requests import Response
 
 
+class Memoize:
+    """一个缓存属性, 使用方法类似 @property, 区别是被此装饰器包裹的属性只会计算一次."""
+
+    def __init__(self, fget):
+        self.fget = fget
+        self.cache_key = 'cache_key_' + fget.__name__
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self
+
+        if not hasattr(instance, self.cache_key):
+            setattr(instance, self.cache_key, self.fget(instance))
+        return getattr(instance, self.cache_key)
+
+
+def clean_textarea(value: str, keep_inline_space: bool=True) -> Union[List[str], List[List[str]]]:
+    rows = [r.strip() for r in value.splitlines() if r and not r.isspace()]
+    return rows if keep_inline_space else [r.split() for r in rows]
+
+
+def cls_fields(cls: type) -> dict:
+    """返回所有类属性"""
+    return { k: v for k, v in cls.__dict__.items() if not k.startswith('__') }
+
+
+def make_accessors(cls: type, target_pattern: str, func: Callable, const_owner: type,
+                   const_prefix: Optional[str] = None) -> NoReturn:
+    """
+    1. 将要增加的类方法名由 target_pattern + const_owner 的所有类属性名组成,
+
+       可以用 const_prefix 来指定 const_owner 中的类属性名前缀对类属性进行过滤.
+
+    2. 将要增加的类方法具体功能由 func 提供, func 应该有两个参数, 第一个是 self,
+
+       第二个参数值会被设为 const_owner 对应的类属性的值.
+    """
+    if const_prefix is None:
+        len_prefix = 0
+        validate = lambda f: not f.startswith('__')
+    else:
+        len_prefix = len(const_prefix)
+        validate = lambda f: f.startswith(const_prefix)
+
+    arg_names = list(signature(func).parameters.keys())
+    if len(arg_names) >= 3:
+        raise ValueError('func arg number >= 3')
+    param_name = arg_names[1]
+
+    for field, value in const_owner.__dict__.items():
+        if not validate(field):
+            continue
+
+        target_name = target_pattern % field[len_prefix:].lower()
+        if target_name in cls.__dict__:
+            raise ValueError('field %s is exist' % target_name)
+        wrapped = property(partial(func, **{param_name: value}))
+        setattr(cls, target_name, wrapped)
+
+
 def run_shell(context: Optional[dict] = None, plain: bool = False) -> NoReturn:
     """启动预置变量的交互 shell
 
@@ -49,11 +109,6 @@ def temporary_chdir(path: str) -> ContextManager:
         yield
     finally:
         os.chdir(cwd)
-
-
-def cls_fields(cls: type) -> dict:
-    """返回所有类属性"""
-    return { k: v for k, v in cls.__dict__.items() if not k.startswith('__') }
 
 
 def upload(url: str, file: Union[str, IO[str]], file_name: str=None) -> 'Response':
@@ -95,58 +150,3 @@ def write_csv(header: List[str], rows: List[List[str]], file_path: Optional[str]
     else:
         file.close()
         return
-
-
-def clean_textarea(value: str, keep_inline_space: bool=True) -> Union[List[str], List[List[str]]]:
-    rows = [r.strip() for r in value.splitlines() if r and not r.isspace()]
-    return rows if keep_inline_space else [r.split() for r in rows]
-
-
-def make_accessors(cls: type, target_pattern: str, func: Callable, const_owner: type,
-                   const_prefix: Optional[str] = None) -> NoReturn:
-    """
-    1. 将要增加的类方法名由 target_pattern + const_owner 的所有类属性名组成,
-
-       可以用 const_prefix 来指定 const_owner 中的类属性名前缀对类属性进行过滤.
-
-    2. 将要增加的类方法具体功能由 func 提供, func 应该有两个参数, 第一个是 self,
-
-       第二个参数值会被设为 const_owner 对应的类属性的值.
-    """
-    if const_prefix is None:
-        len_prefix = 0
-        validate = lambda f: not f.startswith('__')
-    else:
-        len_prefix = len(const_prefix)
-        validate = lambda f: f.startswith(const_prefix)
-
-    arg_names = list(signature(func).parameters.keys())
-    if len(arg_names) >= 3:
-        raise ValueError('func arg number >= 3')
-    param_name = arg_names[1]
-
-    for field, value in const_owner.__dict__.items():
-        if not validate(field):
-            continue
-
-        target_name = target_pattern % field[len_prefix:].lower()
-        if target_name in cls.__dict__:
-            raise ValueError('field %s is exist' % target_name)
-        wrapped = property(partial(func, **{param_name: value}))
-        setattr(cls, target_name, wrapped)
-
-
-class Memoize:
-    """一个缓存属性, 使用方法类似 @property, 区别是被此装饰器包裹的属性只会计算一次."""
-
-    def __init__(self, fget):
-        self.fget = fget
-        self.cache_key = 'cache_key_' + fget.__name__
-
-    def __get__(self, instance, owner):
-        if instance is None:
-            return self
-
-        if not hasattr(instance, self.cache_key):
-            setattr(instance, self.cache_key, self.fget(instance))
-        return getattr(instance, self.cache_key)
