@@ -115,7 +115,7 @@ def make_accessors(cls: type, target_pattern: str, func: Callable, const_owner: 
         validate = lambda f: not f.startswith('__')
     else:
         len_prefix = len(const_prefix)
-        validate = lambda f: not f.startswith(const_prefix)
+        validate = lambda f: f.startswith(const_prefix)
 
     arg_names = list(signature(func).parameters.keys())
     if len(arg_names) >= 3:

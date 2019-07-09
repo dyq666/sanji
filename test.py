@@ -106,5 +106,6 @@ def test_make_accessor():
         A_C = 2
     make_accessors(Foo3, 'is_%s', Foo3._is_status, Status2, const_prefix='S_')
 
-    assert Foo(0).is_a and Foo(1).is_b
-    assert not hasattr(Foo, 'is_c')
+    assert Foo3(0).is_a and Foo3(1).is_b
+    assert hasattr(Foo3, 'is_a')
+    assert not hasattr(Foo3, 'is_c')
