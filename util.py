@@ -5,6 +5,7 @@ __all__ = (
     'Relationship',
     'clean_textarea',
     'cls_fields',
+    'import_object',
     'make_accessors',
     'run_shell',
     'temporary_chdir',

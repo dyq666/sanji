@@ -7,12 +7,15 @@ import pytest
 
 from util import (
     Relationship, Memoize, clean_textarea, cls_fields,
-    make_accessors, temporary_chdir, write_csv,
+    import_object, make_accessors, temporary_chdir, write_csv,
 )
 
 
 class User:
-    """for test_Relationship"""
+    """
+    for test_Relationship
+        test_import_object
+    """
     @classmethod
     def get(cls, user_id):
         return user_id
@@ -78,6 +81,14 @@ def test_cls_fields():
 
 
     assert set(dict(cls_fields(Foo)).keys()) == {'bar', 'foo', '_a'}
+
+
+def test_import_object():
+    Cls = import_object('test.User')
+    assert hasattr(Cls, 'get')
+
+    with pytest.raises(ImportError):
+        import_object('test.U')
 
 
 def test_make_accessor():
