@@ -2,6 +2,7 @@
 
 __all__ = (
     'Memoize',
+    'Relationship',
     'clean_textarea',
     'cls_fields',
     'make_accessors',
@@ -16,6 +17,7 @@ import os
 import warnings
 from contextlib import contextmanager
 from functools import partial
+from importlib import import_module
 from inspect import signature
 from io import StringIO
 from typing import Callable, ContextManager, IO, List, NoReturn, Optional, TYPE_CHECKING, Union
@@ -38,6 +40,35 @@ class Memoize:
         if not hasattr(instance, self.cache_key):
             setattr(instance, self.cache_key, self.fget(instance))
         return getattr(instance, self.cache_key)
+
+
+class Relationship:
+
+    """用于 model 中的外键.
+
+    由于公司通常不会使用外键约束, 所以 orm 库提供的相关函数都是无法使用的.
+
+    使用此描述器可以简化描述外键关系的代码量.
+    """
+
+    def __init__(self, cls_path, cls_method, instance_field_name):
+        self.cls_path = cls_path
+        self.cls_method = cls_method
+        self.instance_field_name = instance_field_name
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self
+
+        func = getattr(self.imported_cls, self.cls_method)
+        instance_field_value = getattr(instance, self.instance_field_name)
+        return func(instance_field_value)
+
+    @property
+    def imported_cls(self):
+        split_ = self.cls_path.rindex('.')
+        module, cls = self.cls_path[:split_], self.cls_path[split_+1:]
+        return getattr(import_module(module), cls)
 
 
 def clean_textarea(value: str, keep_inline_space: bool=True) -> Union[List[str], List[List[str]]]:

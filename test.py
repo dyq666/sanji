@@ -5,7 +5,17 @@ from tempfile import TemporaryDirectory
 
 import pytest
 
-from util import Memoize, clean_textarea, cls_fields, make_accessors, temporary_chdir, write_csv
+from util import (
+    Relationship, Memoize, clean_textarea, cls_fields,
+    make_accessors, temporary_chdir, write_csv,
+)
+
+
+class User:
+    """for test_Relationship"""
+    @classmethod
+    def get(cls, user_id):
+        return user_id
 
 
 def test_Memoize():
@@ -26,6 +36,14 @@ def test_Memoize():
 
     f.id = 2
     assert f.foo == 1
+
+
+def test_Relationship():
+    class Book:
+        user = Relationship('test.User', 'get', 'user_id')
+        def __init__(self, user_id): self.user_id = user_id
+
+    assert Book(user_id=1).user == 1
 
 
 def test_clean_textarea():
