@@ -1,6 +1,7 @@
 __all__ = ()
 
 import os
+from tempfile import TemporaryDirectory
 
 import pytest
 
@@ -109,6 +110,17 @@ def test_temporary_chdir():
 
 
 def test_write_csv():
-    # TODO(test arg:file_path)
-    file = write_csv(['name', 'sex'], [['dyq', 'male'], ['yqd', 'female']])
-    assert file.getvalue().replace('\r\n', '\n') == '\n'.join(['name,sex', 'dyq,male', 'yqd,female', ''])
+    header = ['name', 'sex']
+    rows = [['dyq', 'male'], ['yqd', 'female']]
+    csv_content = '\n'.join(['name,sex', 'dyq,male', 'yqd,female', ''])
+
+    file = write_csv(header, rows)
+    assert file.getvalue().replace('\r\n', '\n') == csv_content
+
+    # test arg:file_path
+    with TemporaryDirectory() as dirname:
+        file_path = os.path.join(dirname, 'data.csv')
+        write_csv(header, rows, file_path)
+
+        with open(file_path) as f:
+            assert f.read() == csv_content
