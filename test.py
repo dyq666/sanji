@@ -105,6 +105,10 @@ def test_temporary_chdir():
     assert os.getcwd()[-4:] == 'util'
 
 
+# TODO(test upload)
+
+
 def test_write_csv():
+    # TODO(test arg:file_path)
     file = write_csv(['name', 'sex'], [['dyq', 'male'], ['yqd', 'female']])
     assert file.getvalue().replace('\r\n', '\n') == '\n'.join(['name,sex', 'dyq,male', 'yqd,female', ''])
