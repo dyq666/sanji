@@ -86,14 +86,25 @@ def test_make_accessor():
     assert Foo(0).is_a() and Foo(1).is_b()
     assert not Foo(0).is_b() and not Foo(1).is_a()
 
+    # 如果新生成的方法名与现有的重复就会报错.
     with pytest.raises(ValueError):
-        # is_a 重复
-        class Foo:
-            def _is_status(self, status) -> bool:
-                return status == self.status
-            def is_a(self):
-                pass
-        class Status:
-            A = 0
-            B = 1
-        make_accessors(Foo, 'is_%s', Foo._is_status, Status)
+        class Foo2:
+            def _is_status(self, status): pass
+            def is_a(self): pass
+        make_accessors(Foo, 'is_%s', Foo2._is_status, Status)
+
+    # 测试 const_prefix
+    # class
+    class Foo3:
+        def __init__(self, status):
+            self.status = status
+        def _is_status(self, status) -> bool:
+            return status == self.status
+    class Status2:
+        S_A = 0
+        S_B = 1
+        A_C = 2
+    make_accessors(Foo3, 'is_%s', Foo3._is_status, Status2, const_prefix='S_')
+
+    assert Foo(0).is_a() and Foo(1).is_b()
+    assert not hasattr(Foo, 'is_c')

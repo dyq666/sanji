@@ -99,9 +99,26 @@ def clean_textarea(value: str, keep_inline_space: bool=True) -> Union[List[str],
     return rows if keep_inline_space else [r.split() for r in rows]
 
 
-def make_accessors(cls: type, target_pattern: str, func: Callable, const_owner: type) -> NoReturn:
-    for field, value in cls_fields(const_owner).items():
-        target_name = target_pattern % field.lower()
+def make_accessors(cls: type, target_pattern: str, func: Callable, const_owner: type,
+                   const_prefix: Optional[str] = None) -> NoReturn:
+    """
+    1. 新的类方法名由 target_pattern + const_owner 的所有类属性名组成.
+    2. 新的类方法具体功能由 func 提供, func 应该有两个参数, 第一个是 self,
+       第二个参数值会被设为 const_owner 对应雷属性的值.
+    """
+    if const_prefix is None:
+        len_prefix = 0
+        validate = lambda f: not f.startswith('__')
+    else:
+        len_prefix = len(const_prefix)
+        validate = lambda f: not f.startswith(const_prefix)
+
+
+    for field, value in const_owner.__dict__.items():
+        if not validate(field):
+            continue
+
+        target_name = target_pattern % field[len_prefix:].lower()
         if target_name in cls.__dict__:
             raise ValueError('field %s is exist' % target_name)
         param_name = list(signature(func).parameters.keys())[-1]
