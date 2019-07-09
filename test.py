@@ -94,7 +94,6 @@ def test_make_accessor():
         make_accessors(Foo, 'is_%s', Foo2._is_status, Status)
 
     # 测试 const_prefix
-    # class
     class Foo3:
         def __init__(self, status):
             self.status = status
