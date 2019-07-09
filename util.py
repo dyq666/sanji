@@ -26,6 +26,7 @@ if TYPE_CHECKING:
 
 def run_shell(context: Optional[dict] = None, plain: bool = False) -> NoReturn:
     """启动预置变量的交互 shell
+
     Require: ipython
     """
     if plain:
@@ -57,6 +58,8 @@ def cls_fields(cls: type) -> dict:
 
 def upload(url: str, file: Union[str, IO[str]], file_name: str=None) -> 'Response':
     """上传文件
+
+    Require: requests
 
     file: 可以是一个 str 代表文件路径, 也可以是一个类文件对象, 比如 io.StringIO.
 
