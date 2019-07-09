@@ -20,7 +20,7 @@ from functools import partial
 from importlib import import_module
 from inspect import signature
 from io import StringIO
-from typing import Callable, ContextManager, IO, List, NoReturn, Optional, TYPE_CHECKING, Union
+from typing import Any, Callable, ContextManager, IO, List, NoReturn, Optional, TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
     from requests import Response
@@ -60,15 +60,10 @@ class Relationship:
         if instance is None:
             return self
 
-        func = getattr(self.imported_cls, self.cls_method)
+        imported_cls = import_object(self.cls_path)
+        func = getattr(imported_cls, self.cls_method)
         instance_field_value = getattr(instance, self.instance_field_name)
         return func(instance_field_value)
-
-    @property
-    def imported_cls(self):
-        split_ = self.cls_path.rindex('.')
-        module, cls = self.cls_path[:split_], self.cls_path[split_+1:]
-        return getattr(import_module(module), cls)
 
 
 def clean_textarea(value: str, keep_inline_space: bool=True) -> Union[List[str], List[List[str]]]:
@@ -79,6 +74,18 @@ def clean_textarea(value: str, keep_inline_space: bool=True) -> Union[List[str],
 def cls_fields(cls: type) -> dict:
     """返回所有类属性"""
     return { k: v for k, v in cls.__dict__.items() if not k.startswith('__') }
+
+
+def import_object(object_path: str) -> Any:
+    try:
+        dot = object_path.rindex('.')
+        module, obj = object_path[:dot], object_path[dot+1:]
+        return getattr(import_module(module), obj)
+    # rindex        -> ValueError
+    # import_module -> ModuleNotFoundError
+    # getattr       -> AttributeError
+    except (ValueError, ModuleNotFoundError, AttributeError):
+        raise ImportError(f'Cannot import {object_path}')
 
 
 def make_accessors(cls: type, target_pattern: str, func: Callable, const_owner: type,
