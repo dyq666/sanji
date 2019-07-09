@@ -24,9 +24,6 @@
 ```python
 import importlib
 
-# 字符串模式加载模块
-importlib.import_module('')
-
 # 重载模块, 常用于 IPython
 importlib.reload()
 ```
