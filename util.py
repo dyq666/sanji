@@ -102,9 +102,13 @@ def clean_textarea(value: str, keep_inline_space: bool=True) -> Union[List[str],
 def make_accessors(cls: type, target_pattern: str, func: Callable, const_owner: type,
                    const_prefix: Optional[str] = None) -> NoReturn:
     """
-    1. 新的类方法名由 target_pattern + const_owner 的所有类属性名组成.
-    2. 新的类方法具体功能由 func 提供, func 应该有两个参数, 第一个是 self,
-       第二个参数值会被设为 const_owner 对应雷属性的值.
+    1. 将要增加的类方法名由 target_pattern + const_owner 的所有类属性名组成,
+
+       可以用 const_prefix 来指定 const_owner 中的类属性名前缀对类属性进行过滤.
+
+    2. 将要增加的类方法具体功能由 func 提供, func 应该有两个参数, 第一个是 self,
+
+       第二个参数值会被设为 const_owner 对应的类属性的值.
     """
     if const_prefix is None:
         len_prefix = 0
@@ -113,6 +117,10 @@ def make_accessors(cls: type, target_pattern: str, func: Callable, const_owner: 
         len_prefix = len(const_prefix)
         validate = lambda f: not f.startswith(const_prefix)
 
+    arg_names = list(signature(func).parameters.keys())
+    if len(arg_names) >= 3:
+        raise ValueError('func arg number >= 3')
+    param_name = arg_names[1]
 
     for field, value in const_owner.__dict__.items():
         if not validate(field):
@@ -121,7 +129,6 @@ def make_accessors(cls: type, target_pattern: str, func: Callable, const_owner: 
         target_name = target_pattern % field[len_prefix:].lower()
         if target_name in cls.__dict__:
             raise ValueError('field %s is exist' % target_name)
-        param_name = list(signature(func).parameters.keys())[-1]
         wrapped = property(partial(func, **{param_name: value}))
         setattr(cls, target_name, wrapped)
 
