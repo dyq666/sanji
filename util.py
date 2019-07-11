@@ -11,17 +11,22 @@ __all__ = (
     'temporary_chdir',
     'upload',
     'write_csv',
+    'yearly_ranges',
 )
 
 import csv
 import os
 import warnings
 from contextlib import contextmanager
+from datetime import date, datetime
 from functools import partial
 from importlib import import_module
 from inspect import signature
 from io import StringIO
-from typing import Any, Callable, ContextManager, IO, List, NoReturn, Optional, TYPE_CHECKING, Union
+from typing import (
+    Any, Callable, ContextManager, IO, Iterable, List,
+    NoReturn, Optional, Tuple, TYPE_CHECKING, Union,
+)
 
 if TYPE_CHECKING:
     from requests import Response
@@ -126,7 +131,7 @@ def make_accessors(cls: type, target_pattern: str, func: Callable, const_owner: 
 def run_shell(context: Optional[dict] = None, plain: bool = False) -> NoReturn:
     """启动预置变量的交互 shell
 
-    Require: ipython
+    Require: pipenv install ipython
     """
     if plain:
         import code
@@ -153,7 +158,7 @@ def temporary_chdir(path: str) -> ContextManager:
 def upload(url: str, file: Union[str, IO[str]], file_name: str=None) -> 'Response':
     """上传文件
 
-    Require: requests
+    Require: pipenv install requests
 
     file: 可以是一个 str 代表文件路径, 也可以是一个类文件对象, 比如 io.StringIO.
 
@@ -189,3 +194,31 @@ def write_csv(header: List[str], rows: List[List[str]], file_path: Optional[str]
     else:
         file.close()
         return
+
+
+def yearly_ranges(begin: Union[date, datetime], end: Union[date, datetime], years: int=1) -> Iterable[Tuple]:
+    """生成的时间范围是左闭右开的.
+
+    Require: pipenv install python-dateutil
+
+    例如:
+
+    [
+        [begin,          one_year_later),
+        [one_year_later, two_year_later),
+        [two_year_later, end)
+    ]
+    """
+    if begin > end:
+        raise ValueError('begin time must <= end time')
+    if years <= 0:
+        raise ValueError('years must >= 1')
+
+    from dateutil.relativedelta import relativedelta
+    while True:
+        few_years_later = begin + relativedelta(years=years)
+        if few_years_later >= end:
+            yield begin, end
+            return
+        yield begin, few_years_later
+        begin = few_years_later

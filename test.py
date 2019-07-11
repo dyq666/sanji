@@ -1,6 +1,7 @@
 __all__ = ()
 
 import os
+from datetime import date, datetime
 from tempfile import TemporaryDirectory
 
 import pytest
@@ -8,6 +9,7 @@ import pytest
 from util import (
     Relationship, Memoize, clean_textarea, cls_fields,
     import_object, make_accessors, temporary_chdir, write_csv,
+    yearly_ranges,
 )
 
 
@@ -153,3 +155,32 @@ def test_write_csv():
 
         with open(file_path) as f:
             assert f.read() == csv_content
+
+
+@pytest.mark.parametrize('date_cls', [date, datetime])
+def test_yearly_ranges(date_cls):
+    with pytest.raises(ValueError):
+        next(iter(yearly_ranges(date_cls(2019, 1, 2), date_cls(2019, 1, 1))))
+    with pytest.raises(ValueError):
+        next(iter(yearly_ranges(date_cls(2019, 1, 1), date_cls(2019, 1, 2), 0)))
+
+    # 测试开始和结束时间相同
+    assert list(yearly_ranges(date_cls(2019, 1, 2), date_cls(2019, 1, 2))) == [
+        (date_cls(2019, 1, 2), date_cls(2019, 1, 2))
+    ]
+
+    # 测试结束比开始多一年
+    assert list(yearly_ranges(date_cls(2019, 1, 2), date_cls(2020, 1, 2))) == [
+        (date_cls(2019, 1, 2), date_cls(2020, 1, 2))
+    ]
+
+    # 测试结束比开始多一年 + 一天
+    assert list(yearly_ranges(date_cls(2019, 1, 2), date_cls(2020, 1, 3))) == [
+        (date_cls(2019, 1, 2), date_cls(2020, 1, 2)),
+        (date_cls(2020, 1, 2), date_cls(2020, 1, 3)),
+    ]
+
+    # 测试结束比开始多一年 - -天
+    assert list(yearly_ranges(date_cls(2019, 1, 2), date_cls(2020, 1, 1))) == [
+        (date_cls(2019, 1, 2), date_cls(2020, 1, 1))
+    ]
