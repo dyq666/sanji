@@ -86,6 +86,20 @@ def test_cls_fields():
     assert set(dict(cls_fields(Foo)).keys()) == {'bar', 'foo', '_a'}
 
 
+def test_get_month_last_datetime():
+    new_datetime = partial(datetime, hour=23, minute=59, second=59)
+
+    # 测试闰年
+    # 整除 4, 但不整除 200
+    assert get_month_last_datetime(2020, 2) == new_datetime(2020, 2, 29)
+    # 整除 4, 且整除 200, 但整除 400
+    assert get_month_last_datetime(2000, 2) == new_datetime(2000, 2, 29)
+
+    # 测试第一个月和最后一个月
+    assert get_month_last_datetime(2019, 1) == new_datetime(2019, 1, 31)
+    assert get_month_last_datetime(2019, 12) == new_datetime(2019, 12, 31)
+
+
 def test_import_object():
     Cls = import_object('test.User')
     assert hasattr(Cls, 'get')
@@ -195,18 +209,3 @@ def test_yearly_ranges(date_cls):
     assert new_yearly_ranges(find_date=date_cls(2019, 1, 2)) == (date_cls(2019, 1, 2), date_cls(2020, 1, 2))
     assert new_yearly_ranges(find_date=date_cls(2020, 1, 1)) == (date_cls(2019, 1, 2), date_cls(2020, 1, 2))
     assert new_yearly_ranges(find_date=date_cls(2022, 3, 1)) == (date_cls(2022, 1, 2), date_cls(2022, 3, 2))
-
-
-
-def test_get_month_last_datetime():
-    new_datetime = partial(datetime, hour=23, minute=59, second=59)
-
-    # 测试闰年
-    # 整除 4, 但不整除 200
-    assert get_month_last_datetime(2020, 2) == new_datetime(2020, 2, 29)
-    # 整除 4, 且整除 200, 但整除 400
-    assert get_month_last_datetime(2000, 2) == new_datetime(2000, 2, 29)
-
-    # 测试第一个月和最后一个月
-    assert get_month_last_datetime(2019, 1) == new_datetime(2019, 1, 31)
-    assert get_month_last_datetime(2019, 12) == new_datetime(2019, 12, 31)

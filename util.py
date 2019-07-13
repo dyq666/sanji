@@ -83,6 +83,15 @@ def cls_fields(cls: type) -> dict:
     return { k: v for k, v in cls.__dict__.items() if not k.startswith('__') }
 
 
+def get_month_last_datetime(year: int, month: int) -> datetime:
+    """本月最后一秒
+
+    Require: pipenv install python-dateutil
+    """
+    from dateutil.relativedelta import relativedelta
+    return datetime(year, month, 1) + relativedelta(months=1) - relativedelta(seconds=1)
+
+
 def import_object(object_path: str) -> Any:
     try:
         dot = object_path.rindex('.')
@@ -240,12 +249,3 @@ def yearly_ranges(begin: Union[date, datetime], end: Union[date, datetime], year
     for begin, end in ranges:
         if find_date < end:
             return begin, end
-
-
-def get_month_last_datetime(year: int, month: int) -> datetime:
-    """本月最后一秒
-
-    Require: pipenv install python-dateutil
-    """
-    from dateutil.relativedelta import relativedelta
-    return datetime(year, month, 1) + relativedelta(months=1) - relativedelta(seconds=1)
