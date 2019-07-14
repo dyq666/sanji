@@ -6,8 +6,10 @@ __all__ = (
     'clean_textarea',
     'cls_fields',
     'get_month_last_datetime',
+    'get_number',
     'import_object',
     'make_accessors',
+    'round_half_up',
     'run_shell',
     'temporary_chdir',
     'upload',
@@ -20,6 +22,7 @@ import os
 import warnings
 from contextlib import contextmanager
 from datetime import date, datetime
+from decimal import Decimal, ROUND_HALF_UP
 from functools import partial
 from importlib import import_module
 from inspect import signature
@@ -92,6 +95,17 @@ def get_month_last_datetime(year: int, month: int) -> datetime:
     return datetime(year, month, 1) + relativedelta(months=1) - relativedelta(seconds=1)
 
 
+def get_number(number: Union[int], ndigits: int=0) -> int:
+    """获取某位上的数字
+
+    `ndigits`: 与 `round()` 的参数 `ndigits` 保持一样的逻辑, 0 代表个位, -1 代表十位 ...
+    """
+    if ndigits > 0:
+        raise ValueError('ndigits must <= 0')
+
+    return (number // 10 ** abs(ndigits)) % 10
+
+
 def import_object(object_path: str) -> Any:
     try:
         dot = object_path.rindex('.')
@@ -136,6 +150,27 @@ def make_accessors(cls: type, target_pattern: str, func: Callable, const_owner: 
             raise ValueError('field %s is exist' % target_name)
         wrapped = property(partial(func, **{param_name: value}))
         setattr(cls, target_name, wrapped)
+
+
+def round_half_up(number: Union[int, float], ndigits: int=0) -> Union[int, float]:
+    """四舍五入.
+
+    `ndigits`: 与 `round()` 的参数 `ndigits` 保持一样的逻辑, 整数代表小数位, 0 代表个位, -1 代表十位 ...
+
+    Require: util.get_number
+    """
+    if ndigits < 0:
+        half_even_result = round(number, ndigits)
+
+        # 如果保留位是偶数, 它的后一位是 5, 并且后面剩下的位都是 0.
+        if (get_number(number, ndigits) % 2 == 0 and
+                get_number(number, ndigits + 1) == 5 and
+                number % (10 ** abs(ndigits + 1)) == 0):
+            half_even_result += 10 ** abs(ndigits)
+        return int(half_even_result)
+
+    ndigits = Decimal(str(1 / (10 ** ndigits)))
+    return float(Decimal(str(number)).quantize(ndigits, rounding=ROUND_HALF_UP))
 
 
 def run_shell(context: Optional[dict] = None, plain: bool = False) -> NoReturn:

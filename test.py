@@ -9,8 +9,8 @@ import pytest
 
 from util import (
     Relationship, Memoize, clean_textarea, cls_fields,
-    get_month_last_datetime, import_object, make_accessors,
-    temporary_chdir, write_csv, yearly_ranges,
+    get_month_last_datetime, get_number, import_object, make_accessors,
+    round_half_up, temporary_chdir, write_csv, yearly_ranges,
 )
 
 
@@ -19,6 +19,7 @@ class User:
     for test_Relationship
         test_import_object
     """
+
     @classmethod
     def get(cls, user_id):
         return user_id
@@ -47,6 +48,7 @@ def test_Memoize():
 def test_Relationship():
     class Book:
         user = Relationship('test.User', 'get', 'user_id')
+
         def __init__(self, user_id): self.user_id = user_id
 
     assert Book(user_id=1).user == 1
@@ -82,7 +84,6 @@ def test_cls_fields():
         def foo(self):
             pass
 
-
     assert set(dict(cls_fields(Foo)).keys()) == {'bar', 'foo', '_a'}
 
 
@@ -100,6 +101,18 @@ def test_get_month_last_datetime():
     assert get_month_last_datetime(2019, 12) == new_datetime(2019, 12, 31)
 
 
+def test_get_number():
+    groups = [
+        (14230, [1, 4, 2, 3, 0]),
+        (9999, [9, 9, 9, 9]),
+    ]
+    for i, (number, res) in enumerate(groups):
+        assert get_number(number, -i) == res[-(i + 1)]
+
+    with pytest.raises(ValueError):
+        get_number(13212, 1)
+
+
 def test_import_object():
     Cls = import_object('test.User')
     assert hasattr(Cls, 'get')
@@ -112,11 +125,14 @@ def test_make_accessor():
     class Foo:
         def __init__(self, status):
             self.status = status
+
         def _is_status(self, status) -> bool:
             return status == self.status
+
     class Status:
         A = 0
         B = 1
+
     make_accessors(Foo, 'is_%s', Foo._is_status, Status)
 
     assert Foo(0).is_a and Foo(1).is_b
@@ -126,24 +142,44 @@ def test_make_accessor():
     with pytest.raises(ValueError):
         class Foo2:
             def _is_status(self, status): pass
+
             def is_a(self): pass
+
         make_accessors(Foo, 'is_%s', Foo2._is_status, Status)
 
     # 测试 const_prefix
     class Foo3:
         def __init__(self, status):
             self.status = status
+
         def _is_status(self, status) -> bool:
             return status == self.status
+
     class Status2:
         S_A = 0
         S_B = 1
         A_C = 2
+
     make_accessors(Foo3, 'is_%s', Foo3._is_status, Status2, const_prefix='S_')
 
     assert Foo3(0).is_a and Foo3(1).is_b
     assert hasattr(Foo3, 'is_a')
     assert not hasattr(Foo3, 'is_c')
+
+
+# TODO test run_shell
+
+
+def test_round_half_up():
+
+    assert round_half_up(10499, -3) == 10000
+    assert round_half_up(10510, -3) == 11000
+
+    assert round(10500, -3) == 10000
+    assert round_half_up(10500, -3) == 11000
+
+    assert round(0.155, 2) == 0.15
+    assert round_half_up(0.155, 2) == 0.16
 
 
 def test_temporary_chdir():
@@ -152,7 +188,7 @@ def test_temporary_chdir():
     assert os.getcwd()[-4:] == 'util'
 
 
-# TODO(test upload)
+# TODO test upload
 
 
 def test_write_csv():
