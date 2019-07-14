@@ -21,7 +21,7 @@ import csv
 import os
 import warnings
 from contextlib import contextmanager
-from datetime import date, datetime
+from datetime import datetime
 from decimal import Decimal, ROUND_HALF_UP
 from functools import partial
 from importlib import import_module
@@ -33,6 +33,7 @@ from typing import (
 )
 
 if TYPE_CHECKING:
+    from datetime import date
     from requests import Response
 
 
@@ -241,8 +242,8 @@ def write_csv(header: List[str], rows: List[List[str]], file_path: Optional[str]
         return
 
 
-def yearly_ranges(begin: Union[date, datetime], end: Union[date, datetime], years: int=1,
-                  find_date: Union[date, datetime] = None) -> Union[List[Tuple], Tuple, None]:
+def yearly_ranges(begin: Union['date', datetime], end: Union['date', datetime], years: int=1,
+                  find_date: Union['date' , datetime] = None) -> Union[List[Tuple], Tuple, None]:
     """生成的时间范围是左闭右开的.
 
     Require: pipenv install python-dateutil
