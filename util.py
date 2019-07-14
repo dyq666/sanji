@@ -163,7 +163,7 @@ def round_half_up(number: Union[int, float], ndigits: int=0) -> Union[int, float
         half_even_result = round(number, ndigits)
 
         # 如果保留位是偶数, 它的后一位是 5, 并且后面剩下的位都是 0.
-        if (get_number(number, ndigits) % 2 == 0 and
+        if (get_number(number, ndigits) & 1 == 0 and
                 get_number(number, ndigits + 1) == 5 and
                 number % (10 ** abs(ndigits + 1)) == 0):
             half_even_result += 10 ** abs(ndigits)
