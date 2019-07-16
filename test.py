@@ -8,7 +8,7 @@ from tempfile import TemporaryDirectory
 import pytest
 
 from util import (
-    Relationship, Memoize, clean_textarea, cls_fields,
+    CaseInsensitiveDict, Relationship, Memoize, clean_textarea, cls_fields,
     get_month_last_datetime, get_number, import_object, make_accessors,
     round_half_up, temporary_chdir, write_csv, yearly_ranges,
 )
@@ -23,6 +23,24 @@ class User:
     @classmethod
     def get(cls, user_id):
         return user_id
+
+
+def test_CaseInsensitiveDict():
+    d = CaseInsensitiveDict()
+    content_type = 'application/json'
+
+    # __setitem__, __getitem__
+    d['Content-Type'] = content_type
+    assert d['content-type'] == content_type
+
+    # get
+    assert d.get('content-Type') == content_type
+    assert d.get('dsa') is None
+    assert d.get('dasda', 1) == 1
+
+    # __delitem__, __contains__
+    del d['Content-Type']
+    assert 'Content-Type' not in d
 
 
 def test_Memoize():

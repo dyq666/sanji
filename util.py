@@ -1,6 +1,7 @@
 """一些工具函数, 绝大部分都不依赖第三方包, 小部分依赖的包也在 doc 中标注了."""
 
 __all__ = (
+    'CaseInsensitiveDict',
     'Memoize',
     'Relationship',
     'clean_textarea',
@@ -20,6 +21,7 @@ __all__ = (
 import csv
 import os
 import warnings
+from collections import UserDict
 from contextlib import contextmanager
 from datetime import datetime
 from decimal import Decimal, ROUND_HALF_UP
@@ -35,6 +37,31 @@ from typing import (
 if TYPE_CHECKING:
     from datetime import date
     from requests import Response
+
+
+class CaseInsensitiveDict(UserDict):
+
+    """
+    C: __setitem__
+    U: __setitem__
+    R: __getitem__, __contains__, get
+    D: __delitem__
+    """
+
+    def __getitem__(self, key):
+        return super().__getitem__(key.lower())
+
+    def __setitem__(self, key, value):
+        super().__setitem__(key.lower(), value)
+
+    def __delitem__(self, key):
+        super().__delitem__(key.lower())
+
+    def __contains__(self, key: str):
+        return super().__contains__(key.lower())
+
+    def get(self, key, default=None):
+        return super().get(key, default)
 
 
 class Memoize:
