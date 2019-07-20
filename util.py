@@ -210,6 +210,7 @@ def run_shell(context: Optional[dict] = None, plain: bool = False) -> NoReturn:
         import code
         code.interact(local=context)
     else:
+        # learn from https://github.com/ei-grad/flask-shell-ipython/blob/master/flask_shell_ipython.py
         try:
             import IPython
             from IPython.terminal.ipapp import load_default_config
