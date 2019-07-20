@@ -10,6 +10,7 @@ requests = "*"
 
 [packages]
 python-dateutil = "*"
+pycodestyle = "*"
 
 [requires]
 python_version = "3.6"
