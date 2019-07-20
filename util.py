@@ -212,7 +212,11 @@ def run_shell(context: Optional[dict] = None, plain: bool = False) -> NoReturn:
     else:
         try:
             import IPython
-            IPython.start_ipython(user_ns=context)
+            from IPython.terminal.ipapp import load_default_config
+            config = load_default_config()
+            config.TerminalInteractiveShell.banner1 = 'Preset Vars:\n%s\n' % '\n'.join(
+                f'  - {key}' for key in context.keys())
+            IPython.start_ipython(config=config, user_ns=context)
         except ImportError:
             warnings.warn('Must install ipython')
 
