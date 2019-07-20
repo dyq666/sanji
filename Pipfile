@@ -7,7 +7,6 @@ verify_ssl = true
 ipython = "*"
 pytest = "*"
 requests = "*"
-v = {editable = true,version = "*"}
 
 [packages]
 python-dateutil = "*"
