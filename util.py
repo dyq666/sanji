@@ -104,14 +104,15 @@ class Relationship:
         return func(instance_field_value)
 
 
-def clean_textarea(value: str, keep_inline_space: bool=True) -> Union[List[str], List[List[str]]]:
+def clean_textarea(value: str, keep_inline_space: bool = True
+                   ) -> Union[List[str], List[List[str]]]:
     rows = [r.strip() for r in value.splitlines() if r and not r.isspace()]
     return rows if keep_inline_space else [r.split() for r in rows]
 
 
 def cls_fields(cls: type) -> dict:
     """返回所有类属性"""
-    return { k: v for k, v in cls.__dict__.items() if not k.startswith('__') }
+    return {k: v for k, v in cls.__dict__.items() if not k.startswith('__')}
 
 
 def get_month_last_datetime(year: int, month: int) -> datetime:
@@ -120,10 +121,12 @@ def get_month_last_datetime(year: int, month: int) -> datetime:
     Require: pipenv install python-dateutil
     """
     from dateutil.relativedelta import relativedelta
-    return datetime(year, month, 1) + relativedelta(months=1) - relativedelta(seconds=1)
+    return (datetime(year, month, 1)
+            + relativedelta(months=1)
+            - relativedelta(seconds=1))
 
 
-def get_number(number: Union[int], ndigits: int=0) -> int:
+def get_number(number: Union[int], ndigits: int = 0) -> int:
     """获取某位上的数字
 
     `ndigits`: 与 `round()` 的参数 `ndigits` 保持一样的逻辑, 0 代表个位, -1 代表十位 ...
@@ -137,7 +140,7 @@ def get_number(number: Union[int], ndigits: int=0) -> int:
 def import_object(object_path: str) -> Any:
     try:
         dot = object_path.rindex('.')
-        module, obj = object_path[:dot], object_path[dot+1:]
+        module, obj = object_path[:dot], object_path[dot + 1:]
         return getattr(import_module(module), obj)
     # rindex        -> ValueError
     # import_module -> ModuleNotFoundError
@@ -146,8 +149,9 @@ def import_object(object_path: str) -> Any:
         raise ImportError(f'Cannot import {object_path}')
 
 
-def make_accessors(cls: type, target_pattern: str, func: Callable, const_owner: type,
-                   const_prefix: Optional[str] = None) -> NoReturn:
+def make_accessors(cls: type, target_pattern: str, func: Callable,
+                   const_owner: type, const_prefix: Optional[str] = None
+                   ) -> NoReturn:
     """
     1. 将要增加的类方法名由 target_pattern + const_owner 的所有类属性名组成,
 
@@ -180,7 +184,8 @@ def make_accessors(cls: type, target_pattern: str, func: Callable, const_owner: 
         setattr(cls, target_name, wrapped)
 
 
-def round_half_up(number: Union[int, float], ndigits: int=0) -> Union[int, float]:
+def round_half_up(number: Union[int, float],
+                  ndigits: int = 0) -> Union[int, float]:
     """四舍五入.
 
     `ndigits`: 与 `round()` 的参数 `ndigits` 保持一样的逻辑, 整数代表小数位, 0 代表个位, -1 代表十位 ...
@@ -191,14 +196,17 @@ def round_half_up(number: Union[int, float], ndigits: int=0) -> Union[int, float
         half_even_result = round(number, ndigits)
 
         # 如果保留位是偶数, 它的后一位是 5, 并且后面剩下的位都是 0.
-        if (get_number(number, ndigits) & 1 == 0 and
-                get_number(number, ndigits + 1) == 5 and
-                number % (10 ** abs(ndigits + 1)) == 0):
+        if (get_number(number, ndigits) & 1 == 0
+                and get_number(number, ndigits + 1) == 5
+                and number % (10 ** abs(ndigits + 1)) == 0):
             half_even_result += 10 ** abs(ndigits)
         return int(half_even_result)
 
     ndigits = Decimal(str(1 / (10 ** ndigits)))
-    return float(Decimal(str(number)).quantize(ndigits, rounding=ROUND_HALF_UP))
+    return (
+        float(Decimal(str(number))
+              .quantize(ndigits, rounding=ROUND_HALF_UP))
+    )
 
 
 def run_shell(context: Optional[dict] = None, plain: bool = False) -> NoReturn:
@@ -210,13 +218,15 @@ def run_shell(context: Optional[dict] = None, plain: bool = False) -> NoReturn:
         import code
         code.interact(local=context)
     else:
-        # learn from https://github.com/ei-grad/flask-shell-ipython/blob/master/flask_shell_ipython.py
+        # learn from
+        # https://github.com/ei-grad/flask-shell-ipython/blob/master/flask_shell_ipython.py
         try:
             import IPython
             from IPython.terminal.ipapp import load_default_config
             config = load_default_config()
-            config.TerminalInteractiveShell.banner1 = 'Preset Vars:\n%s\n' % '\n'.join(
+            prompt = 'Preset Vars:\n%s\n' % '\n'.join(
                 f'  - {key}' for key in context.keys())
+            config.TerminalInteractiveShell.banner1 = prompt
             IPython.start_ipython(config=config, user_ns=context)
         except ImportError:
             warnings.warn('Must install ipython')
@@ -233,7 +243,8 @@ def temporary_chdir(path: str) -> ContextManager:
         os.chdir(cwd)
 
 
-def upload(url: str, file: Union[str, IO[str]], file_name: str=None) -> 'Response':
+def upload(url: str, file: Union[str, IO[str]],
+           file_name: str = None) -> 'Response':
     """上传文件
 
     Require: pipenv install requests
@@ -250,13 +261,15 @@ def upload(url: str, file: Union[str, IO[str]], file_name: str=None) -> 'Respons
         file = open(file)
     else:
         if file_name is None:
-            raise ValueError('You must specify file_name arg, if file type is str')
+            raise ValueError('You must specify file_name arg, '
+                             'if file type is str')
 
     r = requests.post(url=url, files={'file': (file_name, file)})
     return r
 
 
-def write_csv(header: List[str], rows: List[List[str]], file_path: Optional[str]=None) -> Union[NoReturn, StringIO]:
+def write_csv(header: List[str], rows: List[List[str]],
+              file_path: Optional[str] = None) -> Union[NoReturn, StringIO]:
     """将数据写入 csv
 
     file_path: 如果不传入此参数, 则会返回一个 StringIO.
@@ -274,8 +287,9 @@ def write_csv(header: List[str], rows: List[List[str]], file_path: Optional[str]
         return
 
 
-def yearly_ranges(begin: Union['date', datetime], end: Union['date', datetime], years: int=1,
-                  find_date: Union['date' , datetime] = None) -> Union[List[Tuple], Tuple, None]:
+def yearly_ranges(begin: Union['date', datetime], end: Union['date', datetime],
+                  years: int = 1, find_date: Union['date', datetime] = None
+                  ) -> Union[List[Tuple], Tuple, None]:
     """生成的时间范围是左闭右开的.
 
     Require: pipenv install python-dateutil

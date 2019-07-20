@@ -67,7 +67,8 @@ def test_Relationship():
     class Book:
         user = Relationship('test.User', 'get', 'user_id')
 
-        def __init__(self, user_id): self.user_id = user_id
+        def __init__(self, user_id):
+            self.user_id = user_id
 
     assert Book(user_id=1).user == 1
 
@@ -86,9 +87,10 @@ def test_clean_textarea():
     1 a
     2\t\t b
     \t
-    3      c 
+    3      c
     """
-    assert clean_textarea(textarea, keep_inline_space=False) == [['1', 'a'], ['2', 'b'], ['3', 'c']]
+    assert clean_textarea(textarea, keep_inline_space=False) == \
+        [['1', 'a'], ['2', 'b'], ['3', 'c']]
 
 
 def test_cls_fields():
@@ -159,9 +161,11 @@ def test_make_accessor():
     # 如果新生成的方法名与现有的重复就会报错.
     with pytest.raises(ValueError):
         class Foo2:
-            def _is_status(self, status): pass
+            def _is_status(self, status):
+                pass
 
-            def is_a(self): pass
+            def is_a(self):
+                pass
 
         make_accessors(Foo, 'is_%s', Foo2._is_status, Status)
 
@@ -254,12 +258,16 @@ def test_yearly_ranges(date_cls):
         (date_cls(2019, 1, 2), date_cls(2020, 1, 1))
     ]
 
-    new_yearly_ranges = partial(yearly_ranges, date_cls(2019, 1, 2), date_cls(2022, 3, 2))
+    new_yearly_ranges = partial(yearly_ranges,
+                                date_cls(2019, 1, 2), date_cls(2022, 3, 2))
 
     assert new_yearly_ranges(find_date=date_cls(2019, 1, 1)) is None
     assert new_yearly_ranges(find_date=date_cls(2022, 3, 2)) is None
     assert new_yearly_ranges(find_date=date_cls(2022, 3, 3)) is None
 
-    assert new_yearly_ranges(find_date=date_cls(2019, 1, 2)) == (date_cls(2019, 1, 2), date_cls(2020, 1, 2))
-    assert new_yearly_ranges(find_date=date_cls(2020, 1, 1)) == (date_cls(2019, 1, 2), date_cls(2020, 1, 2))
-    assert new_yearly_ranges(find_date=date_cls(2022, 3, 1)) == (date_cls(2022, 1, 2), date_cls(2022, 3, 2))
+    assert new_yearly_ranges(find_date=date_cls(2019, 1, 2)) == \
+        (date_cls(2019, 1, 2), date_cls(2020, 1, 2))
+    assert new_yearly_ranges(find_date=date_cls(2020, 1, 1)) == \
+        (date_cls(2019, 1, 2), date_cls(2020, 1, 2))
+    assert new_yearly_ranges(find_date=date_cls(2022, 3, 1)) == \
+        (date_cls(2022, 1, 2), date_cls(2022, 3, 2))
