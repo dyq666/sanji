@@ -1,3 +1,6 @@
+shell:
+	pipenv run ipython
+
 test:
 	pipenv run pytest test.py
 
