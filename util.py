@@ -268,16 +268,25 @@ def upload(url: str, file: Union[str, IO[str]],
     return r
 
 
-def write_csv(header: List[str], rows: List[List[str]],
+def write_csv(header: List[str], rows: List[Union[list, dict]],
               file_path: Optional[str] = None) -> Union[NoReturn, StringIO]:
     """将数据写入 csv
 
     file_path: 如果不传入此参数, 则会返回一个 StringIO.
     """
+    assert len(rows), 'Rows cannot empty'
+
     file = StringIO() if file_path is None else open(file_path, 'w')
-    csv_f = csv.writer(file)
-    csv_f.writerow(header)
-    csv_f.writerows(rows)
+    if isinstance(rows[0], dict):
+        f_csv = csv.DictWriter(file, header)
+        f_csv.writeheader()
+        f_csv.writerows(rows)
+    elif isinstance(rows[0], list):
+        f_csv = csv.writer(file)
+        f_csv.writerow(header)
+        f_csv.writerows(rows)
+    else:
+        return
 
     if file_path is None:
         file.seek(0)

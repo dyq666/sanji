@@ -213,21 +213,30 @@ def test_temporary_chdir():
 # TODO test upload
 
 
-def test_write_csv():
-    header = ['name', 'sex']
-    rows = [['dyq', 'male'], ['yqd', 'female']]
-    csv_content = '\n'.join(['name,sex', 'dyq,male', 'yqd,female', ''])
+class TestWriteCSV:
 
-    file = write_csv(header, rows)
-    assert file.getvalue().replace('\r\n', '\n') == csv_content
+    def test_error(self):
+        with pytest.raises(AssertionError):
+            write_csv([], [])
 
-    # test arg:file_path
-    with TemporaryDirectory() as dirname:
-        file_path = os.path.join(dirname, 'data.csv')
-        write_csv(header, rows, file_path)
+    @pytest.mark.parametrize('rows', (
+        [['dyq', 'male'], ['yqd', 'female']],
+        [{'name': 'dyq', 'sex': 'male'}, {'name': 'yqd', 'sex': 'female'}],
+    ))
+    def test_row_is_list_or_dict(self, rows):
+        header = ['name', 'sex']
+        csv_content = '\n'.join(['name,sex', 'dyq,male', 'yqd,female', ''])
 
-        with open(file_path) as f:
-            assert f.read() == csv_content
+        file = write_csv(header, rows)
+        assert file.getvalue().replace('\r\n', '\n') == csv_content
+
+        # test arg:file_path
+        with TemporaryDirectory() as dirname:
+            file_path = os.path.join(dirname, 'data.csv')
+            write_csv(header, rows, file_path)
+
+            with open(file_path) as f:
+                assert f.read() == csv_content
 
 
 @pytest.mark.parametrize('date_cls', [date, datetime])
