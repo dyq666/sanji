@@ -261,8 +261,7 @@ def upload(url: str, file: Union[str, IO[str]],
         file = open(file)
     else:
         if file_name is None:
-            raise ValueError('You must specify file_name arg, '
-                             'if file type is str')
+            file_name = 'data.csv'
 
     r = requests.post(url=url, files={'file': (file_name, file)})
     return r
