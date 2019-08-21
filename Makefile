@@ -13,3 +13,6 @@ pep8:
 
 install:
 	pipenv install
+
+venv:
+	pipenv shell
