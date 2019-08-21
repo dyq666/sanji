@@ -224,7 +224,7 @@ class TestSequenceGrouper:
     @pytest.mark.parametrize('sequence', (
         list(range(10)), 'abcdefghij', '世界你好好世界再见见',
     ))
-    def test_full(self, sequence):
+    def test_not_empty(self, sequence):
         assert list(sequence_grouper(sequence, size=9)) == \
             [sequence[:9], sequence[9:10]]
         assert list(sequence_grouper(sequence, size=10)) == [sequence]
