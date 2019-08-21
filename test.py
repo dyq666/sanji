@@ -9,8 +9,9 @@ import pytest
 
 from util import (
     CaseInsensitiveDict, Relationship, Memoize, clean_textarea, cls_fields,
-    get_month_last_datetime, get_number, import_object, make_accessors,
-    round_half_up, sequence_grouper, temporary_chdir, write_csv, yearly_ranges,
+    get_month_last_datetime, get_number, import_object, is_subclass,
+    make_accessors, round_half_up, sequence_grouper, temporary_chdir,
+    write_csv, yearly_ranges,
 )
 
 
@@ -139,6 +140,17 @@ def test_import_object():
 
     with pytest.raises(ImportError):
         import_object('test.U')
+
+
+def test_is_subclass():
+    assert is_subclass(object, object)
+    assert not is_subclass(object, type)
+    with pytest.raises(TypeError):
+        is_subclass(1, object)
+
+    assert is_subclass(object, object, is_silent=True)
+    assert not is_subclass(object, type, is_silent=True)
+    assert not is_subclass(1, object, is_silent=True)
 
 
 def test_make_accessor():

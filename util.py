@@ -9,6 +9,7 @@ __all__ = (
     'get_month_last_datetime',
     'get_number',
     'import_object',
+    'is_subclass',
     'make_accessors',
     'round_half_up',
     'run_shell',
@@ -149,6 +150,17 @@ def import_object(object_path: str) -> Any:
     # getattr       -> AttributeError
     except (ValueError, ModuleNotFoundError, AttributeError):
         raise ImportError(f'Cannot import {object_path}')
+
+
+def is_subclass(sub_cls: type, base_cls: type, is_silent: bool = False
+                ) -> bool:
+    """当 sub_cls 参数传入的不是 type 类型, issubclass 会 raise TypeError"""
+    if not is_silent:
+        return issubclass(sub_cls, base_cls)
+    try:
+        return issubclass(sub_cls, base_cls)
+    except TypeError:
+        return False
 
 
 def make_accessors(cls: type, target_pattern: str, func: Callable,
