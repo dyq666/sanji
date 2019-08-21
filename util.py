@@ -12,6 +12,7 @@ __all__ = (
     'make_accessors',
     'round_half_up',
     'run_shell',
+    'sequence_grouper',
     'temporary_chdir',
     'upload',
     'write_csv',
@@ -19,6 +20,7 @@ __all__ = (
 )
 
 import csv
+import math
 import os
 import warnings
 from collections import UserDict
@@ -30,8 +32,8 @@ from importlib import import_module
 from inspect import signature
 from io import StringIO
 from typing import (
-    Any, Callable, ContextManager, IO, List,
-    NoReturn, Optional, Tuple, TYPE_CHECKING, Union,
+    Any, Callable, ContextManager, IO, Iterable, List,
+    NoReturn, Optional, Sequence, Tuple, TYPE_CHECKING, Union,
 )
 
 if TYPE_CHECKING:
@@ -230,6 +232,12 @@ def run_shell(context: Optional[dict] = None, plain: bool = False) -> NoReturn:
             IPython.start_ipython(config=config, user_ns=context)
         except ImportError:
             warnings.warn('Must install ipython')
+
+
+def sequence_grouper(sequence: Sequence, size: int) -> Iterable:
+    len_ = len(sequence)
+    times = math.ceil(len_ / size)
+    return (sequence[i * size: (i + 1) * size] for i in range(times))
 
 
 @contextmanager

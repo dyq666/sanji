@@ -10,7 +10,7 @@ import pytest
 from util import (
     CaseInsensitiveDict, Relationship, Memoize, clean_textarea, cls_fields,
     get_month_last_datetime, get_number, import_object, make_accessors,
-    round_half_up, temporary_chdir, write_csv, yearly_ranges,
+    round_half_up, sequence_grouper, temporary_chdir, write_csv, yearly_ranges,
 )
 
 
@@ -189,11 +189,7 @@ def test_make_accessor():
     assert not hasattr(Foo3, 'is_c')
 
 
-# TODO test run_shell
-
-
 def test_round_half_up():
-
     assert round_half_up(10499, -3) == 10000
     assert round_half_up(10510, -3) == 11000
 
@@ -202,6 +198,25 @@ def test_round_half_up():
 
     assert round(0.155, 2) == 0.15
     assert round_half_up(0.155, 2) == 0.16
+
+
+# TODO test run_shell
+
+
+class TestSequenceGrouper:
+
+    @pytest.mark.parametrize('sequence', ([], ''))
+    def test_empty(self, sequence):
+        assert list(sequence_grouper(sequence, size=9)) == []
+
+    @pytest.mark.parametrize('sequence', (
+        list(range(10)), 'abcdefghij', '世界你好好世界再见见',
+    ))
+    def test_full(self, sequence):
+        assert list(sequence_grouper(sequence, size=9)) == \
+            [sequence[:9], sequence[9:10]]
+        assert list(sequence_grouper(sequence, size=10)) == [sequence]
+        assert list(sequence_grouper(sequence, size=11)) == [sequence]
 
 
 def test_temporary_chdir():
