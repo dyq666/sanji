@@ -9,8 +9,8 @@ import pytest
 
 from util import (
     CaseInsensitiveDict, Relationship, Memoize, clean_textarea, cls_fields,
-    get_month_last_datetime, get_number, import_object, is_subclass,
-    make_accessors, round_half_up, sequence_grouper, temporary_chdir,
+    flat_iterable, get_month_last_datetime, get_number, import_object,
+    is_subclass, make_accessors, round_half_up, sequence_grouper, temporary_chdir,
     write_csv, yearly_ranges,
 )
 
@@ -106,6 +106,23 @@ def test_cls_fields():
             pass
 
     assert set(dict(cls_fields(Foo)).keys()) == {'bar', 'foo', '_a'}
+
+
+class TestFlatIterable:
+
+    @pytest.mark.parametrize('iterable', ('', [], {}))
+    def test_empty(self, iterable):
+        assert flat_iterable(iterable) == ()
+
+    def test_collection_cls(self):
+        iterable = [[1, 2], [2, 3]]
+        assert flat_iterable(iterable, list) == [1, 2, 2, 3]
+        assert flat_iterable(iterable, tuple) == (1, 2, 2, 3)
+        assert flat_iterable(iterable, set) == {1, 2, 3}
+
+    def test_generator(self):
+        generator = ([i] for i in range(10))
+        assert flat_iterable(generator) == tuple(range(10))
 
 
 def test_get_month_last_datetime():

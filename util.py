@@ -7,6 +7,7 @@ __all__ = (
     'clean_textarea',
     'cls_fields',
     'get_month_last_datetime',
+    'flat_iterable',
     'get_number',
     'import_object',
     'is_subclass',
@@ -31,9 +32,10 @@ from decimal import Decimal, ROUND_HALF_UP
 from functools import partial
 from importlib import import_module
 from inspect import signature
+from itertools import chain
 from io import StringIO
 from typing import (
-    Any, Callable, ContextManager, Dict, IO, Iterable, List,
+    Any, Callable, ContextManager, IO, Iterable, List,
     NoReturn, Optional, Sequence, Tuple, TYPE_CHECKING, Union,
 )
 
@@ -116,6 +118,10 @@ def clean_textarea(value: str, keep_inline_space: bool = True
 def cls_fields(cls: type) -> dict:
     """返回所有类属性"""
     return {k: v for k, v in cls.__dict__.items() if not k.startswith('__')}
+
+
+def flat_iterable(iterable: Iterable, sequence_cls: Callable = tuple) -> Sequence:
+    return sequence_cls(chain(*iterable))
 
 
 def get_month_last_datetime(year: int, month: int) -> datetime:
