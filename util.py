@@ -267,12 +267,10 @@ def upload(url: str, file: Union[str, IO[str]],
            file_name: str = None) -> 'Response':
     """上传文件
 
-    Require: pipenv install requests
-
     file: 可以是一个 str 代表文件路径, 也可以是一个类文件对象, 比如 io.StringIO.
 
-    file_name: 上传的文件名, 如果不指定并且 ``file`` 是 str 则从 ``file`` 中提取,
-               如果 ``file`` 不是 str 则必须指定.
+    file_name: 上传的文件名, 如果不指定并且 ``file`` 类型是 str 则从 ``file`` 中提取,
+               如果 ``file`` 类型不是 str, 则默认值为 data.csv
     """
     import requests
 
@@ -280,8 +278,7 @@ def upload(url: str, file: Union[str, IO[str]],
         file_name = os.path.split(file)[1] if file_name is None else file_name
         file = open(file)
     else:
-        if file_name is None:
-            file_name = 'data.csv'
+        file_name = 'data.csv' if file_name is None else file_name
 
     r = requests.post(url=url, files={'file': (file_name, file)})
     return r
