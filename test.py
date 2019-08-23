@@ -242,22 +242,35 @@ def test_temporary_chdir():
 
 class TestWriteCSV:
 
-    def test_error(self):
-        with pytest.raises(AssertionError):
-            write_csv([], [])
+    header = ('name', 'sex')
+    rows = (('father', 'male'), ('mother', 'female'))
+    content = 'name,sex\nfather,male\nmother,female\n'
 
-    @pytest.mark.parametrize('rows', (
-        [['dyq', 'male'], ['yqd', 'female']],
-        [{'name': 'dyq', 'sex': 'male'}, {'name': 'yqd', 'sex': 'female'}],
-    ))
-    def test_row_is_list_or_dict(self, rows):
-        header = ['name', 'sex']
-        csv_content = '\n'.join(['name,sex', 'dyq,male', 'yqd,female', ''])
+    def test_expected_exceptions(self):
+        with pytest.raises(ValueError):
+            write_csv((), ())
+        with pytest.raises(TypeError):
+            write_csv(('1',), ({1}))
+
+    def test_row_item_type(self):
+        rows_fixtures = (
+            self.rows,
+            tuple(list(row) for row in self.rows),
+            tuple({header: datum for header, datum in zip(self.header, row)}
+                  for row in self.rows),
+        )
+        for rows in rows_fixtures:
+            file = write_csv(self.header, rows)
+            assert file.getvalue().replace('\r\n', '\n') == self.content
+
+    def test_out_path_arg(self):
+        header = self.header
+        rows = self.rows
+        csv_content = self.content
 
         file = write_csv(header, rows)
         assert file.getvalue().replace('\r\n', '\n') == csv_content
 
-        # test arg:file_path
         with TemporaryDirectory() as dirname:
             file_path = os.path.join(dirname, 'data.csv')
             write_csv(header, rows, file_path)

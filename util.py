@@ -33,7 +33,7 @@ from importlib import import_module
 from inspect import signature
 from io import StringIO
 from typing import (
-    Any, Callable, ContextManager, IO, Iterable, List,
+    Any, Callable, ContextManager, Dict, IO, Iterable, List,
     NoReturn, Optional, Sequence, Tuple, TYPE_CHECKING, Union,
 )
 
@@ -287,27 +287,35 @@ def upload(url: str, file: Union[str, IO[str]],
     return r
 
 
-def write_csv(header: List[str], rows: List[Union[list, dict]],
-              file_path: Optional[str] = None) -> Union[NoReturn, StringIO]:
+def write_csv(header: Tuple[str, ...],
+              rows: Union[Tuple[dict, ...], Tuple[list, ...], Tuple[tuple, ...]],
+              out_path: Optional[str] = None
+              ) -> Union[NoReturn, StringIO]:
     """将数据写入 csv
 
-    file_path: 如果不传入此参数, 则会返回一个 StringIO.
-    """
-    assert len(rows), 'Rows cannot empty'
+    header: 标题
 
-    file = StringIO() if file_path is None else open(file_path, 'w')
+    rows: 数据行
+
+    out_path: 不传会返回一个 StringIO, 传则写入此路径.
+    """
+    if not header or not rows:
+        raise ValueError('header or rows should not empty')
+    if not isinstance(rows[0], (dict, list, tuple)):
+        raise TypeError('type of row item must be dict or tuple or list')
+
+    file = StringIO() if out_path is None else open(out_path, 'w')
+
     if isinstance(rows[0], dict):
         f_csv = csv.DictWriter(file, header)
         f_csv.writeheader()
         f_csv.writerows(rows)
-    elif isinstance(rows[0], list):
+    else:
         f_csv = csv.writer(file)
         f_csv.writerow(header)
         f_csv.writerows(rows)
-    else:
-        return
 
-    if file_path is None:
+    if out_path is None:
         file.seek(0)
         return file
     else:
