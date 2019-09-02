@@ -74,6 +74,9 @@ def test_Relationship():
     assert Book(user_id=1).user == 1
 
 
+# TODO test SessionWithUrlPrefix
+
+
 def test_clean_textarea():
     textarea = """
     1

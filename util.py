@@ -4,6 +4,7 @@ __all__ = (
     'CaseInsensitiveDict',
     'Memoize',
     'Relationship',
+    'SessionWithUrlPrefix',
     'clean_textarea',
     'cls_fields',
     'get_month_last_datetime',
@@ -34,6 +35,7 @@ from importlib import import_module
 from inspect import signature
 from itertools import chain
 from io import StringIO
+from requests import Session
 from typing import (
     Any, Callable, ContextManager, IO, Iterable, List,
     NoReturn, Optional, Sequence, Tuple, TYPE_CHECKING, Union,
@@ -107,6 +109,30 @@ class Relationship:
         func = getattr(imported_cls, self.cls_method)
         instance_field_value = getattr(instance, self.instance_field_name)
         return func(instance_field_value)
+
+
+class SessionWithUrlPrefix(Session):
+
+    """
+    >>> s = SessionWithUrlPrefix('http://localhost')
+    >>> s.get('/api')
+    >>> s.post('/api')
+    """
+
+    def __init__(self, url_prefix: Optional[str] = None):
+        super().__init__()
+        self.url_prefix = url_prefix
+
+    def __repr__(self):
+        return (
+            f'<{self.__class__.__name__}'
+            f' url_prefix={self.url_prefix}'
+            f'>'
+        )
+
+    def request(self, method: str, url: str, *args, **kwargs) -> 'Response':
+        url = self.url_prefix + url if self.url_prefix is not None else url
+        return super().request(method, url, *args, **kwargs)
 
 
 def clean_textarea(value: str, keep_inline_space: bool = True
