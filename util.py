@@ -1,13 +1,9 @@
-"""一些工具函数, 绝大部分都不依赖第三方包, 小部分依赖的包也在 doc 中标注了."""
-
 __all__ = (
     'CaseInsensitiveDict',
     'Memoize',
     'Relationship',
-    'SessionWithUrlPrefix',
     'clean_textarea',
     'cls_fields',
-    'get_month_last_datetime',
     'flat_iterable',
     'get_number',
     'import_object',
@@ -17,9 +13,7 @@ __all__ = (
     'run_shell',
     'sequence_grouper',
     'temporary_chdir',
-    'upload',
     'write_csv',
-    'yearly_ranges',
 )
 
 import csv
@@ -28,22 +22,16 @@ import os
 import warnings
 from collections import UserDict
 from contextlib import contextmanager
-from datetime import datetime
 from decimal import Decimal, ROUND_HALF_UP
 from functools import partial
 from importlib import import_module
 from inspect import signature
 from itertools import chain
 from io import StringIO
-from requests import Session
 from typing import (
-    Any, Callable, ContextManager, IO, Iterable, List,
-    NoReturn, Optional, Sequence, Tuple, TYPE_CHECKING, Union,
+    Any, Callable, ContextManager, Iterable, List,
+    NoReturn, Optional, Sequence, Tuple, Union,
 )
-
-if TYPE_CHECKING:
-    from datetime import date
-    from requests import Response
 
 
 class CaseInsensitiveDict(UserDict):
@@ -111,30 +99,6 @@ class Relationship:
         return func(instance_field_value)
 
 
-class SessionWithUrlPrefix(Session):
-
-    """
-    >>> s = SessionWithUrlPrefix('http://localhost')
-    >>> s.get('/api')
-    >>> s.post('/api')
-    """
-
-    def __init__(self, url_prefix: Optional[str] = None):
-        super().__init__()
-        self.url_prefix = url_prefix
-
-    def __repr__(self):
-        return (
-            f'<{self.__class__.__name__}'
-            f' url_prefix={self.url_prefix}'
-            f'>'
-        )
-
-    def request(self, method: str, url: str, *args, **kwargs) -> 'Response':
-        url = self.url_prefix + url if self.url_prefix is not None else url
-        return super().request(method, url, *args, **kwargs)
-
-
 def clean_textarea(value: str, keep_inline_space: bool = True
                    ) -> Union[List[str], List[List[str]]]:
     rows = [r.strip() for r in value.splitlines() if r and not r.isspace()]
@@ -148,17 +112,6 @@ def cls_fields(cls: type) -> dict:
 
 def flat_iterable(iterable: Iterable, sequence_cls: Callable = tuple) -> Sequence:
     return sequence_cls(chain(*iterable))
-
-
-def get_month_last_datetime(year: int, month: int) -> datetime:
-    """本月最后一秒
-
-    Require: pipenv install python-dateutil
-    """
-    from dateutil.relativedelta import relativedelta
-    return (datetime(year, month, 1)
-            + relativedelta(months=1)
-            - relativedelta(seconds=1))
 
 
 def get_number(number: Union[int], ndigits: int = 0) -> int:
@@ -295,27 +248,6 @@ def temporary_chdir(path: str) -> ContextManager:
         os.chdir(cwd)
 
 
-def upload(url: str, file: Union[str, IO[str]],
-           file_name: str = None) -> 'Response':
-    """上传文件
-
-    file: 可以是一个 str 代表文件路径, 也可以是一个类文件对象, 比如 io.StringIO.
-
-    file_name: 上传的文件名, 如果不指定并且 ``file`` 类型是 str 则从 ``file`` 中提取,
-               如果 ``file`` 类型不是 str, 则默认值为 data.csv
-    """
-    import requests
-
-    if isinstance(file, str):
-        file_name = os.path.split(file)[1] if file_name is None else file_name
-        file = open(file)
-    else:
-        file_name = 'data.csv' if file_name is None else file_name
-
-    r = requests.post(url=url, files={'file': (file_name, file)})
-    return r
-
-
 def write_csv(header: Tuple[str, ...],
               rows: Union[Tuple[dict, ...], Tuple[list, ...], Tuple[tuple, ...]],
               out_path: Optional[str] = None
@@ -350,49 +282,3 @@ def write_csv(header: Tuple[str, ...],
     else:
         file.close()
         return
-
-
-def yearly_ranges(begin: Union['date', datetime], end: Union['date', datetime],
-                  years: int = 1, find_date: Union['date', datetime] = None
-                  ) -> Union[List[Tuple], Tuple, None]:
-    """生成的时间范围是左闭右开的.
-
-    Require: pipenv install python-dateutil
-
-    如果不指定 find_date 则会生成如下格式的生成器 (都是左闭右开的):
-    [
-        (begin,          one_year_later),
-        (one_year_later, two_year_later),
-        (two_year_later, end)
-    ]
-
-    如果指定 find_date, 则从上面生成的范围中找到一个合适的范围, 如果没有则返回 None, 有返回如下结构
-    (
-        begin, end
-    )
-    """
-
-    if begin > end:
-        raise ValueError('begin time must <= end time')
-    if years <= 0:
-        raise ValueError('years must >= 1')
-
-    from dateutil.relativedelta import relativedelta
-
-    ranges = []
-    while True:
-        few_years_later = begin + relativedelta(years=years)
-        if few_years_later >= end:
-            ranges.append((begin, end))
-            break
-        ranges.append((begin, few_years_later))
-        begin = few_years_later
-
-    if find_date is None:
-        return ranges
-
-    if find_date < ranges[0][0] or find_date >= ranges[-1][-1]:
-        return
-    for begin, end in ranges:
-        if find_date < end:
-            return begin, end

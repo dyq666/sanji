@@ -9,10 +9,11 @@ import pytest
 
 from util import (
     CaseInsensitiveDict, Relationship, Memoize, clean_textarea, cls_fields,
-    flat_iterable, get_month_last_datetime, get_number, import_object,
+    flat_iterable, get_number, import_object,
     is_subclass, make_accessors, round_half_up, sequence_grouper, temporary_chdir,
-    write_csv, yearly_ranges,
+    write_csv
 )
+from util_dateutil import yearly_ranges
 
 
 class User:
@@ -126,20 +127,6 @@ class TestFlatIterable:
     def test_generator(self):
         generator = ([i] for i in range(10))
         assert flat_iterable(generator) == tuple(range(10))
-
-
-def test_get_month_last_datetime():
-    new_datetime = partial(datetime, hour=23, minute=59, second=59)
-
-    # 测试闰年
-    # 整除 4, 但不整除 200
-    assert get_month_last_datetime(2020, 2) == new_datetime(2020, 2, 29)
-    # 整除 4, 且整除 200, 但整除 400
-    assert get_month_last_datetime(2000, 2) == new_datetime(2000, 2, 29)
-
-    # 测试第一个月和最后一个月
-    assert get_month_last_datetime(2019, 1) == new_datetime(2019, 1, 31)
-    assert get_month_last_datetime(2019, 12) == new_datetime(2019, 12, 31)
 
 
 def test_get_number():

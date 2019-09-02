@@ -6,11 +6,11 @@ verify_ssl = true
 [dev-packages]
 ipython = "*"
 pytest = "*"
-requests = "*"
+pycodestyle = "*"
 
 [packages]
+requests = "*"
 python-dateutil = "*"
-pycodestyle = "*"
 
 [requires]
 python_version = "3.6"
