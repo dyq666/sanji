@@ -10,7 +10,6 @@ __all__ = (
     'is_subclass',
     'make_accessors',
     'round_half_up',
-    'run_shell',
     'sequence_grouper',
     'temporary_chdir',
     'write_csv',
@@ -19,7 +18,6 @@ __all__ = (
 import csv
 import math
 import os
-import warnings
 from collections import UserDict
 from contextlib import contextmanager
 from decimal import Decimal, ROUND_HALF_UP
@@ -206,29 +204,6 @@ def round_half_up(number: Union[int, float],
         float(Decimal(str(number))
               .quantize(ndigits, rounding=ROUND_HALF_UP))
     )
-
-
-def run_shell(context: Optional[dict] = None, plain: bool = False) -> NoReturn:
-    """启动预置变量的交互 shell
-
-    Require: pipenv install ipython
-    """
-    if plain:
-        import code
-        code.interact(local=context)
-    else:
-        # learn from
-        # https://github.com/ei-grad/flask-shell-ipython/blob/master/flask_shell_ipython.py
-        try:
-            import IPython
-            from IPython.terminal.ipapp import load_default_config
-            config = load_default_config()
-            prompt = 'Preset Vars:\n%s\n' % '\n'.join(
-                f'  - {key}' for key in context.keys())
-            config.TerminalInteractiveShell.banner1 = prompt
-            IPython.start_ipython(config=config, user_ns=context)
-        except ImportError:
-            warnings.warn('Must install ipython')
 
 
 def sequence_grouper(sequence: Sequence, size: int) -> Iterable:

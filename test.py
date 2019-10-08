@@ -219,9 +219,6 @@ def test_round_half_up():
     assert round_half_up(0.155, 2) == 0.16
 
 
-# TODO test run_shell
-
-
 class TestSequenceGrouper:
 
     @pytest.mark.parametrize('sequence', ([], ''))
