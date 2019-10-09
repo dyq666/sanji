@@ -9,9 +9,8 @@ import pytest
 
 from util import (
     CaseInsensitiveDict, Relationship, Memoize, clean_textarea, cls_fields,
-    flat_iterable, get_number, import_object,
-    is_subclass, make_accessors, round_half_up, sequence_grouper, temporary_chdir,
-    write_csv
+    flat_iterable, import_object, is_subclass, make_accessors, round_half_up,
+    sequence_grouper, temporary_chdir, write_csv,
 )
 from util_dateutil import yearly_ranges
 
@@ -129,18 +128,6 @@ class TestFlatIterable:
         assert flat_iterable(generator) == tuple(range(10))
 
 
-def test_get_number():
-    groups = [
-        (14230, [1, 4, 2, 3, 0]),
-        (9999, [9, 9, 9, 9]),
-    ]
-    for i, (number, res) in enumerate(groups):
-        assert get_number(number, -i) == res[-(i + 1)]
-
-    with pytest.raises(ValueError):
-        get_number(13212, 1)
-
-
 def test_import_object():
     Cls = import_object('test.User')
     assert hasattr(Cls, 'get')
@@ -209,14 +196,23 @@ def test_make_accessor():
 
 
 def test_round_half_up():
+    # 四舍五入, round 是奇进偶舍
     assert round_half_up(10499, -3) == 10000
-    assert round_half_up(10510, -3) == 11000
-
-    assert round(10500, -3) == 10000
     assert round_half_up(10500, -3) == 11000
+    assert round(10500, -3) == 10000
+    assert round_half_up(10501, -3) == 11000
 
+    # 0.155 是无限小数, 0.154999...
+    # 因此无论是奇进偶舍还是四舍五入都应该变为 0.16
     assert round(0.155, 2) == 0.15
     assert round_half_up(0.155, 2) == 0.16
+
+    # 0.125 和 0.375 都是有限小数
+    # 可以看出奇进偶舍和四舍五入的区别
+    assert round(0.125, 2) == 0.12
+    assert round(0.375, 2) == 0.38
+    assert round_half_up(0.125, 2) == 0.13
+    assert round_half_up(0.375, 2) == 0.38
 
 
 class TestSequenceGrouper:
