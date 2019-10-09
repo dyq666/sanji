@@ -10,7 +10,7 @@ import pytest
 from util import (
     CaseInsensitiveDict, Relationship, Memoize, clean_textarea, cls_fields,
     flat_iterable, import_object, is_subclass, make_accessors, round_half_up,
-    sequence_grouper, temporary_chdir, write_csv,
+    sequence_grouper, write_csv,
 )
 from util_dateutil import yearly_ranges
 
@@ -72,9 +72,6 @@ def test_Relationship():
             self.user_id = user_id
 
     assert Book(user_id=1).user == 1
-
-
-# TODO test SessionWithUrlPrefix
 
 
 def test_clean_textarea():
@@ -231,15 +228,6 @@ class TestSequenceGrouper:
         assert list(sequence_grouper(sequence, size=11)) == [sequence]
 
 
-def test_temporary_chdir():
-    with temporary_chdir('/'):
-        assert os.getcwd() == '/'
-    assert os.getcwd()[-4:] == 'util'
-
-
-# TODO test upload
-
-
 class TestWriteCSV:
 
     header = ('name', 'sex')
@@ -277,6 +265,9 @@ class TestWriteCSV:
 
             with open(file_path) as f:
                 assert f.read() == csv_content
+
+
+"""test dateutil util"""
 
 
 @pytest.mark.parametrize('date_cls', [date, datetime])

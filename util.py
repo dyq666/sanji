@@ -10,15 +10,12 @@ __all__ = (
     'make_accessors',
     'round_half_up',
     'sequence_grouper',
-    'temporary_chdir',
     'write_csv',
 )
 
 import csv
 import math
-import os
 from collections import UserDict
-from contextlib import contextmanager
 from decimal import ROUND_HALF_UP, Decimal
 from functools import partial
 from importlib import import_module
@@ -26,7 +23,7 @@ from inspect import signature
 from itertools import chain
 from io import StringIO
 from typing import (
-    Any, Callable, ContextManager, Iterable, List,
+    Any, Callable, Iterable, List,
     NoReturn, Optional, Sequence, Tuple, Union,
 )
 
@@ -201,17 +198,6 @@ def sequence_grouper(sequence: Sequence, size: int) -> Iterable:
     len_ = len(sequence)
     times = math.ceil(len_ / size)
     return (sequence[i * size: (i + 1) * size] for i in range(times))
-
-
-@contextmanager
-def temporary_chdir(path: str) -> ContextManager:
-    """在 with 环境下修改工作目录"""
-    cwd = os.getcwd()
-    os.chdir(path)
-    try:
-        yield
-    finally:
-        os.chdir(cwd)
 
 
 def write_csv(header: Tuple[str, ...],
