@@ -188,22 +188,22 @@ def sequence_grouper(sequence: Sequence, size: int) -> Iterable:
 
 def write_csv(header: Tuple[str, ...],
               rows: Union[Tuple[dict, ...], Tuple[list, ...], Tuple[tuple, ...]],
-              out_path: Optional[str] = None
-              ) -> Union[NoReturn, StringIO]:
+              file_path: Optional[str] = None
+              ) -> Optional[StringIO]:
     """将数据写入 csv
 
     header: 标题
 
     rows: 数据行
 
-    out_path: 不传会返回一个 StringIO, 传则写入此路径.
+    file_path: 不传会返回一个 StringIO, 传则写入此路径.
     """
     if not header or not rows:
         raise ValueError('header or rows should not empty')
     if not isinstance(rows[0], (dict, list, tuple)):
         raise TypeError('type of row item must be dict or tuple or list')
 
-    file = StringIO() if out_path is None else open(out_path, 'w')
+    file = StringIO() if file_path is None else open(file_path, 'w')
 
     if isinstance(rows[0], dict):
         f_csv = csv.DictWriter(file, header)
@@ -214,7 +214,7 @@ def write_csv(header: Tuple[str, ...],
         f_csv.writerow(header)
         f_csv.writerows(rows)
 
-    if out_path is None:
+    if file_path is None:
         file.seek(0)
         return file
     else:
