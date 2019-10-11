@@ -52,11 +52,17 @@ class CaseInsensitiveDict(UserDict):
 
 
 class Memoize:
-    """一个缓存属性, 使用方法类似 @property, 区别是被此装饰器包裹的属性只会计算一次."""
+    """缓存属性.
+
+    类似 property, 区别是 memoize 的属性只会计算一次.
+    需要注意的是类中不应该有和 `self.cache_key` 相同的属性.
+    """
 
     def __init__(self, fget):
         self.fget = fget
-        self.cache_key = 'cache_key_' + fget.__name__
+        # property 也设置了 __doc__.
+        self.__doc__ = fget.__doc__
+        self.cache_key = '__cache_' + fget.__name__
 
     def __get__(self, instance, owner):
         if instance is None:

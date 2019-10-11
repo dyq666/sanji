@@ -48,16 +48,22 @@ def test_Memoize():
 
         @Memoize
         def foo(self):
-            return self.id
+            """I am foo"""
+            return self.id + 100
+
+    assert Foo.foo.__doc__ == 'I am foo'
 
     f = Foo()
 
     assert not hasattr(f, 'cache_key_foo')
-    assert f.foo == 1
-    assert f.cache_key_foo == 1
+    assert f.foo == f.__cache_foo == 101
 
     f.id = 2
-    assert f.foo == 1
+    assert f.foo == f.__cache_foo == 101
+
+    # 直接改缓存的属性
+    f.__cache_foo = 2
+    assert f.foo == f.__cache_foo == 2
 
 
 def test_Relationship():
