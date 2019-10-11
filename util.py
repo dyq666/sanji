@@ -3,7 +3,6 @@ __all__ = (
     'Memoize',
     'Relationship',
     'clean_textarea',
-    'cls_fields',
     'flat_iterable',
     'import_object',
     'make_accessors',
@@ -98,11 +97,6 @@ def clean_textarea(value: str, keep_inline_space: bool = True
                    ) -> Union[List[str], List[List[str]]]:
     rows = [r.strip() for r in value.splitlines() if r and not r.isspace()]
     return rows if keep_inline_space else [r.split() for r in rows]
-
-
-def cls_fields(cls: type) -> dict:
-    """返回所有类属性"""
-    return {k: v for k, v in cls.__dict__.items() if not k.startswith('__')}
 
 
 def flat_iterable(iterable: Iterable, sequence_cls: Callable = tuple) -> Sequence:

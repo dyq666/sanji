@@ -6,7 +6,7 @@ from tempfile import TemporaryDirectory
 import pytest
 
 from util import (
-    CaseInsensitiveDict, Relationship, Memoize, clean_textarea, cls_fields,
+    CaseInsensitiveDict, Relationship, Memoize, clean_textarea,
     flat_iterable, import_object, make_accessors, round_half_up,
     sequence_grouper, write_csv,
 )
@@ -89,20 +89,6 @@ def test_clean_textarea():
     """
     assert clean_textarea(textarea, keep_inline_space=False) == \
         [['1', 'a'], ['2', 'b'], ['3', 'c']]
-
-
-def test_cls_fields():
-    class Foo:
-        bar = 1
-        _a = 2
-
-        def __init__(self):
-            pass
-
-        def foo(self):
-            pass
-
-    assert set(dict(cls_fields(Foo)).keys()) == {'bar', 'foo', '_a'}
 
 
 class TestFlatIterable:
