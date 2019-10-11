@@ -93,6 +93,10 @@ class Relationship:
 
 def clean_textarea(value: str, keep_inline_space: bool = True
                    ) -> Union[List[str], List[List[str]]]:
+    """在字符串中获取数据.
+
+    keep_inline_space: 是否拆分一行中的数据
+    """
     rows = [r.strip() for r in value.splitlines() if r and not r.isspace()]
     return rows if keep_inline_space else [r.split() for r in rows]
 
