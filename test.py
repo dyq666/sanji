@@ -1,8 +1,6 @@
 __all__ = ()
 
 import os
-from datetime import date, datetime
-from functools import partial
 from tempfile import TemporaryDirectory
 
 import pytest
@@ -12,7 +10,6 @@ from util import (
     flat_iterable, import_object, is_subclass, make_accessors, round_half_up,
     sequence_grouper, write_csv,
 )
-from util_dateutil import yearly_ranges
 
 
 class User:
@@ -265,49 +262,3 @@ class TestWriteCSV:
 
             with open(file_path) as f:
                 assert f.read() == csv_content
-
-
-"""test dateutil util"""
-
-
-@pytest.mark.parametrize('date_cls', [date, datetime])
-def test_yearly_ranges(date_cls):
-    with pytest.raises(ValueError):
-        yearly_ranges(date_cls(2019, 1, 2), date_cls(2019, 1, 1))
-    with pytest.raises(ValueError):
-        yearly_ranges(date_cls(2019, 1, 1), date_cls(2019, 1, 2), 0)
-
-    # 测试开始和结束时间相同
-    assert yearly_ranges(date_cls(2019, 1, 2), date_cls(2019, 1, 2)) == [
-        (date_cls(2019, 1, 2), date_cls(2019, 1, 2))
-    ]
-
-    # 测试结束比开始多一年
-    assert yearly_ranges(date_cls(2019, 1, 2), date_cls(2020, 1, 2)) == [
-        (date_cls(2019, 1, 2), date_cls(2020, 1, 2))
-    ]
-
-    # 测试结束比开始多一年 + 一天
-    assert yearly_ranges(date_cls(2019, 1, 2), date_cls(2020, 1, 3)) == [
-        (date_cls(2019, 1, 2), date_cls(2020, 1, 2)),
-        (date_cls(2020, 1, 2), date_cls(2020, 1, 3)),
-    ]
-
-    # 测试结束比开始多一年 - -天
-    assert yearly_ranges(date_cls(2019, 1, 2), date_cls(2020, 1, 1)) == [
-        (date_cls(2019, 1, 2), date_cls(2020, 1, 1))
-    ]
-
-    new_yearly_ranges = partial(yearly_ranges,
-                                date_cls(2019, 1, 2), date_cls(2022, 3, 2))
-
-    assert new_yearly_ranges(find_date=date_cls(2019, 1, 1)) is None
-    assert new_yearly_ranges(find_date=date_cls(2022, 3, 2)) is None
-    assert new_yearly_ranges(find_date=date_cls(2022, 3, 3)) is None
-
-    assert new_yearly_ranges(find_date=date_cls(2019, 1, 2)) == \
-        (date_cls(2019, 1, 2), date_cls(2020, 1, 2))
-    assert new_yearly_ranges(find_date=date_cls(2020, 1, 1)) == \
-        (date_cls(2019, 1, 2), date_cls(2020, 1, 2))
-    assert new_yearly_ranges(find_date=date_cls(2022, 3, 1)) == \
-        (date_cls(2022, 1, 2), date_cls(2022, 3, 2))
