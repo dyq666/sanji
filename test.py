@@ -7,8 +7,7 @@ import pytest
 
 from util import (
     CaseInsensitiveDict, Relationship, Memoize, clean_textarea,
-    flat_iterable, import_object, make_accessors, round_half_up,
-    sequence_grouper, write_csv,
+    import_object, make_accessors, round_half_up, sequence_grouper, write_csv,
 )
 
 
@@ -89,23 +88,6 @@ def test_clean_textarea():
     """
     assert clean_textarea(textarea, keep_inline_space=False) == \
         [['1', 'a'], ['2', 'b'], ['3', 'c']]
-
-
-class TestFlatIterable:
-
-    @pytest.mark.parametrize('iterable', ('', [], {}))
-    def test_empty(self, iterable):
-        assert flat_iterable(iterable) == ()
-
-    def test_collection_cls(self):
-        iterable = [[1, 2], [2, 3]]
-        assert flat_iterable(iterable, list) == [1, 2, 2, 3]
-        assert flat_iterable(iterable, tuple) == (1, 2, 2, 3)
-        assert flat_iterable(iterable, set) == {1, 2, 3}
-
-    def test_generator(self):
-        generator = ([i] for i in range(10))
-        assert flat_iterable(generator) == tuple(range(10))
 
 
 def test_import_object():
