@@ -214,12 +214,12 @@ def test_round_half_up():
 
 class TestSequenceGrouper:
 
-    @pytest.mark.parametrize('sequence', ([], ''))
+    @pytest.mark.parametrize('sequence', ([], '', (), b''))
     def test_empty(self, sequence):
         assert list(sequence_grouper(sequence, size=9)) == []
 
     @pytest.mark.parametrize('sequence', (
-        list(range(10)), 'abcdefghij', '世界你好好世界再见见',
+        list(range(10)), '世界你好好世界再见见', tuple(range(10)), bytearray(range(10))
     ))
     def test_not_empty(self, sequence):
         assert list(sequence_grouper(sequence, size=9)) == \

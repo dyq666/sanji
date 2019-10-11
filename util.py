@@ -195,8 +195,8 @@ def round_half_up(number: Number, ndigits: int = 0) -> Number:
 
 
 def sequence_grouper(sequence: Sequence, size: int) -> Iterable:
-    len_ = len(sequence)
-    times = math.ceil(len_ / size)
+    """按组迭代"""
+    times = math.ceil(len(sequence) / size)
     return (sequence[i * size: (i + 1) * size] for i in range(times))
 
 
