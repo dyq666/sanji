@@ -98,9 +98,14 @@ def test_clean_textarea():
 
 def test_import_object():
     Cls = import_object('test.User')
-    assert hasattr(Cls, 'get')
+    assert Cls == User
 
     with pytest.raises(ImportError):
+        # ValueError
+        import_object('test')
+        # ModuleNotFoundError
+        import_object('test1.User')
+        # Attribute
         import_object('test.U')
 
 
