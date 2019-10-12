@@ -6,15 +6,14 @@ from tempfile import TemporaryDirectory
 import pytest
 
 from util import (
-    CaseInsensitiveDict, Relationship, Memoize, clean_textarea,
-    import_object, make_accessors, round_half_up, sequence_grouper, write_csv,
+    CaseInsensitiveDict, Memoize, clean_textarea,
+    import_object, round_half_up, sequence_grouper, write_csv,
 )
 
 
 class User:
     """
-    for test_Relationship
-        test_import_object
+    for test_import_object
     """
 
     @classmethod
@@ -66,16 +65,6 @@ def test_Memoize():
     assert f.foo == f.__cache_foo == 2
 
 
-def test_Relationship():
-    class Book:
-        user = Relationship('test.User', 'get', 'user_id')
-
-        def __init__(self, user_id):
-            self.user_id = user_id
-
-    assert Book(user_id=1).user == 1
-
-
 def test_clean_textarea():
     textarea = """
     1
@@ -107,54 +96,6 @@ def test_import_object():
         import_object('test1.User')
         # Attribute
         import_object('test.U')
-
-
-def test_make_accessor():
-    class Foo:
-        def __init__(self, status):
-            self.status = status
-
-        def _is_status(self, status) -> bool:
-            return status == self.status
-
-    class Status:
-        A = 0
-        B = 1
-
-    make_accessors(Foo, 'is_%s', Foo._is_status, Status)
-
-    assert Foo(0).is_a and Foo(1).is_b
-    assert not Foo(0).is_b and not Foo(1).is_a
-
-    # 如果新生成的方法名与现有的重复就会报错.
-    with pytest.raises(ValueError):
-        class Foo2:
-            def _is_status(self, status):
-                pass
-
-            def is_a(self):
-                pass
-
-        make_accessors(Foo, 'is_%s', Foo2._is_status, Status)
-
-    # 测试 const_prefix
-    class Foo3:
-        def __init__(self, status):
-            self.status = status
-
-        def _is_status(self, status) -> bool:
-            return status == self.status
-
-    class Status2:
-        S_A = 0
-        S_B = 1
-        A_C = 2
-
-    make_accessors(Foo3, 'is_%s', Foo3._is_status, Status2, const_prefix='S_')
-
-    assert Foo3(0).is_a and Foo3(1).is_b
-    assert hasattr(Foo3, 'is_a')
-    assert not hasattr(Foo3, 'is_c')
 
 
 def test_round_half_up():
