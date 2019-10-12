@@ -11,16 +11,6 @@ from util import (
 )
 
 
-class User:
-    """
-    for test_import_object
-    """
-
-    @classmethod
-    def get(cls, user_id):
-        return user_id
-
-
 def test_CaseInsensitiveDict():
     d = CaseInsensitiveDict()
     content_type = 'application/json'
@@ -86,16 +76,16 @@ def test_clean_textarea():
 
 
 def test_import_object():
-    Cls = import_object('test.User')
-    assert Cls == User
+    obj = import_object('util.import_object')
+    assert obj == import_object
 
     with pytest.raises(ImportError):
         # ValueError
-        import_object('test')
+        import_object('util')
         # ModuleNotFoundError
-        import_object('test1.User')
+        import_object('util1.import_object')
         # Attribute
-        import_object('test.U')
+        import_object('util.U')
 
 
 def test_round_half_up():
