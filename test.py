@@ -25,8 +25,9 @@ def test_CaseInsensitiveDict():
     assert d.get('dasda', 1) == 1
 
     # __delitem__, __contains__
-    del d['Content-Type']
-    assert 'Content-Type' not in d
+    assert 'content-type' in d
+    del d['ContenT-Type']
+    assert 'content-type' not in d
 
 
 def test_Memoize():

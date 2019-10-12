@@ -22,12 +22,15 @@ Number = Union[int, float]
 
 
 class CaseInsensitiveDict(UserDict):
+    """无视大小写的 DICT
 
-    """
-    C: __setitem__
-    U: __setitem__
-    R: __getitem__, __contains__, get
-    D: __delitem__
+    可作为其他自定义 dict 的参考, 主要需要 override 下面四个方法:
+
+    - __setitem__
+    - __getitem__
+    - __delitem__
+
+    get, __contains__ 方法会调用 `__getitem__` 所以不用 override
     """
 
     def __getitem__(self, key):
@@ -38,12 +41,6 @@ class CaseInsensitiveDict(UserDict):
 
     def __delitem__(self, key):
         super().__delitem__(key.lower())
-
-    def __contains__(self, key: str):
-        return super().__contains__(key.lower())
-
-    def get(self, key, default=None):
-        return super().get(key, default)
 
 
 class Memoize:
