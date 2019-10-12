@@ -4,21 +4,12 @@ __all__ = (
 )
 
 import os
-from typing import IO, Optional, TYPE_CHECKING, Union
+from typing import IO, Optional, Union
 
-from requests import Session
-
-if TYPE_CHECKING:
-    from requests import Response
+from requests import Session, Response
 
 
 class SessionWithUrlPrefix(Session):
-
-    """
-    >>> s = SessionWithUrlPrefix('http://localhost')
-    >>> s.get('/api')
-    >>> s.post('/api')
-    """
 
     def __init__(self, url_prefix: Optional[str] = None):
         super().__init__()
@@ -27,17 +18,17 @@ class SessionWithUrlPrefix(Session):
     def __repr__(self):
         return (
             f'<{self.__class__.__name__}'
-            f' url_prefix={self.url_prefix}'
+            f' url_prefix={self.url_prefix!r}'
             f'>'
         )
 
-    def request(self, method: str, url: str, *args, **kwargs) -> 'Response':
+    def request(self, method: str, url: str, *args, **kwargs) -> Response:
         url = self.url_prefix + url if self.url_prefix is not None else url
         return super().request(method, url, *args, **kwargs)
 
 
-def upload(url: str, file: Union[str, IO[str]],
-           file_name: str = None) -> 'Response':
+def upload(url: str, file: Union[str, IO],
+           file_name: str = None) -> Response:
     """上传文件
 
     file: 可以是一个 str 代表文件路径, 也可以是一个类文件对象, 比如 io.StringIO.
