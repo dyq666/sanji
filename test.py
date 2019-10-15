@@ -6,8 +6,8 @@ from tempfile import TemporaryDirectory
 import pytest
 
 from util import (
-    CaseInsensitiveDict, Memoize, clean_textarea,
-    import_object, round_half_up, sequence_grouper, write_csv,
+    CaseInsensitiveDict, Memoize, clean_textarea, import_object,
+    rm_control_chars, round_half_up, sequence_grouper, write_csv,
 )
 
 
@@ -87,6 +87,11 @@ def test_import_object():
         import_object('util1.import_object')
         # Attribute
         import_object('util.U')
+
+
+def test_rm_control_chars():
+    assert rm_control_chars('带\x00带\x1f我\x7f') == '带带我'
+    assert rm_control_chars('带\u0000带\u001f我\u007f') == '带带我'
 
 
 def test_round_half_up():

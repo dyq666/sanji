@@ -3,6 +3,7 @@ __all__ = (
     'Memoize',
     'clean_textarea',
     'import_object',
+    'rm_control_chars',
     'round_half_up',
     'sequence_grouper',
     'write_csv',
@@ -10,6 +11,7 @@ __all__ = (
 
 import csv
 import math
+import re
 from collections import UserDict
 from decimal import ROUND_HALF_UP, Decimal
 from importlib import import_module
@@ -85,6 +87,11 @@ def import_object(object_path: str) -> Any:
     # getattr       -> AttributeError
     except (ValueError, ModuleNotFoundError, AttributeError):
         raise ImportError(f'Cannot import {object_path}')
+
+
+def rm_control_chars(str_: str) -> str:
+    control_chars_reg = r'[\x00-\x1f\x7f]'
+    return re.sub(control_chars_reg, '', str_)
 
 
 def round_half_up(number: Number, ndigits: int = 0) -> Number:
