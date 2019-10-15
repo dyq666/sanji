@@ -13,10 +13,10 @@ pep8:
 shell:
 	pipenv run ipython
 
-# --exitfirst  exit instantly on first error or failed test
-# --capture=no disable all capturing
+# -s, --capture=no disable all capturing
+# -x, --exitfirst  exit instantly on first error or failed test
 test:
-	pipenv run pytest --exitfirst --capture=no test.py
+	pipenv run pytest -sx test.py
 
 venv:
 	pipenv shell
