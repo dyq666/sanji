@@ -2,6 +2,7 @@ __all__ = (
     'CaseInsensitiveDict',
     'Memoize',
     'clean_textarea',
+    'fill_str',
     'import_object',
     'rm_control_chars',
     'round_half_up',
@@ -75,6 +76,17 @@ def clean_textarea(value: str, keep_inline_space: bool = True
     """
     rows = [r.strip() for r in value.splitlines() if r and not r.isspace()]
     return rows if keep_inline_space else [r.split() for r in rows]
+
+
+def fill_str(str_: str, number: int, filler: str) -> str:
+    """填充字符串是它的长度可以被某个数整除
+
+    为什么有这个看起来很简单的方法呢 ? 在脑子不转的情况下会忘记 == 0 的情况 ...
+    """
+    if len(str_) % number == 0:
+        return str_
+
+    return str_ + filler * (number - len(str_) % number)
 
 
 def import_object(object_path: str) -> Any:
