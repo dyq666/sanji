@@ -125,18 +125,44 @@ def test_round_half_up():
 
 class TestSequenceGrouper:
 
-    @pytest.mark.parametrize('sequence', ([], '', (), b''))
-    def test_empty(self, sequence):
-        assert list(sequence_grouper(sequence, size=9)) == []
-
-    @pytest.mark.parametrize('sequence', (
-        list(range(10)), '世界你好好世界再见见', tuple(range(10)), bytearray(range(10))
+    @pytest.mark.parametrize(('sequence', 'default'), (
+        ('', '1'),
+        (b'', b'1'),
+        ([], 1),
+        ((), 1),
     ))
-    def test_not_empty(self, sequence):
-        assert list(sequence_grouper(sequence, size=9)) == \
-            [sequence[:9], sequence[9:10]]
+    def test_empty(self, sequence, default):
+        assert list(sequence_grouper(sequence, size=9)) == []
+        assert list(sequence_grouper(sequence, size=9, default=default)) == []
+
+    @pytest.mark.parametrize(('sequence', 'default'), (
+        ('0123456789', '1'),
+        (b'0123456789', b'1'),
+    ))
+    def test_text_type_not_empty(self, sequence, default):
+        assert list(sequence_grouper(sequence, size=9)) == [sequence[:9], sequence[9:10]]
         assert list(sequence_grouper(sequence, size=10)) == [sequence]
         assert list(sequence_grouper(sequence, size=11)) == [sequence]
+        assert list(sequence_grouper(sequence, size=9, default=default)) == \
+            [sequence[:9], sequence[9:] + default * 8]
+        assert list(sequence_grouper(sequence, size=10, default=default)) == [sequence]
+        assert list(sequence_grouper(sequence, size=11, default=default)) == [sequence + default]
+
+    @pytest.mark.parametrize(('sequence', 'default'), (
+        ([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 1),
+        ((0, 1, 2, 3, 4, 5, 6, 7, 8, 9), 1),
+    ))
+    def test_collection_type_not_empty(self, sequence, default):
+        type_ = type(sequence)
+        assert list(sequence_grouper(sequence, size=9)) == [sequence[:9], sequence[9:10]]
+        assert list(sequence_grouper(sequence, size=10)) == [sequence]
+        assert list(sequence_grouper(sequence, size=11)) == [sequence]
+        assert list(sequence_grouper(sequence, size=9, default=default)) == \
+            [sequence[:9], sequence[9:] + type_(default for _ in range(8))]
+        assert list(sequence_grouper(sequence, size=10, default=default)) == \
+            [sequence]
+        assert list(sequence_grouper(sequence, size=11, default=default)) == \
+            [sequence + type_([default])]
 
 
 class TestWriteCSV:

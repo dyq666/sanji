@@ -132,10 +132,25 @@ def round_half_up(number: Number, ndigits: int = 0) -> Number:
     return float(decimal.quantize(position, rounding=ROUND_HALF_UP))
 
 
-def sequence_grouper(sequence: Sequence, size: int) -> Iterable:
-    """按组迭代"""
+def sequence_grouper(sequence: Sequence, size: int,
+                     default: Optional[Any] = None) -> Iterable:
+    """按组迭代, 如果 default is not None 则会用 size 个 default 补齐最后一组"""
+    if not isinstance(sequence, (str, bytes, list, tuple)):
+        print(sequence, type(sequence))
+        raise TypeError
+
     times = math.ceil(len(sequence) / size)
-    return (sequence[i * size: (i + 1) * size] for i in range(times))
+    for i in range(times):
+        item = sequence[i * size: (i + 1) * size]
+        if default is not None:
+            missing_number = size - len(item)
+            if isinstance(sequence, (str, bytes)):
+                item += default * missing_number
+            elif isinstance(sequence, (list, tuple)):
+                item += type(sequence)(default for _ in range(missing_number))
+            yield item
+        else:
+            yield item
 
 
 def write_csv(header: Tuple[str, ...],
