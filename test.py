@@ -9,6 +9,7 @@ from util import (
     CaseInsensitiveDict, Memoize, clean_textarea, fill_str, import_object,
     rm_control_chars, round_half_up, sequence_grouper, write_csv,
 )
+from util_phonenumbers import parse_phone
 
 
 def test_CaseInsensitiveDict():
@@ -202,3 +203,14 @@ class TestWriteCSV:
 
             with open(file_path) as f:
                 assert f.read() == csv_content
+
+
+"""test util_phonenumbers"""
+
+
+def test_parse_phone():
+    tel = '17718809932'
+    assert parse_phone(tel) == tel
+    assert parse_phone(f'+86{tel}') == '17718809932'
+    assert parse_phone(f'+87{tel}') is None
+    assert parse_phone(tel[:10]) is None
