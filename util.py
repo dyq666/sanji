@@ -3,7 +3,7 @@ __all__ = (
     'CaseInsensitiveDict',
     'Memoize',
     'clean_textarea',
-    'fill_str',
+    'fill_text',
     'import_object',
     'rm_control_chars',
     'round_half_up',
@@ -24,6 +24,7 @@ from typing import (
 )
 
 Number = Union[int, float]
+Text = Union[str, bytes]
 
 
 class Base64:
@@ -40,7 +41,7 @@ class Base64:
     @staticmethod
     def urlsafe_b64decode(s: bytes, fill_equal: bool = False) -> bytes:
         if fill_equal:
-            s = fill_str(s, 4, b'=')
+            s = fill_text(s, 4, b'=')
         return urlsafe_b64decode(s)
 
 
@@ -98,7 +99,7 @@ def clean_textarea(value: str, keep_inline_space: bool = True
     return rows if keep_inline_space else [r.split() for r in rows]
 
 
-def fill_str(str_: str, number: int, filler: str) -> str:
+def fill_text(str_: Text, number: int, filler: Text) -> Text:
     """填充字符串是它的长度可以被某个数整除
 
     为什么有这个看起来很简单的方法呢 ? 在脑子不转的情况下会忘记 == 0 的情况 ...

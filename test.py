@@ -5,7 +5,7 @@ from functools import partial
 import pytest
 
 from util import (
-    Base64, CaseInsensitiveDict, Memoize, clean_textarea, fill_str,
+    Base64, CaseInsensitiveDict, Memoize, clean_textarea, fill_text,
     import_object, rm_control_chars, round_half_up, sequence_grouper, write_csv,
 )
 from util_cryptography import AESCipher
@@ -97,13 +97,13 @@ def test_clean_textarea():
         [['1', 'a'], ['2', 'b'], ['3', 'c']]
 
 
-def test_fill_str():
-    assert fill_str('', 4, '=') == ''
-    assert fill_str('1', 4, '=') == '1==='
-    assert fill_str('11', 4, '=') == '11=='
-    assert fill_str('111', 4, '=') == '111='
-    assert fill_str('1111', 4, '=') == '1111'
-    assert fill_str('11111', 4, '=') == '11111==='
+def test_fill_text():
+    assert fill_text('', 4, '=') == ''
+    assert fill_text('1', 4, '=') == '1==='
+    assert fill_text('11', 4, '=') == '11=='
+    assert fill_text('111', 4, '=') == '111='
+    assert fill_text('1111', 4, '=') == '1111'
+    assert fill_text('11111', 4, '=') == '11111==='
 
 
 def test_import_object():
