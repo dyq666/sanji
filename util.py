@@ -1,4 +1,5 @@
 __all__ = (
+    'Base64',
     'CaseInsensitiveDict',
     'Memoize',
     'clean_textarea',
@@ -13,6 +14,7 @@ __all__ = (
 import csv
 import math
 import re
+from base64 import urlsafe_b64decode, urlsafe_b64encode
 from collections import UserDict
 from decimal import ROUND_HALF_UP, Decimal
 from importlib import import_module
@@ -22,6 +24,24 @@ from typing import (
 )
 
 Number = Union[int, float]
+
+
+class Base64:
+
+    """标准库里面没有去除 '=' 的方法."""
+
+    @staticmethod
+    def urlsafe_b64encode(s: bytes, strip_equal: bool = False) -> bytes:
+        content = urlsafe_b64encode(s)
+        if strip_equal:
+            content = content.rstrip(b'=')
+        return content
+
+    @staticmethod
+    def urlsafe_b64decode(s: bytes, fill_equal: bool = False) -> bytes:
+        if fill_equal:
+            s = fill_str(s, 4, b'=')
+        return urlsafe_b64decode(s)
 
 
 class CaseInsensitiveDict(UserDict):

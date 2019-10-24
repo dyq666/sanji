@@ -1,14 +1,35 @@
 import os
 from tempfile import TemporaryDirectory
+from functools import partial
 
 import pytest
 
 from util import (
-    CaseInsensitiveDict, Memoize, clean_textarea, fill_str, import_object,
-    rm_control_chars, round_half_up, sequence_grouper, write_csv,
+    Base64, CaseInsensitiveDict, Memoize, clean_textarea, fill_str,
+    import_object, rm_control_chars, round_half_up, sequence_grouper, write_csv,
 )
 from util_cryptography import AESCipher
 from util_phonenumbers import parse_phone
+
+
+class TestBase64:
+
+    """= 号只有三种情况, 两个, 一个, 零个. 因此只用选三个特例就行."""
+
+    def test_strip_equal_number(self):
+        encode1 = partial(Base64.urlsafe_b64encode, strip_equal=True)
+        encode2 = partial(Base64.urlsafe_b64encode, strip_equal=False)
+        assert encode1(b'a') == encode2(b'a')[:-2]
+        assert encode1(b'aa') == encode2(b'aa')[:-1]
+        assert encode1(b'aaa') == encode2(b'aaa')
+
+    @pytest.mark.parametrize('use_equal', (True, False))
+    def test_encode_and_decode(self, use_equal: bool):
+        encode = partial(Base64.urlsafe_b64encode, strip_equal=use_equal)
+        decode = partial(Base64.urlsafe_b64decode, fill_equal=use_equal)
+        assert decode(encode(b'a')) == b'a'
+        assert decode(encode(b'aa')) == b'aa'
+        assert decode(encode(b'aaa')) == b'aaa'
 
 
 def test_CaseInsensitiveDict():
