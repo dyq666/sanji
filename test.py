@@ -1,5 +1,3 @@
-__all__ = ()
-
 import os
 from tempfile import TemporaryDirectory
 
@@ -9,6 +7,7 @@ from util import (
     CaseInsensitiveDict, Memoize, clean_textarea, fill_str, import_object,
     rm_control_chars, round_half_up, sequence_grouper, write_csv,
 )
+from util_cryptography import AESCipher
 from util_phonenumbers import parse_phone
 
 
@@ -203,6 +202,31 @@ class TestWriteCSV:
 
             with open(file_path) as f:
                 assert f.read() == csv_content
+
+
+"""test util_cryptography"""
+
+
+class TestAESCiper:
+
+    key = os.urandom(16)
+    iv = os.urandom(16)
+    ciper = AESCipher(key, iv)
+
+    def test_filler(self):
+        """确保填充字符等于需要填充的个数"""
+        for i in range(1, 17):
+            content = b'-' * i
+            encrypted_content = self.ciper.encrypt(content)
+            decryptor = self.ciper.cipher.decryptor()
+            decrypted_content = decryptor.update(encrypted_content) + decryptor.finalize()
+            assert decrypted_content[-1] == 16 - (i % 16)
+
+    def test_encrypt_and_decrypt(self):
+        for i in range(1, 17):
+            content = b'-' * i
+            encrypted_content = self.ciper.encrypt(content)
+            assert content == self.ciper.decrypt(encrypted_content)
 
 
 """test util_phonenumbers"""
