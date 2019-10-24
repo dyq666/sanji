@@ -5,7 +5,7 @@ from functools import partial
 import pytest
 
 from util import (
-    Base64, CaseInsensitiveDict, Memoize, clean_textarea, fill_text,
+    Base64, CaseInsensitiveDict, Memoize, clean_textarea, fill_sequence,
     import_object, rm_control_chars, round_half_up, sequence_grouper, write_csv,
 )
 from util_cryptography import AESCipher
@@ -97,13 +97,36 @@ def test_clean_textarea():
         [['1', 'a'], ['2', 'b'], ['3', 'c']]
 
 
-def test_fill_text():
-    assert fill_text('', 4, '=') == ''
-    assert fill_text('1', 4, '=') == '1==='
-    assert fill_text('11', 4, '=') == '11=='
-    assert fill_text('111', 4, '=') == '111='
-    assert fill_text('1111', 4, '=') == '1111'
-    assert fill_text('11111', 4, '=') == '11111==='
+class TestFillSequence:
+
+    @pytest.mark.parametrize(('sequence', 'filler'), (
+        ('', '1'),
+        (b'', b'1'),
+        ([], 1),
+        ((), 1),
+    ))
+    def test_empty(self, sequence, filler):
+        assert fill_sequence(sequence, size=9, filler=filler) == sequence
+
+    @pytest.mark.parametrize(('item', 'filler'), (
+        ('1', '='),
+        (b'1', b'='),
+    ))
+    def test_text_type_not_empty(self, item, filler):
+        for i in range(1, 5):
+            sequence = item * i
+            fillers = filler * (4 - i)
+            assert fill_sequence(sequence, 4, filler) == sequence + fillers
+
+    @pytest.mark.parametrize(('cls', 'item', 'filler'), (
+        (list, 1, '='),
+        (tuple, 2, '='),
+    ))
+    def test_collection_type_not_empty(self, cls, item, filler):
+        for i in range(1, 5):
+            sequence = cls(item for _ in range(i))
+            fillers = cls(filler for _ in range(4 - i))
+            assert fill_sequence(sequence, 4, filler) == sequence + fillers
 
 
 def test_import_object():

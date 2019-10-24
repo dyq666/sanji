@@ -3,7 +3,7 @@ __all__ = (
     'CaseInsensitiveDict',
     'Memoize',
     'clean_textarea',
-    'fill_text',
+    'fill_sequence',
     'import_object',
     'rm_control_chars',
     'round_half_up',
@@ -41,7 +41,7 @@ class Base64:
     @staticmethod
     def urlsafe_b64decode(s: bytes, fill_equal: bool = False) -> bytes:
         if fill_equal:
-            s = fill_text(s, 4, b'=')
+            s = fill_sequence(s, 4, b'=')
         return urlsafe_b64decode(s)
 
 
@@ -99,15 +99,17 @@ def clean_textarea(value: str, keep_inline_space: bool = True
     return rows if keep_inline_space else [r.split() for r in rows]
 
 
-def fill_text(str_: Text, number: int, filler: Text) -> Text:
-    """填充字符串是它的长度可以被某个数整除
+def fill_sequence(sequence: Sequence, size: int, filler: Any) -> Sequence:
+    if not isinstance(sequence, (str, bytes, list, tuple)):
+        raise TypeError
+    if len(sequence) % size == 0:
+        return sequence
 
-    为什么有这个看起来很简单的方法呢 ? 在脑子不转的情况下会忘记 == 0 的情况 ...
-    """
-    if len(str_) % number == 0:
-        return str_
-
-    return str_ + filler * (number - len(str_) % number)
+    filler_number = size - (len(sequence) % size)
+    if isinstance(sequence, (str, bytes)):
+        return sequence + filler * filler_number
+    elif isinstance(sequence, (list, tuple)):
+        return sequence + type(sequence)(filler for _ in range(filler_number))
 
 
 def import_object(object_path: str) -> Any:
@@ -157,7 +159,6 @@ def sequence_grouper(sequence: Sequence, size: int,
                      default: Optional[Any] = None) -> Iterable:
     """按组迭代, 如果 default is not None 则会用 size 个 default 补齐最后一组"""
     if not isinstance(sequence, (str, bytes, list, tuple)):
-        print(sequence, type(sequence))
         raise TypeError
 
     times = math.ceil(len(sequence) / size)
