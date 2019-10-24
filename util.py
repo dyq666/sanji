@@ -156,7 +156,7 @@ def round_half_up(number: Number, ndigits: int = 0) -> Number:
 
 
 def sequence_grouper(sequence: Sequence, size: int,
-                     default: Optional[Any] = None) -> Iterable:
+                     filler: Optional[Any] = None) -> Iterable:
     """按组迭代, 如果 default is not None 则会用 size 个 default 补齐最后一组"""
     if not isinstance(sequence, (str, bytes, list, tuple)):
         raise TypeError
@@ -164,12 +164,12 @@ def sequence_grouper(sequence: Sequence, size: int,
     times = math.ceil(len(sequence) / size)
     for i in range(times):
         item = sequence[i * size: (i + 1) * size]
-        if default is not None:
+        if filler is not None:
             missing_number = size - len(item)
             if isinstance(sequence, (str, bytes)):
-                item += default * missing_number
+                item += filler * missing_number
             elif isinstance(sequence, (list, tuple)):
-                item += type(sequence)(default for _ in range(missing_number))
+                item += type(sequence)(filler for _ in range(missing_number))
             yield item
         else:
             yield item
