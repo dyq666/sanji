@@ -8,7 +8,7 @@ from util import (
     Base64, CaseInsensitiveDict, Memoize, clean_textarea, fill_sequence,
     import_object, rm_control_chars, round_half_up, sequence_grouper, write_csv,
 )
-from util_cryptography import AESCipher
+from util_cryptography import AESCipher, RSAPrivateKey, RSAPublicKey
 from util_phonenumbers import parse_phone
 
 
@@ -271,6 +271,21 @@ class TestAESCiper:
             content = b'-' * i
             encrypted_content = self.ciper.encrypt(content)
             assert content == self.ciper.decrypt(encrypted_content)
+
+
+class TestRsa:
+
+    def test_load_private_key(self):
+        """load 后的 private key 应该生成一样的 public key"""
+        private_key = RSAPrivateKey.generate()
+        private_key2 = RSAPrivateKey.load(private_key.format_private_key())
+        assert private_key.format_public_key() == private_key2.format_public_key()
+
+    def test_encrpty_and_decrpty(self):
+        content = '带带我666'.encode()
+        private_key = RSAPrivateKey.generate()
+        public_key = RSAPublicKey.load(private_key.format_public_key())
+        assert private_key.decrypt(public_key.encrypt(content)) == content
 
 
 """test util_phonenumbers"""
