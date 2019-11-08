@@ -20,10 +20,12 @@ from decimal import ROUND_HALF_UP, Decimal
 from importlib import import_module
 from io import StringIO
 from typing import (
-    Any, Iterable, List, Optional, Sequence, Tuple, Union,
+    Any, Iterable, List, Optional, Tuple, Union,
 )
 
+Col = Union[list, tuple]  # Collection
 Number = Union[int, float]
+Seq = Union[list, tuple, str, bytes]
 Text = Union[str, bytes]
 
 
@@ -99,7 +101,7 @@ def clean_textarea(value: str, keep_inline_space: bool = True
     return rows if keep_inline_space else [r.split() for r in rows]
 
 
-def fill_sequence(sequence: Sequence, size: int, filler: Any) -> Sequence:
+def fill_sequence(sequence: Seq, size: int, filler: Any) -> Seq:
     if not isinstance(sequence, (str, bytes, list, tuple)):
         raise TypeError
     if len(sequence) % size == 0:
@@ -155,7 +157,7 @@ def round_half_up(number: Number, ndigits: int = 0) -> Number:
     return float(decimal.quantize(position, rounding=ROUND_HALF_UP))
 
 
-def sequence_grouper(sequence: Sequence, size: int,
+def sequence_grouper(sequence: Seq, size: int,
                      filler: Optional[Any] = None) -> Iterable:
     """按组迭代, 如果 default is not None 则会用 size 个 default 补齐最后一组"""
     if not isinstance(sequence, (str, bytes, list, tuple)):
