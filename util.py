@@ -1,7 +1,6 @@
 __all__ = (
     'Base64',
     'CaseInsensitiveDict',
-    'Memoize',
     'clean_textarea',
     'fill_sequence',
     'import_object',
@@ -30,7 +29,6 @@ Text = Union[str, bytes]
 
 
 class Base64:
-
     """可选择是否填充等号的 Base64"""
 
     @staticmethod
@@ -80,28 +78,6 @@ class CaseInsensitiveDict(UserDict):
 
     def __delitem__(self, key):
         super().__delitem__(key.lower())
-
-
-class Memoize:
-    """缓存属性.
-
-    类似 property, 区别是 memoize 的属性只会计算一次.
-    需要注意的是类中不应该有和 `self.cache_key` 相同的属性.
-    """
-
-    def __init__(self, fget):
-        self.fget = fget
-        # property 也设置了 __doc__.
-        self.__doc__ = fget.__doc__
-        self.cache_key = '__cache_' + fget.__name__
-
-    def __get__(self, instance, owner):
-        if instance is None:
-            return self
-
-        if not hasattr(instance, self.cache_key):
-            setattr(instance, self.cache_key, self.fget(instance))
-        return getattr(instance, self.cache_key)
 
 
 def clean_textarea(value: str, keep_inline_space: bool = True

@@ -5,7 +5,7 @@ from functools import partial
 import pytest
 
 from util import (
-    Base64, CaseInsensitiveDict, Memoize, clean_textarea, fill_sequence,
+    Base64, CaseInsensitiveDict, clean_textarea, fill_sequence,
     import_object, rm_control_chars, round_half_up, sequence_grouper, write_csv,
 )
 from util_cryptography import AESCipher, RSAPrivateKey, RSAPublicKey
@@ -54,32 +54,6 @@ def test_CaseInsensitiveDict():
     assert 'content-type' in d
     del d['ContenT-Type']
     assert 'content-type' not in d
-
-
-def test_Memoize():
-    class Foo:
-
-        def __init__(self):
-            self.id = 1
-
-        @Memoize
-        def foo(self):
-            """I am foo"""
-            return self.id + 100
-
-    assert Foo.foo.__doc__ == 'I am foo'
-
-    f = Foo()
-
-    assert not hasattr(f, 'cache_key_foo')
-    assert f.foo == f.__cache_foo == 101
-
-    f.id = 2
-    assert f.foo == f.__cache_foo == 101
-
-    # 直接改缓存的属性
-    f.__cache_foo = 2
-    assert f.foo == f.__cache_foo == 2
 
 
 def test_clean_textarea():
