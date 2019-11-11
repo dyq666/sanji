@@ -1,10 +1,10 @@
 ## 介绍
 
-`util.py` 函数或类.
+`util.py` 只使用标准库的工具.
 
-`util_<package_name>.py` 依赖第三方的工具函数
+`util_<package_name>.py` 依赖第三方的工具.
 
-`test.py` 大部分函数或类的测试用例.
+`test.py` 大部分工具的测试用例.
 
 ### 一些有帮助的链接
 
