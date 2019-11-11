@@ -59,7 +59,9 @@ class Base64:
 
 
 class CaseInsensitiveDict(UserDict):
-    """无视大小写的 DICT
+    """无视大小写的 dict
+
+    实际上真正使用时可以用 requests.structures.CaseInsensitiveDict.
 
     可作为其他自定义 dict 的参考, 主要需要 override 下面四个方法:
 
@@ -125,6 +127,8 @@ def round_half_up(number: Number, ndigits: int = 0) -> Number:
 
     ndigits: 与 ``round`` 的参数 ``ndigits`` 保持一样的逻辑:
              > 0 小数位, <= 0 整数位.
+
+    实际上大多数场景不需要支持 `ndigits <= 0` 的情况.
     """
     def _get_number(_ndigits: int) -> int:
         return int(str(number)[_ndigits - 1])
