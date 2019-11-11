@@ -11,10 +11,10 @@ __all__ = (
     'write_csv',
 )
 
+import base64
 import csv
 import math
 import re
-from base64 import urlsafe_b64decode, urlsafe_b64encode
 from collections import UserDict
 from decimal import ROUND_HALF_UP, Decimal
 from importlib import import_module
@@ -31,20 +31,33 @@ Text = Union[str, bytes]
 
 class Base64:
 
-    """标准库里面没有去除 '=' 的方法."""
+    """可选择是否填充等号的 Base64"""
 
     @staticmethod
-    def urlsafe_b64encode(s: bytes, strip_equal: bool = False) -> bytes:
-        content = urlsafe_b64encode(s)
-        if strip_equal:
+    def b64encode(s: bytes, with_equal: bool = False) -> bytes:
+        content = base64.b64encode(s)
+        if with_equal:
             content = content.rstrip(b'=')
         return content
 
     @staticmethod
-    def urlsafe_b64decode(s: bytes, fill_equal: bool = False) -> bytes:
-        if fill_equal:
+    def b64decode(s: bytes, with_equal: bool = False) -> bytes:
+        if with_equal:
             s = fill_sequence(s, 4, b'=')
-        return urlsafe_b64decode(s)
+        return base64.b64decode(s)
+
+    @staticmethod
+    def urlsafe_b64encode(s: bytes, with_equal: bool = False) -> bytes:
+        content = base64.urlsafe_b64encode(s)
+        if with_equal:
+            content = content.rstrip(b'=')
+        return content
+
+    @staticmethod
+    def urlsafe_b64decode(s: bytes, with_equal: bool = False) -> bytes:
+        if with_equal:
+            s = fill_sequence(s, 4, b'=')
+        return base64.urlsafe_b64decode(s)
 
 
 class CaseInsensitiveDict(UserDict):

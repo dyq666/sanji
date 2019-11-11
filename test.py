@@ -16,17 +16,22 @@ class TestBase64:
 
     """= 号只有三种情况, 两个, 一个, 零个. 因此只用选三个特例就行."""
 
-    def test_strip_equal_number(self):
-        encode1 = partial(Base64.urlsafe_b64encode, strip_equal=True)
-        encode2 = partial(Base64.urlsafe_b64encode, strip_equal=False)
+    @pytest.mark.parametrize('func', (Base64.b64encode, Base64.urlsafe_b64encode))
+    def test_strip_equal(self, func):
+        encode1 = partial(func, with_equal=True)
+        encode2 = partial(func, with_equal=False)
         assert encode1(b'a') == encode2(b'a')[:-2]
         assert encode1(b'aa') == encode2(b'aa')[:-1]
         assert encode1(b'aaa') == encode2(b'aaa')
 
-    @pytest.mark.parametrize('use_equal', (True, False))
-    def test_encode_and_decode(self, use_equal: bool):
-        encode = partial(Base64.urlsafe_b64encode, strip_equal=use_equal)
-        decode = partial(Base64.urlsafe_b64decode, fill_equal=use_equal)
+    @pytest.mark.parametrize('with_equal', (True, False))
+    @pytest.mark.parametrize('funcs', (
+        (Base64.b64encode, Base64.b64decode),
+        (Base64.urlsafe_b64encode, Base64.urlsafe_b64decode),
+    ))
+    def test_encode_and_decode(self, with_equal, funcs):
+        encode = partial(funcs[0], with_equal=with_equal)
+        decode = partial(funcs[1], with_equal=with_equal)
         assert decode(encode(b'a')) == b'a'
         assert decode(encode(b'aa')) == b'aa'
         assert decode(encode(b'aaa')) == b'aaa'
