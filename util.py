@@ -152,22 +152,17 @@ def round_half_up(number: Num, ndigits: int = 0) -> Num:
 
 
 def seq_grouper(seq: Seq, size: int, filler: Optional[Any] = None) -> Iterable:
-    """按组迭代, 如果 default is not None 则会用 size 个 default 补齐最后一组"""
+    """按组迭代序列.
+
+    如果传入了 `filler` 则会用 `filler` 填充最后一组, 使之可以被 `size` 整除.
+    """
     if not isinstance(seq, (str, bytes, list, tuple)):
         raise TypeError
 
+    if filler is not None:
+        seq = fill_seq(seq, size, filler)
     times = math.ceil(len(seq) / size)
-    for i in range(times):
-        item = seq[i * size: (i + 1) * size]
-        if filler is not None:
-            missing_number = size - len(item)
-            if isinstance(seq, (str, bytes)):
-                item += filler * missing_number
-            elif isinstance(seq, (list, tuple)):
-                item += type(seq)(filler for _ in range(missing_number))
-            yield item
-        else:
-            yield item
+    yield from (seq[i * size: (i + 1) * size] for i in range(times))
 
 
 def write_csv(header: Tuple[str, ...],
