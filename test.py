@@ -5,8 +5,8 @@ from functools import partial
 import pytest
 
 from util import (
-    Base64, CaseInsensitiveDict, clean_textarea, fill_sequence,
-    import_object, rm_control_chars, round_half_up, sequence_grouper, write_csv,
+    Base64, CaseInsensitiveDict, clean_textarea, fill_seq,
+    import_object, rm_control_chars, round_half_up, seq_grouper, write_csv,
 )
 from util_cryptography import AESCipher, RSAPrivateKey, RSAPublicKey
 from util_phonenumbers import parse_phone
@@ -76,16 +76,16 @@ def test_clean_textarea():
         [['1', 'a'], ['2', 'b'], ['3', 'c']]
 
 
-class TestFillSequence:
+class TestFillSeq:
 
-    @pytest.mark.parametrize(('sequence', 'filler'), (
+    @pytest.mark.parametrize(('seq', 'filler'), (
         ('', '1'),
         (b'', b'1'),
         ([], 1),
         ((), 1),
     ))
-    def test_empty(self, sequence, filler):
-        assert fill_sequence(sequence, size=9, filler=filler) == sequence
+    def test_empty(self, seq, filler):
+        assert fill_seq(seq, size=9, filler=filler) == seq
 
     @pytest.mark.parametrize(('item', 'filler'), (
         ('1', '='),
@@ -93,9 +93,9 @@ class TestFillSequence:
     ))
     def test_text_type_not_empty(self, item, filler):
         for i in range(1, 5):
-            sequence = item * i
+            seq = item * i
             fillers = filler * (4 - i)
-            assert fill_sequence(sequence, 4, filler) == sequence + fillers
+            assert fill_seq(seq, 4, filler) == seq + fillers
 
     @pytest.mark.parametrize(('cls', 'item', 'filler'), (
         (list, 1, '='),
@@ -103,9 +103,9 @@ class TestFillSequence:
     ))
     def test_collection_type_not_empty(self, cls, item, filler):
         for i in range(1, 5):
-            sequence = cls(item for _ in range(i))
+            seq = cls(item for _ in range(i))
             fillers = cls(filler for _ in range(4 - i))
-            assert fill_sequence(sequence, 4, filler) == sequence + fillers
+            assert fill_seq(seq, 4, filler) == seq + fillers
 
 
 def test_import_object():
@@ -146,46 +146,46 @@ def test_round_half_up():
     assert round_half_up(0.375, 2) == 0.38
 
 
-class TestSequenceGrouper:
+class TestSeqGrouper:
 
-    @pytest.mark.parametrize(('sequence', 'filler'), (
+    @pytest.mark.parametrize(('seq', 'filler'), (
         ('', '1'),
         (b'', b'1'),
         ([], 1),
         ((), 1),
     ))
-    def test_empty(self, sequence, filler):
-        assert list(sequence_grouper(sequence, size=9)) == []
-        assert list(sequence_grouper(sequence, size=9, filler=filler)) == []
+    def test_empty(self, seq, filler):
+        assert list(seq_grouper(seq, size=9)) == []
+        assert list(seq_grouper(seq, size=9, filler=filler)) == []
 
-    @pytest.mark.parametrize(('sequence', 'filler'), (
+    @pytest.mark.parametrize(('seq', 'filler'), (
         ('0123456789', '1'),
         (b'0123456789', b'1'),
     ))
-    def test_text_type_not_empty(self, sequence, filler):
-        assert list(sequence_grouper(sequence, size=9)) == [sequence[:9], sequence[9:10]]
-        assert list(sequence_grouper(sequence, size=10)) == [sequence]
-        assert list(sequence_grouper(sequence, size=11)) == [sequence]
-        assert list(sequence_grouper(sequence, size=9, filler=filler)) == \
-            [sequence[:9], sequence[9:] + filler * 8]
-        assert list(sequence_grouper(sequence, size=10, filler=filler)) == [sequence]
-        assert list(sequence_grouper(sequence, size=11, filler=filler)) == [sequence + filler]
+    def test_text_type_not_empty(self, seq, filler):
+        assert list(seq_grouper(seq, size=9)) == [seq[:9], seq[9:10]]
+        assert list(seq_grouper(seq, size=10)) == [seq]
+        assert list(seq_grouper(seq, size=11)) == [seq]
+        assert list(seq_grouper(seq, size=9, filler=filler)) == \
+            [seq[:9], seq[9:] + filler * 8]
+        assert list(seq_grouper(seq, size=10, filler=filler)) == [seq]
+        assert list(seq_grouper(seq, size=11, filler=filler)) == [seq + filler]
 
-    @pytest.mark.parametrize(('sequence', 'filler'), (
+    @pytest.mark.parametrize(('seq', 'filler'), (
         ([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 1),
         ((0, 1, 2, 3, 4, 5, 6, 7, 8, 9), 1),
     ))
-    def test_collection_type_not_empty(self, sequence, filler):
-        type_ = type(sequence)
-        assert list(sequence_grouper(sequence, size=9)) == [sequence[:9], sequence[9:10]]
-        assert list(sequence_grouper(sequence, size=10)) == [sequence]
-        assert list(sequence_grouper(sequence, size=11)) == [sequence]
-        assert list(sequence_grouper(sequence, size=9, filler=filler)) == \
-            [sequence[:9], sequence[9:] + type_(filler for _ in range(8))]
-        assert list(sequence_grouper(sequence, size=10, filler=filler)) == \
-            [sequence]
-        assert list(sequence_grouper(sequence, size=11, filler=filler)) == \
-            [sequence + type_([filler])]
+    def test_collection_type_not_empty(self, seq, filler):
+        type_ = type(seq)
+        assert list(seq_grouper(seq, size=9)) == [seq[:9], seq[9:10]]
+        assert list(seq_grouper(seq, size=10)) == [seq]
+        assert list(seq_grouper(seq, size=11)) == [seq]
+        assert list(seq_grouper(seq, size=9, filler=filler)) == \
+            [seq[:9], seq[9:] + type_(filler for _ in range(8))]
+        assert list(seq_grouper(seq, size=10, filler=filler)) == \
+            [seq]
+        assert list(seq_grouper(seq, size=11, filler=filler)) == \
+            [seq + type_([filler])]
 
 
 class TestWriteCSV:

@@ -2,11 +2,11 @@ __all__ = (
     'Base64',
     'CaseInsensitiveDict',
     'clean_textarea',
-    'fill_sequence',
+    'fill_seq',
     'import_object',
     'rm_control_chars',
     'round_half_up',
-    'sequence_grouper',
+    'seq_grouper',
     'write_csv',
 )
 
@@ -23,7 +23,7 @@ from typing import (
 )
 
 Col = Union[list, tuple]  # Collection
-Number = Union[int, float]
+Num = Union[int, float]
 Seq = Union[list, tuple, str, bytes]
 Text = Union[str, bytes]
 
@@ -41,7 +41,7 @@ class Base64:
     @staticmethod
     def b64decode(s: bytes, with_equal: bool = False) -> bytes:
         if with_equal:
-            s = fill_sequence(s, 4, b'=')
+            s = fill_seq(s, 4, b'=')
         return base64.b64decode(s)
 
     @staticmethod
@@ -54,7 +54,7 @@ class Base64:
     @staticmethod
     def urlsafe_b64decode(s: bytes, with_equal: bool = False) -> bytes:
         if with_equal:
-            s = fill_sequence(s, 4, b'=')
+            s = fill_seq(s, 4, b'=')
         return base64.urlsafe_b64decode(s)
 
 
@@ -92,17 +92,18 @@ def clean_textarea(value: str, keep_inline_space: bool = True
     return rows if keep_inline_space else [r.split() for r in rows]
 
 
-def fill_sequence(sequence: Seq, size: int, filler: Any) -> Seq:
-    if not isinstance(sequence, (str, bytes, list, tuple)):
+def fill_seq(seq: Seq, size: int, filler: Any) -> Seq:
+    """用 `filler` 填充序列使其内被 `size` 整除"""
+    if not isinstance(seq, (str, bytes, list, tuple)):
         raise TypeError
-    if len(sequence) % size == 0:
-        return sequence
+    if len(seq) % size == 0:
+        return seq
 
-    filler_number = size - (len(sequence) % size)
-    if isinstance(sequence, (str, bytes)):
-        return sequence + filler * filler_number
-    elif isinstance(sequence, (list, tuple)):
-        return sequence + type(sequence)(filler for _ in range(filler_number))
+    num = size - (len(seq) % size)
+    if isinstance(seq, (str, bytes)):
+        return seq + filler * num
+    else:  # list or tuple
+        return seq + type(seq)(filler for _ in range(num))
 
 
 def import_object(object_path: str) -> Any:
@@ -122,7 +123,7 @@ def rm_control_chars(str_: str) -> str:
     return re.sub(control_chars_reg, '', str_)
 
 
-def round_half_up(number: Number, ndigits: int = 0) -> Number:
+def round_half_up(number: Num, ndigits: int = 0) -> Num:
     """四舍五入.
 
     ndigits: 与 ``round`` 的参数 ``ndigits`` 保持一样的逻辑:
@@ -150,21 +151,20 @@ def round_half_up(number: Number, ndigits: int = 0) -> Number:
     return float(decimal.quantize(position, rounding=ROUND_HALF_UP))
 
 
-def sequence_grouper(sequence: Seq, size: int,
-                     filler: Optional[Any] = None) -> Iterable:
+def seq_grouper(seq: Seq, size: int, filler: Optional[Any] = None) -> Iterable:
     """按组迭代, 如果 default is not None 则会用 size 个 default 补齐最后一组"""
-    if not isinstance(sequence, (str, bytes, list, tuple)):
+    if not isinstance(seq, (str, bytes, list, tuple)):
         raise TypeError
 
-    times = math.ceil(len(sequence) / size)
+    times = math.ceil(len(seq) / size)
     for i in range(times):
-        item = sequence[i * size: (i + 1) * size]
+        item = seq[i * size: (i + 1) * size]
         if filler is not None:
             missing_number = size - len(item)
-            if isinstance(sequence, (str, bytes)):
+            if isinstance(seq, (str, bytes)):
                 item += filler * missing_number
-            elif isinstance(sequence, (list, tuple)):
-                item += type(sequence)(filler for _ in range(missing_number))
+            elif isinstance(seq, (list, tuple)):
+                item += type(seq)(filler for _ in range(missing_number))
             yield item
         else:
             yield item
