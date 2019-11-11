@@ -107,6 +107,7 @@ def fill_seq(seq: Seq, size: int, filler: Any) -> Seq:
 
 
 def import_object(object_path: str) -> Any:
+    """根据路径获取对象"""
     try:
         dot = object_path.rindex('.')
         module, obj = object_path[:dot], object_path[dot + 1:]
@@ -119,6 +120,7 @@ def import_object(object_path: str) -> Any:
 
 
 def rm_control_chars(str_: str) -> str:
+    """去除控制字符"""
     control_chars_reg = r'[\x00-\x1f\x7f]'
     return re.sub(control_chars_reg, '', str_)
 
