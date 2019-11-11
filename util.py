@@ -171,11 +171,7 @@ def write_csv(header: Tuple[str, ...],
               ) -> Optional[StringIO]:
     """将数据写入 csv
 
-    header: 标题
-
-    rows: 数据行
-
-    file_path: 不传会返回一个 StringIO, 传则写入此路径.
+    如果传 `file_path` 则将数据写入此路径, 否则返回 StringIO
     """
     if not header or not rows:
         raise ValueError('header or rows should not empty')

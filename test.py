@@ -211,20 +211,17 @@ class TestWriteCSV:
             file = write_csv(self.header, rows)
             assert file.getvalue().replace('\r\n', '\n') == self.content
 
-    def test_out_path_arg(self):
-        header = self.header
-        rows = self.rows
-        csv_content = self.content
-
-        file = write_csv(header, rows)
-        assert file.getvalue().replace('\r\n', '\n') == csv_content
-
+    def test_with_path(self):
         with TemporaryDirectory() as dirname:
             file_path = os.path.join(dirname, 'data.csv')
-            write_csv(header, rows, file_path)
+            write_csv(self.header, self.rows, file_path)
 
             with open(file_path) as f:
-                assert f.read() == csv_content
+                assert f.read() == self.content
+
+    def test_without_path(self):
+        file = write_csv(self.header, self.rows)
+        assert file.getvalue().replace('\r\n', '\n') == self.content
 
 
 """test util_cryptography"""
