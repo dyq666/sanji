@@ -219,22 +219,21 @@ class TestSeqGrouper:
 
 class TestWriteCSV:
 
-    header = ('name', 'sex')
-    rows = (('father', 'male'), ('mother', 'female'))
+    header = ['name', 'sex']
+    rows = [['father', 'male'], ['mother', 'female']]
     content = 'name,sex\nfather,male\nmother,female\n'
 
     def test_expected_exceptions(self):
         with pytest.raises(ValueError):
-            write_csv((), ())
+            write_csv([], [])
         with pytest.raises(TypeError):
-            write_csv(('1',), ({1}))
+            write_csv(['1'], [{1}])
 
     def test_row_item_type(self):
         rows_fixtures = (
             self.rows,
-            tuple(list(row) for row in self.rows),
-            tuple({header: datum for header, datum in zip(self.header, row)}
-                  for row in self.rows),
+            list(tuple(row) for row in self.rows),
+            list(dict(zip(self.header, row)) for row in self.rows),
         )
         for rows in rows_fixtures:
             file = write_csv(self.header, rows)

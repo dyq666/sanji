@@ -182,8 +182,8 @@ def seq_grouper(seq: Seq, size: int, filler: Optional[Any] = None) -> Iterable:
     yield from (seq[i * size: (i + 1) * size] for i in range(times))
 
 
-def write_csv(header: Tuple[str, ...],
-              rows: Union[Tuple[dict, ...], Tuple[list, ...], Tuple[tuple, ...]],
+def write_csv(header: List[str],
+              rows: Union[List[dict], List[list], List[tuple]],
               file_path: Optional[str] = None
               ) -> Optional[StringIO]:
     """将数据写入 csv
