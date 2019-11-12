@@ -1,2 +1,4 @@
+.DS_Store
 .idea/
-.backup/
+__pycache__/
+venv/
