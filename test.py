@@ -1,3 +1,4 @@
+import csv
 import os
 from tempfile import TemporaryDirectory
 from functools import partial
@@ -5,8 +6,8 @@ from functools import partial
 import pytest
 
 from util import (
-    Base64, CaseInsensitiveDict, clean_textarea, fill_seq,
-    import_object, rm_control_chars, round_half_up, seq_grouper, write_csv,
+    Base64, CaseInsensitiveDict, clean_textarea, fill_seq, import_object,
+    read_csv, rm_control_chars, round_half_up, seq_grouper, write_csv,
 )
 from util_cryptography import AESCipher, RSAPrivateKey, RSAPublicKey
 from util_phonenumbers import parse_phone
@@ -119,6 +120,34 @@ def test_import_object():
         import_object('util1.import_object')
         # Attribute
         import_object('util.U')
+
+
+class TestReadCsv:
+
+    header = ['name', 'sex']
+    rows = [['father', 'male'], ['mother', 'female']]
+
+    def test_read_empty_csv(self):
+        with TemporaryDirectory() as dirpath:
+            file_path = os.path.join(dirpath, 'data.csv')
+            with open(file_path, 'w') as f:
+                f_csv = csv.writer(f)
+                f_csv.writerow(self.header)
+
+            assert read_csv(file_path) == (self.header, [])
+            assert read_csv(file_path, True) == (self.header, [])
+
+    def test_read_csv(self):
+        with TemporaryDirectory() as dirpath:
+            file_path = os.path.join(dirpath, 'data.csv')
+            write_csv(self.header, self.rows, file_path)
+
+            assert read_csv(file_path) == (self.header, self.rows)
+            assert read_csv(file_path, True) == (self.header, self.dict_rows)
+
+    @property
+    def dict_rows(self):
+        return [dict(zip(self.header, row)) for row in self.rows]
 
 
 def test_rm_control_chars():

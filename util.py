@@ -4,6 +4,7 @@ __all__ = (
     'clean_textarea',
     'fill_seq',
     'import_object',
+    'read_csv',
     'rm_control_chars',
     'round_half_up',
     'seq_grouper',
@@ -117,6 +118,20 @@ def import_object(object_path: str) -> Any:
     # getattr       -> AttributeError
     except (ValueError, ModuleNotFoundError, AttributeError):
         raise ImportError(f'Cannot import {object_path}')
+
+
+def read_csv(file_path: str, with_dict: bool = False) -> Tuple[list, list]:
+    """从 csv 中读取数据"""
+    with open(file_path) as f:
+        if with_dict:
+            f_csv = csv.DictReader(f)
+            data = list(f_csv)
+            header = f_csv.fieldnames
+        else:
+            f_csv = csv.reader(f)
+            header = next(f_csv)
+            data = list(f_csv)
+    return header, data
 
 
 def rm_control_chars(str_: str) -> str:
