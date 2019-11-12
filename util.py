@@ -122,7 +122,7 @@ def import_object(object_path: str) -> Any:
 
 def read_csv(file_path: str, with_dict: bool = False) -> Tuple[list, list]:
     """从 csv 中读取数据"""
-    with open(file_path) as f:
+    with open(file_path, newline='') as f:
         if with_dict:
             f_csv = csv.DictReader(f)
             data = list(f_csv)
@@ -195,7 +195,7 @@ def write_csv(header: List[str],
     if not isinstance(rows[0], (dict, list, tuple)):
         raise TypeError('type of row item must be dict or tuple or list')
 
-    file = StringIO() if file_path is None else open(file_path, 'w')
+    file = StringIO() if file_path is None else open(file_path, 'w', newline='')
 
     if isinstance(rows[0], dict):
         f_csv = csv.DictWriter(file, header)
