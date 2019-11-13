@@ -13,12 +13,12 @@ __all__ = (
 
 import base64
 import csv
+import io
 import math
 import re
 from collections import UserDict
 from decimal import ROUND_HALF_UP, Decimal
 from importlib import import_module
-from io import StringIO
 from typing import (
     Any, Iterable, List, Optional, Tuple, Union,
 )
@@ -183,13 +183,13 @@ def seq_grouper(seq: Seq, size: int, filler: Optional[Any] = None) -> Iterable:
 
 
 def write_csv(header: Iterable[str], rows: Iterable, *, with_dict: bool = False,
-              file_path: Optional[str] = None) -> Optional[StringIO]:
+              file_path: Optional[str] = None) -> Optional[io.StringIO]:
     """将数据按 csv 格式写入文件.
 
     `with_dict`: `rows` 中的数据项类型是否为 `dict` ?
     `file_path`: 如果传入字符串, 那么将数据写入此文件路径, 否则返回 `StringIO` 对象.
     """
-    file = StringIO() if file_path is None else open(file_path, 'w', newline='')
+    file = io.StringIO() if file_path is None else open(file_path, 'w', newline='')
 
     if with_dict:
         f_csv = csv.DictWriter(file, header)
