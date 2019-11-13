@@ -1,14 +1,13 @@
 __all__ = (
     'Base64',
     'CaseInsensitiveDict',
+    'CSV',
     'clean_textarea',
     'fill_seq',
     'import_object',
-    'read_csv',
     'rm_control_chars',
     'round_half_up',
     'seq_grouper',
-    'write_csv',
 )
 
 import base64
@@ -57,6 +56,58 @@ class Base64:
         if with_equal:
             s = fill_seq(s, 4, b'=')
         return base64.urlsafe_b64decode(s)
+
+
+class CSV:
+
+    @staticmethod
+    def read(file_path: Union[str, io.StringIO], with_dict: bool = False) -> Tuple[list, list]:
+        """从文件中读取 csv 格式的数据.
+
+        `with_dict`: 返回的 `rows` 中的数据项类型是否为 `dict` ?
+        `file_path`: 如果传入字符串, 那么从此文件路径中读取数据, 否则从 `StringIO` 对象中读取数据.
+        """
+        file = open(file_path, newline='') if isinstance(file_path, str) else file_path
+
+        if with_dict:
+            f_csv = csv.DictReader(file)
+            rows = list(f_csv)
+            header = f_csv.fieldnames
+        else:
+            f_csv = csv.reader(file)
+            header = next(f_csv)
+            rows = list(f_csv)
+
+        if isinstance(file_path, str):
+            file.close()
+
+        return header, rows
+
+    @staticmethod
+    def write(header: Iterable[str], rows: Iterable, *, with_dict: bool = False,
+              file_path: Optional[str] = None) -> Optional[io.StringIO]:
+        """将数据按 csv 格式写入文件.
+
+        `with_dict`: `rows` 中的数据项类型是否为 `dict` ?
+        `file_path`: 如果传入字符串, 那么将数据写入此文件路径, 否则返回 `StringIO` 对象.
+        """
+        file = io.StringIO() if file_path is None else open(file_path, 'w', newline='')
+
+        if with_dict:
+            f_csv = csv.DictWriter(file, header)
+            f_csv.writeheader()
+            f_csv.writerows(rows)
+        else:
+            f_csv = csv.writer(file)
+            f_csv.writerow(header)
+            f_csv.writerows(rows)
+
+        if file_path is None:
+            file.seek(0)
+            return file
+        else:
+            file.close()
+            return
 
 
 class CaseInsensitiveDict(UserDict):
@@ -120,29 +171,6 @@ def import_object(object_path: str) -> Any:
         raise ImportError(f'Cannot import {object_path}')
 
 
-def read_csv(file_path: Union[str, io.StringIO], with_dict: bool = False) -> Tuple[list, list]:
-    """从文件中读取 csv 格式的数据.
-
-    `with_dict`: 返回的 `rows` 中的数据项类型是否为 `dict` ?
-    `file_path`: 如果传入字符串, 那么从此文件路径中读取数据, 否则从 `StringIO` 对象中读取数据.
-    """
-    file = open(file_path, newline='') if isinstance(file_path, str) else file_path
-
-    if with_dict:
-        f_csv = csv.DictReader(file)
-        rows = list(f_csv)
-        header = f_csv.fieldnames
-    else:
-        f_csv = csv.reader(file)
-        header = next(f_csv)
-        rows = list(f_csv)
-
-    if isinstance(file_path, str):
-        file.close()
-
-    return header, rows
-
-
 def rm_control_chars(str_: str) -> str:
     """去除控制字符"""
     control_chars_reg = r'[\x00-\x1f\x7f]'
@@ -189,29 +217,3 @@ def seq_grouper(seq: Seq, size: int, filler: Optional[Any] = None) -> Iterable:
         seq = fill_seq(seq, size, filler)
     times = math.ceil(len(seq) / size)
     yield from (seq[i * size: (i + 1) * size] for i in range(times))
-
-
-def write_csv(header: Iterable[str], rows: Iterable, *, with_dict: bool = False,
-              file_path: Optional[str] = None) -> Optional[io.StringIO]:
-    """将数据按 csv 格式写入文件.
-
-    `with_dict`: `rows` 中的数据项类型是否为 `dict` ?
-    `file_path`: 如果传入字符串, 那么将数据写入此文件路径, 否则返回 `StringIO` 对象.
-    """
-    file = io.StringIO() if file_path is None else open(file_path, 'w', newline='')
-
-    if with_dict:
-        f_csv = csv.DictWriter(file, header)
-        f_csv.writeheader()
-        f_csv.writerows(rows)
-    else:
-        f_csv = csv.writer(file)
-        f_csv.writerow(header)
-        f_csv.writerows(rows)
-
-    if file_path is None:
-        file.seek(0)
-        return file
-    else:
-        file.close()
-        return

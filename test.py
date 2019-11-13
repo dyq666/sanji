@@ -5,8 +5,8 @@ from functools import partial
 import pytest
 
 from util import (
-    Base64, CaseInsensitiveDict, clean_textarea, fill_seq, import_object,
-    read_csv, rm_control_chars, round_half_up, seq_grouper, write_csv,
+    Base64, CaseInsensitiveDict, CSV, clean_textarea, fill_seq, import_object,
+    rm_control_chars, round_half_up, seq_grouper,
 )
 from util_cryptography import AESCipher, RSAPrivateKey, RSAPublicKey
 from util_phonenumbers import parse_phone
@@ -54,6 +54,51 @@ def test_CaseInsensitiveDict():
     assert 'content-type' in d
     del d['ContenT-Type']
     assert 'content-type' not in d
+
+
+class TestCSV:
+
+    header = ['name', 'sex']
+    rows = [['father', 'male'], ['mother', 'female']]
+    content = 'name,sex\nfather,male\nmother,female\n'
+
+    @pytest.fixture
+    def types_group(self) -> tuple:
+        return (
+            [self.rows, False],
+            [(tuple(row) for row in self.rows), False],
+            [(dict(zip(self.header, row)) for row in self.rows), True],
+        )
+
+    def test_write_with_path(self, types_group):
+        with TemporaryDirectory() as dirname:
+            file_path = os.path.join(dirname, 'data.csv')
+            for rows, with_dict in types_group:
+                CSV.write(self.header, rows, with_dict=with_dict, file_path=file_path)
+
+                with open(file_path) as f:
+                    assert f.read() == self.content
+
+    def test_write_without_path(self, types_group):
+        for rows, with_dict in types_group:
+            file = CSV.write(self.header, rows, with_dict=with_dict)
+            assert file.getvalue().replace('\r\n', '\n') == self.content
+
+    def test_read_with_path(self):
+        with TemporaryDirectory() as dirpath:
+            file_path = os.path.join(dirpath, 'data.csv')
+            CSV.write(self.header, self.rows, file_path=file_path)
+
+            assert CSV.read(file_path) == (self.header, self.rows)
+            dict_rows = [dict(zip(self.header, row)) for row in self.rows]
+            assert CSV.read(file_path, True) == (self.header, dict_rows)
+
+    def test_read_without_path(self):
+        f = CSV.write(self.header, self.rows)
+        assert CSV.read(f) == (self.header, self.rows)
+        f.seek(0)
+        dict_rows = [dict(zip(self.header, row)) for row in self.rows]
+        assert CSV.read(f, True) == (self.header, dict_rows)
 
 
 def test_clean_textarea():
@@ -121,28 +166,6 @@ def test_import_object():
         import_object('util.U')
 
 
-class TestReadCsv:
-
-    header = ['name', 'sex']
-    rows = [['father', 'male'], ['mother', 'female']]
-
-    def test_with_path(self):
-        with TemporaryDirectory() as dirpath:
-            file_path = os.path.join(dirpath, 'data.csv')
-            write_csv(self.header, self.rows, file_path=file_path)
-
-            assert read_csv(file_path) == (self.header, self.rows)
-            dict_rows = [dict(zip(self.header, row)) for row in self.rows]
-            assert read_csv(file_path, True) == (self.header, dict_rows)
-
-    def test_without_path(self):
-        f = write_csv(self.header, self.rows)
-        assert read_csv(f) == (self.header, self.rows)
-        f.seek(0)
-        dict_rows = [dict(zip(self.header, row)) for row in self.rows]
-        assert read_csv(f, True) == (self.header, dict_rows)
-
-
 def test_rm_control_chars():
     assert rm_control_chars('带\x00带\x1f我\x7f') == '带带我'
     assert rm_control_chars('带\u0000带\u001f我\u007f') == '带带我'
@@ -208,35 +231,6 @@ class TestSeqGrouper:
             [seq]
         assert list(seq_grouper(seq, size=11, filler=filler)) == \
             [seq + type_([filler])]
-
-
-class TestWriteCSV:
-
-    header = ['name', 'sex']
-    rows = [['father', 'male'], ['mother', 'female']]
-    content = 'name,sex\nfather,male\nmother,female\n'
-
-    @pytest.fixture
-    def types_group(self) -> tuple:
-        return (
-            [self.rows, False],
-            [(tuple(row) for row in self.rows), False],
-            [(dict(zip(self.header, row)) for row in self.rows), True],
-        )
-
-    def test_with_path(self, types_group):
-        with TemporaryDirectory() as dirname:
-            file_path = os.path.join(dirname, 'data.csv')
-            for rows, with_dict in types_group:
-                write_csv(self.header, rows, with_dict=with_dict, file_path=file_path)
-
-                with open(file_path) as f:
-                    assert f.read() == self.content
-
-    def test_without_path(self, types_group):
-        for rows, with_dict in types_group:
-            file = write_csv(self.header, rows, with_dict=with_dict)
-            assert file.getvalue().replace('\r\n', '\n') == self.content
 
 
 """test util_cryptography"""
