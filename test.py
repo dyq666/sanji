@@ -27,8 +27,8 @@ class TestBase64:
 
     @pytest.mark.parametrize('with_equal', (True, False))
     @pytest.mark.parametrize('funcs', (
-        (Base64.b64encode, Base64.b64decode),
-        (Base64.urlsafe_b64encode, Base64.urlsafe_b64decode),
+        [Base64.b64encode, Base64.b64decode],
+        [Base64.urlsafe_b64encode, Base64.urlsafe_b64decode],
     ))
     def test_encode_and_decode(self, with_equal, funcs):
         encode = partial(funcs[0], with_equal=with_equal)
