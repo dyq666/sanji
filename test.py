@@ -1,4 +1,3 @@
-import csv
 import os
 from tempfile import TemporaryDirectory
 from functools import partial
@@ -130,9 +129,7 @@ class TestReadCsv:
     def test_read_empty_csv(self):
         with TemporaryDirectory() as dirpath:
             file_path = os.path.join(dirpath, 'data.csv')
-            with open(file_path, 'w') as f:
-                f_csv = csv.writer(f)
-                f_csv.writerow(self.header)
+            write_csv(self.header, [], file_path=file_path)
 
             assert read_csv(file_path) == (self.header, [])
             assert read_csv(file_path, True) == (self.header, [])
@@ -140,14 +137,11 @@ class TestReadCsv:
     def test_read_csv(self):
         with TemporaryDirectory() as dirpath:
             file_path = os.path.join(dirpath, 'data.csv')
-            write_csv(self.header, self.rows, file_path)
+            write_csv(self.header, self.rows, file_path=file_path)
 
             assert read_csv(file_path) == (self.header, self.rows)
-            assert read_csv(file_path, True) == (self.header, self.dict_rows)
-
-    @property
-    def dict_rows(self):
-        return [dict(zip(self.header, row)) for row in self.rows]
+            dict_rows = [dict(zip(self.header, row)) for row in self.rows]
+            assert read_csv(file_path, True) == (self.header, dict_rows)
 
 
 def test_rm_control_chars():
@@ -223,33 +217,27 @@ class TestWriteCSV:
     rows = [['father', 'male'], ['mother', 'female']]
     content = 'name,sex\nfather,male\nmother,female\n'
 
-    def test_expected_exceptions(self):
-        with pytest.raises(ValueError):
-            write_csv([], [])
-        with pytest.raises(TypeError):
-            write_csv(['1'], [{1}])
-
-    def test_row_item_type(self):
-        rows_fixtures = (
-            self.rows,
-            list(tuple(row) for row in self.rows),
-            list(dict(zip(self.header, row)) for row in self.rows),
+    @pytest.fixture
+    def types_group(self) -> tuple:
+        return (
+            [self.rows, False],
+            [(tuple(row) for row in self.rows), False],
+            [(dict(zip(self.header, row)) for row in self.rows), True],
         )
-        for rows in rows_fixtures:
-            file = write_csv(self.header, rows)
-            assert file.getvalue().replace('\r\n', '\n') == self.content
 
-    def test_with_path(self):
+    def test_with_path(self, types_group):
         with TemporaryDirectory() as dirname:
             file_path = os.path.join(dirname, 'data.csv')
-            write_csv(self.header, self.rows, file_path)
+            for rows, with_dict in types_group:
+                write_csv(self.header, rows, with_dict=with_dict, file_path=file_path)
 
-            with open(file_path) as f:
-                assert f.read() == self.content
+                with open(file_path) as f:
+                    assert f.read() == self.content
 
-    def test_without_path(self):
-        file = write_csv(self.header, self.rows)
-        assert file.getvalue().replace('\r\n', '\n') == self.content
+    def test_without_path(self, types_group):
+        for rows, with_dict in types_group:
+            file = write_csv(self.header, rows, with_dict=with_dict)
+            assert file.getvalue().replace('\r\n', '\n') == self.content
 
 
 """test util_cryptography"""

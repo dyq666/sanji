@@ -182,22 +182,16 @@ def seq_grouper(seq: Seq, size: int, filler: Optional[Any] = None) -> Iterable:
     yield from (seq[i * size: (i + 1) * size] for i in range(times))
 
 
-def write_csv(header: List[str],
-              rows: Union[List[dict], List[list], List[tuple]],
-              file_path: Optional[str] = None
-              ) -> Optional[StringIO]:
-    """将数据写入 csv
+def write_csv(header: Iterable[str], rows: Iterable, *, with_dict: bool = False,
+              file_path: Optional[str] = None) -> Optional[StringIO]:
+    """将数据按 csv 格式写入文件.
 
-    如果传 `file_path` 则将数据写入此路径, 否则返回 StringIO
+    `with_dict`: `rows` 中的数据项类型是否为 `dict` ?
+    `file_path`: 如果传入字符串, 那么将数据写入此文件路径, 否则返回 `StringIO` 对象.
     """
-    if not header or not rows:
-        raise ValueError('header or rows should not empty')
-    if not isinstance(rows[0], (dict, list, tuple)):
-        raise TypeError('type of row item must be dict or tuple or list')
-
     file = StringIO() if file_path is None else open(file_path, 'w', newline='')
 
-    if isinstance(rows[0], dict):
+    if with_dict:
         f_csv = csv.DictWriter(file, header)
         f_csv.writeheader()
         f_csv.writerows(rows)
