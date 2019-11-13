@@ -120,18 +120,27 @@ def import_object(object_path: str) -> Any:
         raise ImportError(f'Cannot import {object_path}')
 
 
-def read_csv(file_path: str, with_dict: bool = False) -> Tuple[list, list]:
-    """从 csv 中读取数据"""
-    with open(file_path, newline='') as f:
-        if with_dict:
-            f_csv = csv.DictReader(f)
-            data = list(f_csv)
-            header = f_csv.fieldnames
-        else:
-            f_csv = csv.reader(f)
-            header = next(f_csv)
-            data = list(f_csv)
-    return header, data
+def read_csv(file_path: Union[str, io.StringIO], with_dict: bool = False) -> Tuple[list, list]:
+    """从文件中读取 csv 格式的数据.
+
+    `with_dict`: 返回的 `rows` 中的数据项类型是否为 `dict` ?
+    `file_path`: 如果传入字符串, 那么从此文件路径中读取数据, 否则从 `StringIO` 对象中读取数据.
+    """
+    file = open(file_path, newline='') if isinstance(file_path, str) else file_path
+
+    if with_dict:
+        f_csv = csv.DictReader(file)
+        rows = list(f_csv)
+        header = f_csv.fieldnames
+    else:
+        f_csv = csv.reader(file)
+        header = next(f_csv)
+        rows = list(f_csv)
+
+    if isinstance(file_path, str):
+        file.close()
+
+    return header, rows
 
 
 def rm_control_chars(str_: str) -> str:

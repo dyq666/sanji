@@ -126,15 +126,7 @@ class TestReadCsv:
     header = ['name', 'sex']
     rows = [['father', 'male'], ['mother', 'female']]
 
-    def test_read_empty_csv(self):
-        with TemporaryDirectory() as dirpath:
-            file_path = os.path.join(dirpath, 'data.csv')
-            write_csv(self.header, [], file_path=file_path)
-
-            assert read_csv(file_path) == (self.header, [])
-            assert read_csv(file_path, True) == (self.header, [])
-
-    def test_read_csv(self):
+    def test_with_path(self):
         with TemporaryDirectory() as dirpath:
             file_path = os.path.join(dirpath, 'data.csv')
             write_csv(self.header, self.rows, file_path=file_path)
@@ -142,6 +134,13 @@ class TestReadCsv:
             assert read_csv(file_path) == (self.header, self.rows)
             dict_rows = [dict(zip(self.header, row)) for row in self.rows]
             assert read_csv(file_path, True) == (self.header, dict_rows)
+
+    def test_without_path(self):
+        f = write_csv(self.header, self.rows)
+        assert read_csv(f) == (self.header, self.rows)
+        f.seek(0)
+        dict_rows = [dict(zip(self.header, row)) for row in self.rows]
+        assert read_csv(f, True) == (self.header, dict_rows)
 
 
 def test_rm_control_chars():
