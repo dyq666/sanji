@@ -12,12 +12,12 @@ __all__ = (
 
 import base64
 import csv
+import importlib
 import io
 import math
 import re
 from collections import UserDict
 from decimal import ROUND_HALF_UP, Decimal
-from importlib import import_module
 from typing import (
     Any, Iterable, List, Optional, Tuple, Union,
 )
@@ -163,7 +163,7 @@ def import_object(object_path: str) -> Any:
     try:
         dot = object_path.rindex('.')
         module, obj = object_path[:dot], object_path[dot + 1:]
-        return getattr(import_module(module), obj)
+        return getattr(importlib.import_module(module), obj)
     # rindex        -> ValueError
     # import_module -> ModuleNotFoundError
     # getattr       -> AttributeError
