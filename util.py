@@ -4,6 +4,7 @@ __all__ = (
     'CSV',
     'clean_textarea',
     'fill_seq',
+    'format_dict',
     'import_object',
     'rm_control_chars',
     'round_half_up',
@@ -14,6 +15,7 @@ import base64
 import csv
 import importlib
 import io
+import json
 import math
 import re
 from collections import UserDict
@@ -156,6 +158,20 @@ def fill_seq(seq: Seq, size: int, filler: Any) -> Seq:
         return seq + filler * num
     else:  # list or tuple
         return seq + type(seq)(filler for _ in range(num))
+
+
+def format_dict(data: dict, show_unicode: bool = True) -> str:
+    """将字典转换成四空格缩进的格式.
+
+    `show_unicode`: 是否转化为 Python 中 unicode.
+
+    参考:
+        https://stackoverflow.com/questions/4020539/process-escape-sequences-in-a-string-in-python/4020824#4020824
+    """
+    data = json.dumps(data, indent=4)
+    if show_unicode:
+        data = data.encode().decode('unicode_escape')
+    return data
 
 
 def import_object(object_path: str) -> Any:

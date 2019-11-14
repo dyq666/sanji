@@ -5,8 +5,8 @@ from functools import partial
 import pytest
 
 from util import (
-    Base64, CaseInsensitiveDict, CSV, clean_textarea, fill_seq, import_object,
-    rm_control_chars, round_half_up, seq_grouper,
+    Base64, CaseInsensitiveDict, CSV, clean_textarea, fill_seq, format_dict,
+    import_object, rm_control_chars, round_half_up, seq_grouper,
 )
 from util_cryptography import AESCipher, RSAPrivateKey, RSAPublicKey
 from util_phonenumbers import parse_phone
@@ -151,6 +151,12 @@ class TestFillSeq:
             seq = cls(item for _ in range(i))
             fillers = cls(filler for _ in range(4 - i))
             assert fill_seq(seq, 4, filler) == seq + fillers
+
+
+def test_format_dict():
+    data = {'名字': '小红'}
+    assert format_dict(data) == '{\n    "名字": "小红"\n}'
+    assert format_dict(data, show_unicode=False) == '{\n    "\\u540d\\u5b57": "\\u5c0f\\u7ea2"\n}'
 
 
 def test_import_object():
