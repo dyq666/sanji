@@ -86,7 +86,7 @@ class CSV:
         return header, rows
 
     @staticmethod
-    def write(header: Iterable[str], rows: Iterable, *, with_dict: bool = False,
+    def write(header: Iterable[str], rows: Iterable, with_dict: bool = False,
               file_path: Optional[str] = None) -> Optional[io.StringIO]:
         """将数据按 csv 格式写入文件.
 
