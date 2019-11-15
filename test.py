@@ -155,8 +155,16 @@ class TestFillSeq:
 
 def test_format_dict():
     data = {'名字': '小红'}
-    assert format_dict(data) == '{\n    "名字": "小红"\n}'
-    assert format_dict(data, show_unicode=False) == '{\n    "\\u540d\\u5b57": "\\u5c0f\\u7ea2"\n}'
+    assert format_dict(data) == (
+        '{\n'
+        '    "名字": "小红"\n'
+        '}'
+    )
+    assert format_dict(data, show_unicode=False) == (
+        '{\n'
+        '    "\\u540d\\u5b57": "\\u5c0f\\u7ea2"\n'
+        '}'
+    )
 
 
 def test_import_object():
