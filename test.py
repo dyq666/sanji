@@ -6,7 +6,7 @@ import pytest
 
 from util import (
     Base64, CaseInsensitiveDict, CSV, clean_textarea, fill_seq, format_dict,
-    import_object, rm_control_chars, round_half_up, seq_grouper,
+    import_object, rm_control_chars, round_half_up, seq_grouper, silent_remove,
 )
 from util_cryptography import AESCipher, RSAPrivateKey, RSAPublicKey
 from util_phonenumbers import parse_phone
@@ -296,3 +296,20 @@ def test_parse_phone():
     assert parse_phone(f'+86{tel}') == '17718809932'
     assert parse_phone(f'+87{tel}') is None
     assert parse_phone(tel[:10]) is None
+
+
+def test_silent_remove():
+    col_list = list(range(10))
+    silent_remove(col_list, 100)
+    silent_remove(col_list, 9)
+    assert 9 not in col_list
+
+    col_dict = dict(zip(range(10), range(10)))
+    silent_remove(col_dict, 100)
+    silent_remove(col_dict, 9)
+    assert 9 not in col_dict
+
+    col_tuple = tuple(range(10))
+    silent_remove(col_tuple, 100)
+    silent_remove(col_tuple, 9)
+    assert 9 in col_tuple
