@@ -7,6 +7,7 @@ import pytest
 from util import (
     Base64, CaseInsensitiveDict, CSV, clean_textarea, fill_seq, format_dict,
     import_object, rm_control_chars, round_half_up, seq_grouper, silent_remove,
+    unique_check,
 )
 from util_cryptography import AESCipher, RSAPrivateKey, RSAPublicKey
 from util_phonenumbers import parse_phone
@@ -313,3 +314,27 @@ def test_silent_remove():
     silent_remove(col_tuple, 100)
     silent_remove(col_tuple, 9)
     assert 9 in col_tuple
+
+
+def test_unique_check():
+    @unique_check
+    class A:
+        a = 0
+        b = 1
+
+    with pytest.raises(ValueError):
+        @unique_check
+        class A:
+            a = 0
+            b = 0
+
+    @unique_check
+    class B:
+        a = '0'
+        b = '1'
+
+    with pytest.raises(ValueError):
+        @unique_check
+        class B:
+            a = '0'
+            b = '0'
