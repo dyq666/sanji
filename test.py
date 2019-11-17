@@ -14,7 +14,6 @@ from util_phonenumbers import parse_phone
 
 
 class TestBase64:
-
     """= 号只有三种情况, 两个, 一个, 零个. 因此只用选三个特例就行."""
 
     @pytest.mark.parametrize('func', (Base64.b64encode, Base64.urlsafe_b64encode))

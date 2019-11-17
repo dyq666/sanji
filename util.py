@@ -252,6 +252,7 @@ def silent_remove(col: Union[list, dict], value: Any) -> None:
 
 
 def unique_check(cls: type) -> None:
+    """检查常量类是否有重复的常量"""
     seen = set()
     for v in cls.__dict__.values():
         if not isinstance(v, (int, str)):
