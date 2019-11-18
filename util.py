@@ -141,7 +141,7 @@ def clean_textarea(value: str, keep_inline_space: bool = True
                    ) -> Union[List[str], List[List[str]]]:
     """在字符串中获取数据.
 
-    keep_inline_space: 是否拆分一行中的数据
+    `keep_inline_space`: 是否拆分一行中的数据
     """
     rows = [r.strip() for r in value.splitlines() if r and not r.isspace()]
     return rows if keep_inline_space else [r.split() for r in rows]
@@ -195,10 +195,10 @@ def rm_control_chars(str_: str) -> str:
 
 
 def round_half_up(number: Num, ndigits: int = 0) -> Num:
-    """四舍五入.
+    """四舍五入. ()
 
-    ndigits: 与 ``round`` 的参数 ``ndigits`` 保持一样的逻辑:
-             > 0 小数位, <= 0 整数位.
+    `ndigits`: 与 ``round`` 的参数 ``ndigits`` 保持一样的逻辑:
+               > 0 为修约到小数位, <= 0 为修约到整数位.
 
     实际上大多数场景不需要支持 `ndigits <= 0` 的情况.
     """
@@ -225,7 +225,8 @@ def round_half_up(number: Num, ndigits: int = 0) -> Num:
 def seq_grouper(seq: Seq, size: int, filler: Optional[Any] = None) -> Iterable:
     """按组迭代序列.
 
-    如果传入了 `filler` 则会用 `filler` 填充最后一组, 使之可以被 `size` 整除.
+    `size`: 每组的大小.
+    `filler`: 如果传入, 则用此值填充最后一组.
     """
     if not isinstance(seq, (str, bytes, list, tuple)):
         raise TypeError
