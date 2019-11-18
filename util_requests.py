@@ -54,22 +54,27 @@ class OAuth2(AuthBase):
         return r
 
 
-def upload(url: str, file: Union[str, io.StringIO],
+def upload(url: str, file: Union[str, 'io.StringIO'],
            file_name: str = None) -> 'Response':
     """上传文件到某个 url.
 
     `file`: 可以是一个 str 代表文件路径, 也可以是一个类文件对象, 比如 `io.StringIO`.
     `file_name`: 上传的文件名, 如果指定, 则为此参数.
                  如果不指定此参数且 `file` 类型是 `str`, 那么从 `file` 中提取,
-                 如果不指定此参数且 `file` 类型是 `io.StringIO`, 那么为 `data.csv`.
+                 如果不指定此参数且 `file` 类型是 `io.StringIO`, 那么为 `data`.
     """
     import requests
 
-    if isinstance(file, str):
+    is_file_path = isinstance(file, str)
+    if is_file_path:
         file_name = os.path.split(file)[1] if file_name is None else file_name
         file = open(file)
     else:
-        file_name = 'data.csv' if file_name is None else file_name
+        file_name = 'data' if file_name is None else file_name
 
     r = requests.post(url=url, files={'file': (file_name, file)})
+
+    if is_file_path:
+        file.close()
+
     return r
