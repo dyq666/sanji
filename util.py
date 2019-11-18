@@ -10,7 +10,6 @@ __all__ = (
     'round_half_up',
     'seq_grouper',
     'silent_remove',
-    'unique_check',
 )
 
 import base64
@@ -249,15 +248,3 @@ def silent_remove(col: Union[list, dict], value: Any) -> None:
             del col[value]
         except KeyError:
             pass
-
-
-def unique_check(cls: type) -> None:
-    """检查常量类是否有重复的常量"""
-    seen = set()
-    for v in cls.__dict__.values():
-        if not isinstance(v, (int, str)):
-            continue
-        if v in seen:
-            raise ValueError(f'{v} is repeat.')
-        else:
-            seen.add(v)
