@@ -1,7 +1,6 @@
 __all__ = (
     'CSV',
     'Base64',
-    'clean_textarea',
     'fill_seq',
     'format_dict',
     'import_object',
@@ -9,6 +8,7 @@ __all__ = (
     'round_half_up',
     'seq_grouper',
     'silent_remove',
+    'strip_blank',
 )
 
 import base64
@@ -82,7 +82,7 @@ class CSV:
 
 
 class Base64:
-    """可选择是否填充等号的 Base64"""
+    """可选择是否填充等号的 Base64."""
 
     @staticmethod
     def b64encode(s: bytes, with_equal: bool = False) -> bytes:
@@ -109,16 +109,6 @@ class Base64:
         if with_equal:
             s = fill_seq(s, 4, b'=')
         return base64.urlsafe_b64decode(s)
-
-
-def clean_textarea(value: str, keep_inline_space: bool = True
-                   ) -> Union[List[str], List[List[str]]]:
-    """在字符串中获取数据.
-
-    `keep_inline_space`: 是否拆分一行中的数据
-    """
-    rows = [r.strip() for r in value.splitlines() if r and not r.isspace()]
-    return rows if keep_inline_space else [r.split() for r in rows]
 
 
 def fill_seq(seq: Seq, size: int, filler: Any) -> Seq:
@@ -223,3 +213,13 @@ def silent_remove(col: Union[list, dict], value: Any) -> None:
             del col[value]
         except KeyError:
             pass
+
+
+def strip_blank(value: str, keep_inline_space: bool = True
+                ) -> Union[List[str], List[List[str]]]:
+    """在字符串中获取数据.
+
+    `keep_inline_space`: 是否拆分一行中的数据
+    """
+    rows = [r.strip() for r in value.splitlines() if r and not r.isspace()]
+    return rows if keep_inline_space else [r.split() for r in rows]

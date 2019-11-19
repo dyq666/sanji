@@ -5,8 +5,9 @@ from functools import partial
 import pytest
 
 from util import (
-    CSV, Base64, clean_textarea, fill_seq, format_dict, import_object,
+    CSV, Base64, fill_seq, format_dict, import_object,
     rm_control_chars, round_half_up, seq_grouper, silent_remove,
+    strip_blank,
 )
 
 
@@ -78,26 +79,6 @@ class TestBase64:
         assert decode(encode(b'a')) == b'a'
         assert decode(encode(b'aa')) == b'aa'
         assert decode(encode(b'aaa')) == b'aaa'
-
-
-def test_clean_textarea():
-    textarea = """
-    1
-
-    2
-    3
-
-    """
-    assert clean_textarea(textarea) == ['1', '2', '3']
-
-    textarea = """
-    1 a
-    2\t\t b
-    \t
-    3      c
-    """
-    assert clean_textarea(textarea, keep_inline_space=False) == \
-        [['1', 'a'], ['2', 'b'], ['3', 'c']]
 
 
 class TestFillSeq:
@@ -241,3 +222,23 @@ def test_silent_remove():
     silent_remove(col_tuple, 100)
     silent_remove(col_tuple, 9)
     assert 9 in col_tuple
+
+
+def test_strip_blank():
+    textarea = """
+    1
+
+    2
+    3
+
+    """
+    assert strip_blank(textarea) == ['1', '2', '3']
+
+    textarea = """
+    1 a
+    2\t\t b
+    \t
+    3      c
+    """
+    assert strip_blank(textarea, keep_inline_space=False) == \
+        [['1', 'a'], ['2', 'b'], ['3', 'c']]
