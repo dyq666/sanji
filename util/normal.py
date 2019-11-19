@@ -26,7 +26,6 @@ from typing import (
 Col = Union[list, tuple, dict]  # Collection
 Num = Union[int, float]
 Seq = Union[list, tuple, str, bytes]
-Text = Union[str, bytes]
 
 
 class CSV:
