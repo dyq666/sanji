@@ -5,7 +5,7 @@ from functools import partial
 import pytest
 
 from util import (
-    CSV, Base64, fill_seq, format_dict, import_object,
+    CSV, Base64, fill_seq, import_object, indent_data,
     round_half_up, seq_grouper, silent_remove, strip_blank,
     strip_control,
 )
@@ -113,20 +113,6 @@ class TestFillSeq:
             assert fill_seq(seq, 4, filler) == seq + fillers
 
 
-def test_format_dict():
-    data = {'名字': '小红'}
-    assert format_dict(data) == (
-        '{\n'
-        '    "名字": "小红"\n'
-        '}'
-    )
-    assert format_dict(data, show_unicode=False) == (
-        '{\n'
-        '    "\\u540d\\u5b57": "\\u5c0f\\u7ea2"\n'
-        '}'
-    )
-
-
 def test_import_object():
     obj = import_object('util.import_object')
     assert obj == import_object
@@ -138,6 +124,20 @@ def test_import_object():
         import_object('util1.import_object')
         # Attribute
         import_object('util.U')
+
+
+def test_indent_data():
+    data = {'名字': '小红'}
+    assert indent_data(data) == (
+        '{\n'
+        '    "名字": "小红"\n'
+        '}'
+    )
+    assert indent_data(data, show_unicode=False) == (
+        '{\n'
+        '    "\\u540d\\u5b57": "\\u5c0f\\u7ea2"\n'
+        '}'
+    )
 
 
 def test_round_half_up():

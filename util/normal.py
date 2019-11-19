@@ -2,8 +2,8 @@ __all__ = (
     'CSV',
     'Base64',
     'fill_seq',
-    'format_dict',
     'import_object',
+    'indent_data',
     'round_half_up',
     'seq_grouper',
     'silent_remove',
@@ -23,7 +23,7 @@ from typing import (
     Any, Iterable, List, Optional, Tuple, Union,
 )
 
-Col = Union[list, tuple]  # Collection
+Col = Union[list, tuple, dict]  # Collection
 Num = Union[int, float]
 Seq = Union[list, tuple, str, bytes]
 Text = Union[str, bytes]
@@ -126,20 +126,6 @@ def fill_seq(seq: Seq, size: int, filler: Any) -> Seq:
         return seq + type(seq)(filler for _ in range(num))
 
 
-def format_dict(data: dict, show_unicode: bool = True) -> str:
-    """将字典转换成四空格缩进的格式.
-
-    `show_unicode`: 是否转化为 Python 中 unicode.
-
-    参考:
-        https://stackoverflow.com/questions/4020539/process-escape-sequences-in-a-string-in-python/4020824#4020824
-    """
-    data = json.dumps(data, indent=4)
-    if show_unicode:
-        data = data.encode().decode('unicode_escape')
-    return data
-
-
 def import_object(object_path: str) -> Any:
     """根据路径获取对象."""
     try:
@@ -151,6 +137,20 @@ def import_object(object_path: str) -> Any:
     # getattr       -> AttributeError
     except (ValueError, ModuleNotFoundError, AttributeError):
         raise ImportError(f'Cannot import {object_path}')
+
+
+def indent_data(data: Col, show_unicode: bool = True) -> str:
+    """将数据转换成四空格缩进的格式.
+
+    `show_unicode`: 是否转化为 Python 中 unicode.
+
+    参考:
+        https://stackoverflow.com/questions/4020539/process-escape-sequences-in-a-string-in-python/4020824#4020824
+    """
+    data = json.dumps(data, indent=4)
+    if show_unicode:
+        data = data.encode().decode('unicode_escape')
+    return data
 
 
 def round_half_up(number: Num, ndigits: int = 0) -> Num:

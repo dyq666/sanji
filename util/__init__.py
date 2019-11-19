@@ -5,8 +5,8 @@ __all__ = (
     'OAuth2',
     'SessionWithUrlPrefix',
     'fill_seq',
-    'format_dict',
     'import_object',
+    'indent_data',
     'parse_phone',
     'round_half_up',
     'seq_grouper',
@@ -18,7 +18,7 @@ __all__ = (
 
 from .demo import CaseInsensitiveDict
 from .normal import (
-    CSV, Base64, fill_seq, format_dict, import_object,
+    CSV, Base64, fill_seq, import_object, indent_data,
     round_half_up, seq_grouper, silent_remove, strip_blank,
     strip_control,
 )
