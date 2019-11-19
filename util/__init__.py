@@ -19,8 +19,9 @@ __all__ = (
     'upload',
 )
 
+from .demo import CaseInsensitiveDict
 from .normal import (
-    Base64, CaseInsensitiveDict, CSV, clean_textarea, fill_seq, format_dict,
+    CSV, Base64, clean_textarea, fill_seq, format_dict,
     import_object, rm_control_chars, round_half_up, seq_grouper, silent_remove,
 )
 from .third_cryptography import AESCipher, RSAPrivateKey, RSAPublicKey

@@ -5,9 +5,8 @@ from functools import partial
 import pytest
 
 from util import (
-    CSV, Base64, CaseInsensitiveDict, clean_textarea, fill_seq,
-    format_dict, import_object, rm_control_chars, round_half_up,
-    seq_grouper, silent_remove,
+    CSV, Base64, clean_textarea, fill_seq, format_dict, import_object,
+    rm_control_chars, round_half_up, seq_grouper, silent_remove,
 )
 
 
@@ -78,25 +77,6 @@ class TestBase64:
         assert decode(encode(b'a')) == b'a'
         assert decode(encode(b'aa')) == b'aa'
         assert decode(encode(b'aaa')) == b'aaa'
-
-
-def test_CaseInsensitiveDict():
-    d = CaseInsensitiveDict()
-    content_type = 'application/json'
-
-    # __setitem__, __getitem__
-    d['Content-Type'] = content_type
-    assert d['content-type'] == content_type
-
-    # get
-    assert d.get('content-Type') == content_type
-    assert d.get('dsa') is None
-    assert d.get('dasda', 1) == 1
-
-    # __delitem__, __contains__
-    assert 'content-type' in d
-    del d['ContenT-Type']
-    assert 'content-type' not in d
 
 
 def test_clean_textarea():
