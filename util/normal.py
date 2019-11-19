@@ -1,6 +1,6 @@
 __all__ = (
-    'Base64',
     'CSV',
+    'Base64',
     'clean_textarea',
     'fill_seq',
     'format_dict',
@@ -27,36 +27,6 @@ Col = Union[list, tuple]  # Collection
 Num = Union[int, float]
 Seq = Union[list, tuple, str, bytes]
 Text = Union[str, bytes]
-
-
-class Base64:
-    """可选择是否填充等号的 Base64"""
-
-    @staticmethod
-    def b64encode(s: bytes, with_equal: bool = False) -> bytes:
-        content = base64.b64encode(s)
-        if with_equal:
-            content = content.rstrip(b'=')
-        return content
-
-    @staticmethod
-    def b64decode(s: bytes, with_equal: bool = False) -> bytes:
-        if with_equal:
-            s = fill_seq(s, 4, b'=')
-        return base64.b64decode(s)
-
-    @staticmethod
-    def urlsafe_b64encode(s: bytes, with_equal: bool = False) -> bytes:
-        content = base64.urlsafe_b64encode(s)
-        if with_equal:
-            content = content.rstrip(b'=')
-        return content
-
-    @staticmethod
-    def urlsafe_b64decode(s: bytes, with_equal: bool = False) -> bytes:
-        if with_equal:
-            s = fill_seq(s, 4, b'=')
-        return base64.urlsafe_b64decode(s)
 
 
 class CSV:
@@ -109,6 +79,36 @@ class CSV:
         else:
             file.close()
             return
+
+
+class Base64:
+    """可选择是否填充等号的 Base64"""
+
+    @staticmethod
+    def b64encode(s: bytes, with_equal: bool = False) -> bytes:
+        content = base64.b64encode(s)
+        if with_equal:
+            content = content.rstrip(b'=')
+        return content
+
+    @staticmethod
+    def b64decode(s: bytes, with_equal: bool = False) -> bytes:
+        if with_equal:
+            s = fill_seq(s, 4, b'=')
+        return base64.b64decode(s)
+
+    @staticmethod
+    def urlsafe_b64encode(s: bytes, with_equal: bool = False) -> bytes:
+        content = base64.urlsafe_b64encode(s)
+        if with_equal:
+            content = content.rstrip(b'=')
+        return content
+
+    @staticmethod
+    def urlsafe_b64decode(s: bytes, with_equal: bool = False) -> bytes:
+        if with_equal:
+            s = fill_seq(s, 4, b'=')
+        return base64.urlsafe_b64decode(s)
 
 
 def clean_textarea(value: str, keep_inline_space: bool = True
