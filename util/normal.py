@@ -112,9 +112,10 @@ class Base64:
 
 
 def fill_seq(seq: Seq, size: int, filler: Any) -> Seq:
-    """用 `filler` 填充序列使其内被 `size` 整除"""
+    """用 `filler` 填充序列使其内被 `size` 整除."""
     if not isinstance(seq, (str, bytes, list, tuple)):
         raise TypeError
+
     if len(seq) % size == 0:
         return seq
 
@@ -140,7 +141,7 @@ def format_dict(data: dict, show_unicode: bool = True) -> str:
 
 
 def import_object(object_path: str) -> Any:
-    """根据路径获取对象"""
+    """根据路径获取对象."""
     try:
         dot = object_path.rindex('.')
         module, obj = object_path[:dot], object_path[dot + 1:]
@@ -159,12 +160,13 @@ def rm_control_chars(str_: str) -> str:
 
 
 def round_half_up(number: Num, ndigits: int = 0) -> Num:
-    """四舍五入. ()
+    """四舍五入.
 
     `ndigits`: 与 ``round`` 的参数 ``ndigits`` 保持一样的逻辑:
                > 0 为修约到小数位, <= 0 为修约到整数位.
 
-    实际上大多数场景不需要支持 `ndigits <= 0` 的情况.
+    此外:
+      大多数真实场景中不需要支持 `ndigits <= 0` 的情况, 因此只需要复制最后三行即可.
     """
     def _get_number(_ndigits: int) -> int:
         return int(str(number)[_ndigits - 1])
