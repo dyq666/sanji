@@ -6,8 +6,8 @@ import pytest
 
 from util import (
     CSV, Base64, fill_seq, format_dict, import_object,
-    rm_control_chars, round_half_up, seq_grouper, silent_remove,
-    strip_blank,
+    round_half_up, seq_grouper, silent_remove, strip_blank,
+    strip_control,
 )
 
 
@@ -140,11 +140,6 @@ def test_import_object():
         import_object('util.U')
 
 
-def test_rm_control_chars():
-    assert rm_control_chars('带\x00带\x1f我\x7f') == '带带我'
-    assert rm_control_chars('带\u0000带\u001f我\u007f') == '带带我'
-
-
 def test_round_half_up():
     # 四舍五入, round 是奇进偶舍
     assert round_half_up(10499, -3) == 10000
@@ -242,3 +237,8 @@ def test_strip_blank():
     """
     assert strip_blank(textarea, keep_inline_space=False) == \
         [['1', 'a'], ['2', 'b'], ['3', 'c']]
+
+
+def test_strip_control():
+    assert strip_control('带\x00带\x1f我\x7f') == '带带我'
+    assert strip_control('带\u0000带\u001f我\u007f') == '带带我'

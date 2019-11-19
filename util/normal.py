@@ -4,11 +4,11 @@ __all__ = (
     'fill_seq',
     'format_dict',
     'import_object',
-    'rm_control_chars',
     'round_half_up',
     'seq_grouper',
     'silent_remove',
     'strip_blank',
+    'strip_control',
 )
 
 import base64
@@ -153,12 +153,6 @@ def import_object(object_path: str) -> Any:
         raise ImportError(f'Cannot import {object_path}')
 
 
-def rm_control_chars(str_: str) -> str:
-    """去除控制字符"""
-    control_chars_reg = r'[\x00-\x1f\x7f]'
-    return re.sub(control_chars_reg, '', str_)
-
-
 def round_half_up(number: Num, ndigits: int = 0) -> Num:
     """四舍五入.
 
@@ -225,3 +219,9 @@ def strip_blank(value: str, keep_inline_space: bool = True
     """
     rows = [r.strip() for r in value.splitlines() if r and not r.isspace()]
     return rows if keep_inline_space else [r.split() for r in rows]
+
+
+def strip_control(value: str) -> str:
+    """去除字符串中的控制字符."""
+    control_chars_reg = r'[\x00-\x1f\x7f]'
+    return re.sub(control_chars_reg, '', value)
