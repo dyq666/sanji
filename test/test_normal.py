@@ -5,53 +5,10 @@ from functools import partial
 import pytest
 
 from util import (
-    CSV, AESCipher, Base64, CaseInsensitiveDict, RSAPrivateKey, RSAPublicKey,
-    clean_textarea, fill_seq, format_dict, import_object, rm_control_chars, round_half_up,
-    parse_phone, seq_grouper, silent_remove,
+    CSV, Base64, CaseInsensitiveDict, clean_textarea, fill_seq,
+    format_dict, import_object, rm_control_chars, round_half_up,
+    seq_grouper, silent_remove,
 )
-
-
-class TestBase64:
-    """= 号只有三种情况, 两个, 一个, 零个. 因此只用选三个特例就行."""
-
-    @pytest.mark.parametrize('func', (Base64.b64encode, Base64.urlsafe_b64encode))
-    def test_strip_equal(self, func):
-        encode1 = partial(func, with_equal=True)
-        encode2 = partial(func, with_equal=False)
-        assert encode1(b'a') == encode2(b'a')[:-2]
-        assert encode1(b'aa') == encode2(b'aa')[:-1]
-        assert encode1(b'aaa') == encode2(b'aaa')
-
-    @pytest.mark.parametrize('with_equal', (True, False))
-    @pytest.mark.parametrize('funcs', (
-        [Base64.b64encode, Base64.b64decode],
-        [Base64.urlsafe_b64encode, Base64.urlsafe_b64decode],
-    ))
-    def test_encode_and_decode(self, with_equal, funcs):
-        encode = partial(funcs[0], with_equal=with_equal)
-        decode = partial(funcs[1], with_equal=with_equal)
-        assert decode(encode(b'a')) == b'a'
-        assert decode(encode(b'aa')) == b'aa'
-        assert decode(encode(b'aaa')) == b'aaa'
-
-
-def test_CaseInsensitiveDict():
-    d = CaseInsensitiveDict()
-    content_type = 'application/json'
-
-    # __setitem__, __getitem__
-    d['Content-Type'] = content_type
-    assert d['content-type'] == content_type
-
-    # get
-    assert d.get('content-Type') == content_type
-    assert d.get('dsa') is None
-    assert d.get('dasda', 1) == 1
-
-    # __delitem__, __contains__
-    assert 'content-type' in d
-    del d['ContenT-Type']
-    assert 'content-type' not in d
 
 
 class TestCSV:
@@ -97,6 +54,49 @@ class TestCSV:
         f.seek(0)
         dict_rows = [dict(zip(self.header, row)) for row in self.rows]
         assert CSV.read(f, True) == (self.header, dict_rows)
+
+
+class TestBase64:
+    """= 号只有三种情况, 两个, 一个, 零个. 因此只用选三个特例就行."""
+
+    @pytest.mark.parametrize('func', (Base64.b64encode, Base64.urlsafe_b64encode))
+    def test_strip_equal(self, func):
+        encode1 = partial(func, with_equal=True)
+        encode2 = partial(func, with_equal=False)
+        assert encode1(b'a') == encode2(b'a')[:-2]
+        assert encode1(b'aa') == encode2(b'aa')[:-1]
+        assert encode1(b'aaa') == encode2(b'aaa')
+
+    @pytest.mark.parametrize('with_equal', (True, False))
+    @pytest.mark.parametrize('funcs', (
+        [Base64.b64encode, Base64.b64decode],
+        [Base64.urlsafe_b64encode, Base64.urlsafe_b64decode],
+    ))
+    def test_encode_and_decode(self, with_equal, funcs):
+        encode = partial(funcs[0], with_equal=with_equal)
+        decode = partial(funcs[1], with_equal=with_equal)
+        assert decode(encode(b'a')) == b'a'
+        assert decode(encode(b'aa')) == b'aa'
+        assert decode(encode(b'aaa')) == b'aaa'
+
+
+def test_CaseInsensitiveDict():
+    d = CaseInsensitiveDict()
+    content_type = 'application/json'
+
+    # __setitem__, __getitem__
+    d['Content-Type'] = content_type
+    assert d['content-type'] == content_type
+
+    # get
+    assert d.get('content-Type') == content_type
+    assert d.get('dsa') is None
+    assert d.get('dasda', 1) == 1
+
+    # __delitem__, __contains__
+    assert 'content-type' in d
+    del d['ContenT-Type']
+    assert 'content-type' not in d
 
 
 def test_clean_textarea():
@@ -243,57 +243,6 @@ class TestSeqGrouper:
             [seq]
         assert list(seq_grouper(seq, size=11, filler=filler)) == \
             [seq + type_([filler])]
-
-
-"""test util_cryptography"""
-
-
-class TestAESCiper:
-
-    key = os.urandom(16)
-    iv = os.urandom(16)
-    ciper = AESCipher(key, iv)
-
-    def test_filler(self):
-        """确保填充字符等于需要填充的个数"""
-        for i in range(1, 17):
-            content = b'-' * i
-            encrypted_content = self.ciper.encrypt(content)
-            decryptor = self.ciper.cipher.decryptor()
-            decrypted_content = decryptor.update(encrypted_content) + decryptor.finalize()
-            assert decrypted_content[-1] == 16 - (i % 16)
-
-    def test_encrypt_and_decrypt(self):
-        for i in range(1, 17):
-            content = b'-' * i
-            encrypted_content = self.ciper.encrypt(content)
-            assert content == self.ciper.decrypt(encrypted_content)
-
-
-class TestRsa:
-
-    def test_load_private_key(self):
-        """load 后的 private key 应该生成一样的 public key"""
-        private_key = RSAPrivateKey.generate()
-        private_key2 = RSAPrivateKey.load(private_key.format_private_key())
-        assert private_key.format_public_key() == private_key2.format_public_key()
-
-    def test_encrpty_and_decrpty(self):
-        content = '带带我666'.encode()
-        private_key = RSAPrivateKey.generate()
-        public_key = RSAPublicKey.load(private_key.format_public_key())
-        assert private_key.decrypt(public_key.encrypt(content)) == content
-
-
-"""test util_phonenumbers"""
-
-
-def test_parse_phone():
-    tel = '17718809932'
-    assert parse_phone(tel) == tel
-    assert parse_phone(f'+86{tel}') == '17718809932'
-    assert parse_phone(f'+87{tel}') is None
-    assert parse_phone(tel[:10]) is None
 
 
 def test_silent_remove():
