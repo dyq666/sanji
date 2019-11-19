@@ -8,6 +8,10 @@ import phonenumbers
 
 
 def parse_phone(source: str) -> Optional[str]:
+    """解析中国地区的手机号.
+
+    将带 +86 前缀的手机号和正常的 11 位手机号都转换成 11 位手机号.
+    """
     try:
         pp = phonenumbers.parse(source, 'CN')
     except phonenumbers.NumberParseException:
