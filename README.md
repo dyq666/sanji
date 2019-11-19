@@ -12,4 +12,4 @@
 
 `test/test_normal.py` 依赖标准库的工具的测试用例.
 
-`test/test_{package_name}.py` 依赖第三方的工具的测试用例.
+`test/test_third_{package_name}.py` 依赖第三方的工具的测试用例.
