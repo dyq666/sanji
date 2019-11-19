@@ -10,6 +10,6 @@
 
 `util/third_{package_name}.py` 依赖第三方的工具.
 
-`util/demo.py` demo 级别的工具.
+`util/demo.py` demo 级别的工具. (一些不经常使用但有一定参考价值的工具)
 
 `test/` 测试用例, 对应模块的测试用例放在 `test_{module_name}.py` 中.
