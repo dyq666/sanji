@@ -16,21 +16,24 @@ class TestCSV:
     rows = [['father', 'male'], ['mother', 'female']]
     content = 'name,sex\nfather,male\nmother,female\n'
 
+    @property
+    def dict_rows(self):
+        return [dict(zip(self.header, row)) for row in self.rows]
+
     @pytest.fixture
     def types_group(self) -> tuple:
         return (
             [self.rows, False],
-            [(tuple(row) for row in self.rows), False],
-            [(dict(zip(self.header, row)) for row in self.rows), True],
+            [self.dict_rows, True],
         )
 
     def test_write_with_path(self, types_group):
         with TemporaryDirectory() as dirname:
-            file_path = os.path.join(dirname, 'data.csv')
+            filepath = os.path.join(dirname, 'data.csv')
             for rows, with_dict in types_group:
-                CSV.write(self.header, rows, with_dict=with_dict, file_path=file_path)
+                CSV.write(self.header, rows, with_dict=with_dict, filepath=filepath)
 
-                with open(file_path) as f:
+                with open(filepath) as f:
                     assert f.read() == self.content
 
     def test_write_without_path(self, types_group):
@@ -40,19 +43,17 @@ class TestCSV:
 
     def test_read_with_path(self):
         with TemporaryDirectory() as dirpath:
-            file_path = os.path.join(dirpath, 'data.csv')
-            CSV.write(self.header, self.rows, file_path=file_path)
+            filepath = os.path.join(dirpath, 'data.csv')
+            CSV.write(self.header, self.rows, filepath=filepath)
 
-            assert CSV.read(file_path) == (self.header, self.rows)
-            dict_rows = [dict(zip(self.header, row)) for row in self.rows]
-            assert CSV.read(file_path, True) == (self.header, dict_rows)
+            assert CSV.read(filepath) == (self.header, self.rows)
+            assert CSV.read(filepath, with_dict=True) == (self.header, self.dict_rows)
 
     def test_read_without_path(self):
         f = CSV.write(self.header, self.rows)
         assert CSV.read(f) == (self.header, self.rows)
         f.seek(0)
-        dict_rows = [dict(zip(self.header, row)) for row in self.rows]
-        assert CSV.read(f, True) == (self.header, dict_rows)
+        assert CSV.read(f, with_dict=True) == (self.header, self.dict_rows)
 
 
 class TestBase64:

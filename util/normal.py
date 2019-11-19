@@ -32,13 +32,13 @@ Text = Union[str, bytes]
 class CSV:
 
     @staticmethod
-    def read(file_path: Union[str, io.StringIO], with_dict: bool = False) -> Tuple[list, list]:
+    def read(filepath: Union[str, io.StringIO], with_dict: bool = False) -> Tuple[list, list]:
         """从文件中读取 csv 格式的数据.
 
         `with_dict`: 返回的 `rows` 中的数据项类型是否为 `dict` ?
         `file_path`: 如果传入字符串, 那么从此文件路径中读取数据, 否则从 `StringIO` 对象中读取数据.
         """
-        file = open(file_path, newline='') if isinstance(file_path, str) else file_path
+        file = open(filepath, newline='') if isinstance(filepath, str) else filepath
 
         if with_dict:
             f_csv = csv.DictReader(file)
@@ -49,20 +49,20 @@ class CSV:
             header = next(f_csv)
             rows = list(f_csv)
 
-        if isinstance(file_path, str):
+        if isinstance(filepath, str):
             file.close()
 
         return header, rows
 
     @staticmethod
-    def write(header: Iterable[str], rows: Iterable, with_dict: bool = False,
-              file_path: Optional[str] = None) -> Optional[io.StringIO]:
+    def write(header: Iterable[str], rows: Iterable[Iterable], with_dict: bool = False,
+              filepath: Optional[str] = None) -> Optional[io.StringIO]:
         """将数据按 csv 格式写入文件.
 
         `with_dict`: `rows` 中的数据项类型是否为 `dict` ?
         `file_path`: 如果传入字符串, 那么将数据写入此文件路径, 否则返回 `StringIO` 对象.
         """
-        file = io.StringIO() if file_path is None else open(file_path, 'w', newline='')
+        file = io.StringIO() if filepath is None else open(filepath, 'w', newline='')
 
         if with_dict:
             f_csv = csv.DictWriter(file, header)
@@ -73,7 +73,7 @@ class CSV:
             f_csv.writerow(header)
             f_csv.writerows(rows)
 
-        if file_path is None:
+        if filepath is None:
             file.seek(0)
             return file
         else:
