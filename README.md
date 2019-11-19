@@ -6,8 +6,10 @@
 
 ## 模块介绍
 
-`util.py` 只使用标准库构建的工具.
+`util/normal.py` 只依赖标准库的工具.
 
-`util_{package_name}.py` 依赖第三方的工具.
+`util/third_{package_name}.py` 依赖第三方的工具.
 
-`test.py` 大部分工具的测试用例.
+`test/test_normal.py` 依赖标准库的工具的测试用例.
+
+`test/test_{package_name}.py` 依赖第三方的工具的测试用例.
