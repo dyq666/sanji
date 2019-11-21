@@ -7,6 +7,7 @@ __all__ = (
 import os
 from typing import TYPE_CHECKING, Optional, Union
 
+import requests
 from requests.auth import AuthBase
 from requests.sessions import Session
 
@@ -63,8 +64,6 @@ def upload(url: str, file: Union[str, 'io.StringIO'],
                 如果不指定此参数且 `file` 类型是 `str`, 那么从 `file` 中提取,
                 如果不指定此参数且 `file` 类型是 `io.StringIO`, 那么为 `data`.
     """
-    import requests
-
     is_file_path = isinstance(file, str)
     if is_file_path:
         filename = os.path.split(file)[1] if filename is None else filename
