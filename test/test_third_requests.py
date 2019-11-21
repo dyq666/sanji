@@ -43,7 +43,7 @@ class TestUpload:
         f = io.StringIO()
         f.write('upload')
         f.seek(0)
-        r = upload(self.url, file=f, file_name='test.txt')
+        r = upload(self.url, file=f, filename='test.txt')
         assert r.status_code == HTTPStatus.OK
 
     def test_upload_file(self):
@@ -53,5 +53,5 @@ class TestUpload:
                 f.write('upload')
             r = upload(self.url, file=filepath)
             assert r.status_code == HTTPStatus.OK
-            r = upload(self.url, file=filepath, file_name='test.txt')
+            r = upload(self.url, file=filepath, filename='test.txt')
             assert r.status_code == HTTPStatus.OK
