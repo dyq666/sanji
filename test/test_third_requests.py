@@ -3,14 +3,17 @@ import os
 import tempfile
 from http import HTTPStatus
 
+import pytest
 import requests
 
 from util import OAuth2, SessionWithUrlPrefix, upload
 
 HOST = 'http://localhost'
 PORT = 5000
+CLOSE = True
 
 
+@pytest.mark.skipif(CLOSE, reason='需要手动开启')
 def test_o_auth2():
     s = requests.Session()
 
@@ -22,6 +25,7 @@ def test_o_auth2():
     assert r.status_code == HTTPStatus.OK
 
 
+@pytest.mark.skipif(CLOSE, reason='需要手动开启')
 def test_session_with_url_prefix():
     s = SessionWithUrlPrefix(f'{HOST}:{PORT}')
 
@@ -35,6 +39,7 @@ def test_session_with_url_prefix():
     assert r.status_code == HTTPStatus.OK
 
 
+@pytest.mark.skipif(CLOSE, reason='需要手动开启')
 class TestUpload:
 
     url = f'{HOST}:{PORT}/upload'
