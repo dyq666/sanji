@@ -1,5 +1,5 @@
 import os
-from tempfile import TemporaryDirectory
+import tempfile
 from functools import partial
 
 import pytest
@@ -29,7 +29,7 @@ class TestCSV:
         )
 
     def test_write_with_path(self, types_group):
-        with TemporaryDirectory() as dirname:
+        with tempfile.TemporaryDirectory() as dirname:
             filepath = os.path.join(dirname, 'data.csv')
             for rows, with_dict in types_group:
                 CSV.write(self.header, rows, with_dict=with_dict, filepath=filepath)
@@ -43,7 +43,7 @@ class TestCSV:
             assert file.getvalue().replace('\r\n', '\n') == self.content
 
     def test_read_with_path(self):
-        with TemporaryDirectory() as dirpath:
+        with tempfile.TemporaryDirectory() as dirpath:
             filepath = os.path.join(dirpath, 'data.csv')
             CSV.write(self.header, self.rows, filepath=filepath)
 
