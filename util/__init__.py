@@ -4,6 +4,7 @@ __all__ = (
     'CaseInsensitiveDict',
     'OAuth2',
     'SessionWithUrlPrefix',
+    'chinese_num',
     'fill_seq',
     'import_object',
     'indent_data',
@@ -18,7 +19,7 @@ __all__ = (
 
 from .demo import CaseInsensitiveDict
 from .normal import (
-    CSV, Base64, fill_seq, import_object, indent_data,
+    CSV, Base64, chinese_num, fill_seq, import_object, indent_data,
     round_half_up, seq_grouper, silent_remove, strip_blank,
     strip_control,
 )

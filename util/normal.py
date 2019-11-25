@@ -1,6 +1,7 @@
 __all__ = (
     'CSV',
     'Base64',
+    'chinese_num',
     'fill_seq',
     'import_object',
     'indent_data',
@@ -108,6 +109,27 @@ class Base64:
         if with_equal:
             s = fill_seq(s, 4, b'=')
         return base64.urlsafe_b64decode(s)
+
+
+def chinese_num(num: int) -> str:
+    """将数字转成中文."""
+    if num >= 100 or num < 0:
+        return ''
+
+    single = dict(zip(
+        range(1, 11),
+        '一二三四五六七八九十',
+    ))
+    single[0] = ''
+
+    if num == 0:
+        return '零'
+    elif num < 11:
+        return single[num]
+    elif num < 20:
+        return single[10] + single[num % 10]
+    else:
+        return single[num // 10] + single[10] + single[num % 10]
 
 
 def fill_seq(seq: Seq, size: int, filler: Any) -> Seq:

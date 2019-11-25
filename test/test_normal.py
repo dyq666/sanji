@@ -5,7 +5,7 @@ from functools import partial
 import pytest
 
 from util import (
-    CSV, Base64, fill_seq, import_object, indent_data,
+    CSV, Base64, chinese_num, fill_seq, import_object, indent_data,
     round_half_up, seq_grouper, silent_remove, strip_blank,
     strip_control,
 )
@@ -79,6 +79,25 @@ class TestBase64:
         assert decode(encode(b'a')) == b'a'
         assert decode(encode(b'aa')) == b'aa'
         assert decode(encode(b'aaa')) == b'aaa'
+
+
+def test_chinese_num():
+    fixtures = (
+        (0, '零'),
+        (1, '一'),
+        (9, '九'),
+        (10, '十'),
+        (11, '十一'),
+        (19, '十九'),
+        (20, '二十'),
+        (29, '二十九'),
+        (99, '九十九'),
+        # error fixtures
+        (-1, ''),
+        (100, ''),
+    )
+    for num, chinese in fixtures:
+        assert chinese_num(num) == chinese
 
 
 class TestFillSeq:
