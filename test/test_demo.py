@@ -8,9 +8,17 @@ class TestCaseInsensitiveDict:
     """测试了下面的 11 个字典的方法
 
     ```
-    __getitem__  __setitem__  __delitem__
-    __len__  __iter__  __contains__
-    get items values keys fromkeys
+    __getitem__
+    __setitem__
+    __delitem__
+    __len__
+    __iter__
+    __contains__
+    get
+    items
+    values
+    keys
+    fromkeys
     ```
     """
 
