@@ -253,7 +253,7 @@ def seq_grouper(seq: Seq, size: int, filler: Optional[Any] = None) -> Iterable:
     if filler is not None:
         seq = fill_seq(seq, size, filler)
     times = math.ceil(len(seq) / size)
-    yield from (seq[i * size: (i + 1) * size] for i in range(times))
+    return (seq[i * size: (i + 1) * size] for i in range(times))
 
 
 def silent_remove(col: Union[list, dict], value: Any) -> None:
