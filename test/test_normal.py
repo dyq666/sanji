@@ -102,8 +102,18 @@ class TestBinary:
         s = ''.join(['00001100', '00100001'])
         assert Binary.str_2_bytes(s) == bytes([12, 33])
 
+    def test_hexstr_2_bytes(self):
+        with pytest.raises(ValueError):
+            Binary.hexstr_2_bytes('f')
+
+        s = ''.join(['0C', '21'])
+        assert Binary.hexstr_2_bytes(s) == bytes([12, 33])
+
     def test_bytes_2_str(self):
-        assert Binary.bytes_2_str(b'\x00\x01\x00') == ''.join(['00000000', '00000001', '00000000'])
+        assert Binary.bytes_2_str(b'\x00\x01\xff') == ''.join(['00000000', '00000001', '11111111'])
+
+    def test_bytes_2_hexstr(self):
+        assert Binary.bytes_2_hexstr(b'\x00\x01\xff') == ''.join(['00', '01', 'ff'])
 
     def test_int_2_str(self):
         assert Binary.int_2_str(255) == '11111111'
@@ -115,6 +125,16 @@ class TestBinary:
         with pytest.raises(ValueError):
             Binary.int_2_str(256)
 
+    def test_int_2_hexstr(self):
+        assert Binary.int_2_hexstr(255) == 'ff'
+        assert Binary.int_2_hexstr(0) == '00'
+
+        with pytest.raises(ValueError):
+            Binary.int_2_hexstr(-1)
+
+        with pytest.raises(ValueError):
+            Binary.int_2_hexstr(256)
+
     def test_str_2_int(self):
         assert Binary.str_2_int('11111111') == 255
         assert Binary.str_2_int('00000000') == 0
@@ -124,6 +144,16 @@ class TestBinary:
 
         with pytest.raises(ValueError):
             Binary.str_2_int('12345678')
+
+    def test_hexstr_2_int(self):
+        assert Binary.hexstr_2_int('ff') == 255
+        assert Binary.hexstr_2_int('00') == 0
+
+        with pytest.raises(ValueError):
+            Binary.hexstr_2_int('fff')
+
+        with pytest.raises(ValueError):
+            Binary.hexstr_2_int('zz')
 
 
 def test_chinese_num():
