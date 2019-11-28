@@ -5,8 +5,8 @@ from functools import partial
 import pytest
 
 from util import (
-    CSV, Base64, chinese_num, fill_seq, import_object, indent_data,
-    round_half_up, seq_grouper, silent_remove, strip_blank,
+    CSV, Base64, Binary, chinese_num, fill_seq, import_object,
+    indent_data, round_half_up, seq_grouper, silent_remove, strip_blank,
     strip_control,
 )
 
@@ -79,6 +79,31 @@ class TestBase64:
         assert decode(encode(b'a')) == b'a'
         assert decode(encode(b'aa')) == b'aa'
         assert decode(encode(b'aaa')) == b'aaa'
+
+
+class TestBinary:
+
+    def test_str_xor(self):
+        with pytest.raises(KeyError):
+            Binary.str_xor('1', '2')
+
+        with pytest.raises(ValueError):
+            Binary.str_xor('11', '000')
+
+        assert Binary.str_xor('0011', '0101') == '0110'
+
+    def test_bytes_xor(self):
+        assert Binary.bytes_xor(b'\x03', b'\x05') == b'\x06'
+
+    def test_str_2_bytes(self):
+        with pytest.raises(ValueError):
+            Binary.str_2_bytes('11')
+
+        s = ''.join(['00001100', '00100001'])
+        assert Binary.str_2_bytes(s) == bytes([12, 33])
+
+    def test_bytes_2_str(self):
+        assert Binary.bytes_2_str(b'\x00\x01\x00') == ''.join(['00000000', '00000001', '00000000'])
 
 
 def test_chinese_num():

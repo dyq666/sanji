@@ -1,6 +1,7 @@
 __all__ = (
     'CSV',
     'Base64',
+    'Binary',
     'CaseInsensitiveDict',
     'OAuth2',
     'SessionWithUrlPrefix',
@@ -19,8 +20,8 @@ __all__ = (
 
 from .demo import CaseInsensitiveDict
 from .normal import (
-    CSV, Base64, chinese_num, fill_seq, import_object, indent_data,
-    round_half_up, seq_grouper, silent_remove, strip_blank,
+    CSV, Base64, Binary, chinese_num, fill_seq, import_object,
+    indent_data, round_half_up, seq_grouper, silent_remove, strip_blank,
     strip_control,
 )
 from .third_phonenumbers import parse_phone

@@ -1,6 +1,7 @@
 __all__ = (
     'CSV',
     'Base64',
+    'Binary',
     'chinese_num',
     'fill_seq',
     'import_object',
@@ -109,6 +110,43 @@ class Base64:
         if with_equal:
             s = fill_seq(s, 4, b'=')
         return base64.urlsafe_b64decode(s)
+
+
+class Binary:
+
+    xor_map = {
+        ('0', '0'): '0',
+        ('0', '1'): '1',
+        ('1', '0'): '1',
+        ('1', '1'): '0',
+    }
+
+    @classmethod
+    def str_xor(cls, s1: str, s2: str) -> str:
+        """XOR 两个 8 位二进制字符串."""
+        if len(s1) != len(s2):
+            raise ValueError
+
+        return ''.join(cls.xor_map[item] for item in zip(s1, s2))
+
+    @classmethod
+    def bytes_xor(cls, b1: bytes, b2: bytes) -> bytes:
+        s1 = cls.bytes_2_str(b1)
+        s2 = cls.bytes_2_str(b2)
+        return cls.str_2_bytes(cls.str_xor(s1, s2))
+
+    @classmethod
+    def str_2_bytes(cls, s: str) -> bytes:
+        """将 8 位二进制字符串转为字节."""
+        if len(s) % 8 != 0:
+            raise ValueError
+
+        return bytes(int(item, 2) for item in seq_grouper(s, 8))
+
+    @classmethod
+    def bytes_2_str(cls, b: bytes) -> str:
+        """将字节转为 8 位二进制字符串."""
+        return ''.join(format(byte, '08b') for byte in b)
 
 
 def chinese_num(num: int) -> str:
