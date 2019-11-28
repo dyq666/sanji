@@ -131,9 +131,8 @@ class Binary:
 
     @classmethod
     def bytes_xor(cls, b1: bytes, b2: bytes) -> bytes:
-        s1 = cls.bytes_2_str(b1)
-        s2 = cls.bytes_2_str(b2)
-        return cls.str_2_bytes(cls.str_xor(s1, s2))
+        """XOR 两个 bytes"""
+        return bytes(item1 ^ item2 for item1, item2 in zip(b1, b2))
 
     @classmethod
     def str_2_bytes(cls, s: str) -> bytes:
