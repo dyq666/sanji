@@ -257,11 +257,6 @@ def test_silent_remove():
     silent_remove(col_dict, 9)
     assert 9 not in col_dict
 
-    col_tuple = tuple(range(10))
-    silent_remove(col_tuple, 100)
-    silent_remove(col_tuple, 9)
-    assert 9 in col_tuple
-
 
 def test_strip_blank():
     textarea = """
