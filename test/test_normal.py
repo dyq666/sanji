@@ -105,6 +105,26 @@ class TestBinary:
     def test_bytes_2_str(self):
         assert Binary.bytes_2_str(b'\x00\x01\x00') == ''.join(['00000000', '00000001', '00000000'])
 
+    def test_int_2_str(self):
+        assert Binary.int_2_str(255) == '11111111'
+        assert Binary.int_2_str(0) == '00000000'
+
+        with pytest.raises(ValueError):
+            Binary.int_2_str(-1)
+
+        with pytest.raises(ValueError):
+            Binary.int_2_str(256)
+
+    def test_str_2_int(self):
+        assert Binary.str_2_int('11111111') == 255
+        assert Binary.str_2_int('00000000') == 0
+
+        with pytest.raises(ValueError):
+            Binary.str_2_int('111000001111')
+
+        with pytest.raises(ValueError):
+            Binary.str_2_int('12345678')
+
 
 def test_chinese_num():
     fixtures = (

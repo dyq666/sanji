@@ -25,7 +25,7 @@ from typing import (
     Any, Iterable, List, Optional, Tuple, Union,
 )
 
-Col = Union[list, tuple, dict]  # Collection
+Col = Union[list, tuple, dict]
 Num = Union[int, float]
 Seq = Union[list, tuple, str, bytes]
 
@@ -141,12 +141,28 @@ class Binary:
         if len(s) % 8 != 0:
             raise ValueError
 
-        return bytes(int(item, 2) for item in seq_grouper(s, 8))
+        return bytes(cls.str_2_int(item) for item in seq_grouper(s, 8))
 
     @classmethod
     def bytes_2_str(cls, b: bytes) -> str:
         """将字节转为 8 位二进制字符串."""
-        return ''.join(format(byte, '08b') for byte in b)
+        return ''.join(cls.int_2_str(byte) for byte in b)
+
+    @staticmethod
+    def int_2_str(i: int) -> str:
+        """将 [0, 255] 之间的整数转为 1 字节的 8 位二进制字符串"""
+        if not 0 <= i <= 255:
+            raise ValueError
+
+        return format(i, '08b')
+
+    @staticmethod
+    def str_2_int(s: str) -> int:
+        """将 1 字节的 8 位二进制字符串转为整数"""
+        if len(s) != 8:
+            raise ValueError
+
+        return int(s, 2)
 
 
 def chinese_num(num: int) -> str:
