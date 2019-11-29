@@ -300,8 +300,8 @@ def seq_grouper(seq: Seq, size: int, filler: Optional[Any] = None) -> Iterable:
     return (seq[i * size: (i + 1) * size] for i in range(times))
 
 
-def silent_remove(col: Union[list, dict], value: Any) -> None:
-    """从列表或字典中移除数据, 如果失败不抛出异常."""
+def silent_remove(col: Union[list, dict, set], value: Any) -> None:
+    """从 set, dict, list 中移除数据, 如果失败不抛出异常."""
     if isinstance(col, list):
         try:
             col.remove(value)
@@ -310,6 +310,11 @@ def silent_remove(col: Union[list, dict], value: Any) -> None:
     elif isinstance(col, dict):
         try:
             del col[value]
+        except KeyError:
+            pass
+    elif isinstance(col, set):
+        try:
+            col.remove(value)
         except KeyError:
             pass
 
