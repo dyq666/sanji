@@ -14,6 +14,7 @@ __all__ = (
 )
 
 import base64
+import binascii
 import csv
 import importlib
 import io
@@ -145,10 +146,11 @@ class Binary:
     @classmethod
     def hexstr_2_bytes(cls, s: str) -> bytes:
         """将 2 位十六进制字符串转为字节序列."""
-        if len(s) % 2 != 0:
+        try:
+            return binascii.a2b_hex(s)
+        except binascii.Error:
+            # `if len(s) % 2 != 0` will raise `binascii.Error`
             raise ValueError
-
-        return bytes(cls.hexstr_2_int(item) for item in seq_grouper(s, 2))
 
     @classmethod
     def bytes_2_str(cls, b: bytes) -> str:
@@ -158,7 +160,7 @@ class Binary:
     @classmethod
     def bytes_2_hexstr(cls, b: bytes) -> str:
         """将字节序列转为 2 位十六进制字符串."""
-        return ''.join(cls.int_2_hexstr(byte) for byte in b)
+        return binascii.b2a_hex(b).decode()
 
     @staticmethod
     def int_2_str(i: int) -> str:
