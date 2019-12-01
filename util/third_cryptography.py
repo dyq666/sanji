@@ -25,10 +25,10 @@ class AES:
     """AES 加密, 解密."""
 
     KEY_SIZES = {16, 24, 32}
-    IV_SIZE = 16  # 等于 `int(algorithms.AES.block_size / 8)`
+    BLOCK_SIZE = 16
 
     def __init__(self, key: bytes, iv: bytes):
-        if len(key) not in self.KEY_SIZES or len(iv) != self.IV_SIZE:
+        if len(key) not in self.KEY_SIZES or len(iv) != self.BLOCK_SIZE:
             raise SizeException
         self.cipher = Cipher(
             algorithm=algorithms.AES(key),
@@ -36,7 +36,7 @@ class AES:
             backend=backend,
         )
         self.padding = padding.PKCS7(
-            block_size=self.IV_SIZE * 8,
+            block_size=self.BLOCK_SIZE * 8,
         )
 
     def encrypt(self, msg: bytes) -> bytes:
@@ -54,6 +54,6 @@ class AES:
         return unpadder.update(plaintext) + unpadder.finalize()
 
     @classmethod
-    def generate(cls, key_size: int = 32) -> Tuple[bytes, bytes]:
+    def generate_key(cls, key_size: int = 32) -> Tuple[bytes, bytes]:
         """生成 key 和 iv."""
-        return secrets.token_bytes(key_size), secrets.token_bytes(cls.IV_SIZE)
+        return secrets.token_bytes(key_size), secrets.token_bytes(cls.BLOCK_SIZE)
