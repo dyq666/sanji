@@ -1,3 +1,4 @@
+import enum
 import os
 import tempfile
 from functools import partial
@@ -5,7 +6,7 @@ from functools import partial
 import pytest
 
 from util import (
-    CSV, Base64, Binary, chinese_num, fill_seq, import_object,
+    CSV, Base64, Binary, BitField, chinese_num, fill_seq, import_object,
     indent_data, round_half_up, seq_grouper, silent_remove, strip_blank,
     strip_control,
 )
@@ -154,6 +155,31 @@ class TestBinary:
 
         with pytest.raises(ValueError):
             Binary.hexstr_2_int('zz')
+
+
+def test_bit_field():
+    @enum.unique
+    class ID(enum.IntEnum):
+        ANIMAL = 1 << 0
+        HUMAN = 1 << 1
+        MAMMALIA = 1 << 2
+        OTHER = 1 << 3
+
+    ids = (ID.ANIMAL, ID.HUMAN, ID.MAMMALIA)
+    bit_field = BitField.create(ids)
+    for id_ in ids:
+        assert bit_field.has(id_)
+
+    bit_field.remove(ID.ANIMAL)
+    assert not bit_field.has(ID.ANIMAL)
+    assert bit_field.has(ID.HUMAN)
+    assert bit_field.has(ID.MAMMALIA)
+
+    bit_field.add(ID.OTHER)
+    assert not bit_field.has(ID.ANIMAL)
+    assert bit_field.has(ID.HUMAN)
+    assert bit_field.has(ID.MAMMALIA)
+    assert bit_field.has(ID.OTHER)
 
 
 def test_chinese_num():

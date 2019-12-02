@@ -2,6 +2,7 @@ __all__ = (
     'CSV',
     'Base64',
     'Binary',
+    'BitField',
     'chinese_num',
     'fill_seq',
     'import_object',
@@ -22,6 +23,8 @@ import json
 import math
 import re
 from decimal import ROUND_HALF_UP, Decimal
+from functools import reduce
+from operator import or_
 from typing import (
     Any, Iterable, List, Optional, Tuple, Union,
 )
@@ -193,6 +196,90 @@ class Binary:
             raise ValueError
 
         return int(s, 16)
+
+
+class BitField:
+    """二进制字段.
+
+    '|'
+    0 0 -> 0
+    0 1 -> 1
+    1 0 -> 1
+    1 1 -> 1
+
+    '&'
+    0 0 -> 0
+    0 1 -> 0
+    1 0 -> 0
+    1 1 -> 1
+
+    '^'
+    0 0 -> 0
+    0 1 -> 1
+    1 0 -> 1
+    1 1 -> 0
+
+    上面总共三种操作符, 三列数据, 假设第一列为原始数据, 第二列为操作值, 第三列为最终数据.
+
+    1. 我们希望将 10101 的第四位变为 1, 其他位置不变.
+    这时我们选择 '|', 在操作表中观察到操作值 0 不会改变原始数据, 而操作值 1 无论什么情况
+    都会让最终数据变为 1. 因此我们需要生成操作值 01000, 而 1000 = 1 << 3.
+
+    2. 我们希望将 10101 的第三位变为 0, 其他位置不变.
+    这时我们选择 '&', 在操作表中观察到操作值 0 不会改变原始数据, 而操作值 1 无论什么情况
+    都会让最终数据变为 0. 因此我们需要生成操作值 11011, 而 11011 = ~100 = ~(1 << 2).
+
+    3, 我们希望查询 10101 的第三位是否为 1.
+    10101 & 00100 = 00100
+    10001 & 00100 = 00000
+    因此可以得出结论, 如果 > 0 则是 1, 等于 0 则是 0.
+
+    实际上 1-3 的例子分别对应增删查.
+
+    ## 一些其他相关的二进制操作.
+
+    1. 左移, 右移.
+    二进制左移等于 * 2
+    二进制右移等于 // 2 (如果最后一位是 1, 会被丢弃, 因此是 //)
+    ```
+    assert 1 << 100 == 1 * (2 ** 100)
+    assert 15 >> 1 == 15 // (2 ** 1)
+    assert 15 >> 2 == 15 // (2 ** 2)
+    assert bin(int('0b1111', 2) >> 1) == '0b111'
+    assert bin(int('0b1111', 2) >> 2) == '0b11'
+    assert bin(int('0b111', 2) << 1) == '0b1110'
+    assert bin(int('0b11', 2) << 2) == '0b1100'
+    ```
+
+    2. 取反
+    ```
+    # Python 中没有符号位使用 '-' 号表示.
+    # 补码计算规则: 正数的补码等于原码, 负数的补码等于原码逐位取反 (符号位不取反), 末位 + 1.
+    #         计算补码         按位取反        转为原码
+    # 01000    ->      01000    ->   10111    ->     11001 (末位 - 1, 逐位取反)
+    # 11110    ->      10010    ->   01101    ->     01101
+    assert ~8 == -9
+    assert ~-8 == 7
+    assert ~int('1000', 2) == int('-1001', 2)
+    assert ~int('-1110', 2) == int('1101', 2)
+    ```
+    """
+
+    def __init__(self, ids: int):
+        self.ids = ids
+
+    def add(self, value: int):
+        self.ids |= value
+
+    def remove(self, value: int):
+        self.ids &= ~value
+
+    def has(self, value: int):
+        return bool(self.ids & value)
+
+    @classmethod
+    def create(cls, ids: Iterable[int]) -> 'BitField':
+        return cls(reduce(or_, ids))
 
 
 def chinese_num(num: int) -> str:
