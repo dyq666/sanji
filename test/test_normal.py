@@ -8,7 +8,7 @@ import pytest
 from util import (
     CSV, Base64, Binary, BitField, chinese_num, fill_seq, import_object,
     indent_data, round_half_up, seq_grouper, silent_remove, strip_blank,
-    strip_control,
+    strip_control, strip_seq,
 )
 
 
@@ -362,3 +362,25 @@ def test_strip_blank():
 def test_strip_control():
     assert strip_control('带\x00带\x1f我\x7f') == '带带我'
     assert strip_control('带\u0000带\u001f我\u007f') == '带带我'
+
+
+class TestStripSeq:
+
+    @pytest.mark.parametrize('seq', ('', b'', [], ()))
+    def test_empty(self, seq):
+        assert strip_seq(seq, size=9) == seq
+
+    @pytest.mark.parametrize('item', ('1', b'1'))
+    def test_text_type_not_empty(self, item):
+        for i in range(4, 8):
+            seq = item * i
+            assert strip_seq(seq, size=4) == item * 4
+
+    @pytest.mark.parametrize(('cls', 'item'), (
+        (list, 1),
+        (tuple, 2),
+    ))
+    def test_collection_type_not_empty(self, cls, item):
+        for i in range(4, 8):
+            seq = cls(item for _ in range(i))
+            assert strip_seq(seq, size=4) == seq[:4]

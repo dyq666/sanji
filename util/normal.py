@@ -12,6 +12,7 @@ __all__ = (
     'silent_remove',
     'strip_blank',
     'strip_control',
+    'strip_seq',
 )
 
 import base64
@@ -304,7 +305,7 @@ def chinese_num(num: int) -> str:
 
 
 def fill_seq(seq: Seq, size: int, filler: Any) -> Seq:
-    """用 `filler` 填充序列使其内被 `size` 整除."""
+    """用 `filler` 填充序列使其能被 `size` 整除."""
     if not isinstance(seq, (str, bytes, list, tuple)):
         raise TypeError
 
@@ -422,3 +423,15 @@ def strip_control(value: str) -> str:
     """去除字符串中的控制字符."""
     control_chars_reg = r'[\x00-\x1f\x7f]'
     return re.sub(control_chars_reg, '', value)
+
+
+def strip_seq(seq: Seq, size: int) -> Seq:
+    """从末尾移除序列使其能被 `size` 整除."""
+    if not isinstance(seq, (str, bytes, list, tuple)):
+        raise TypeError
+
+    if len(seq) % size == 0:
+        return seq
+
+    num = len(seq) % size
+    return seq[:-num]
