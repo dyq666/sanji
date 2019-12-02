@@ -22,7 +22,7 @@ class SizeException(CryptoException):
 
 
 class AES:
-    """AES_256_CBC 加密, 解密."""
+    """AES_256_CBC 加密, 解密, PKCS7 填充."""
 
     KEY_SIZES = {16, 24, 32}
     BLOCK_SIZE = 16
