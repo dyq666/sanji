@@ -6,6 +6,7 @@ __all__ = (
     'BitField',
     'CaseInsensitiveDict',
     'OAuth2',
+    'RSAPrivate',
     'SessionWithUrlPrefix',
     'chinese_num',
     'fill_seq',
@@ -27,6 +28,6 @@ from .normal import (
     indent_data, round_half_up, seq_grouper, silent_remove, strip_blank,
     strip_control, strip_seq,
 )
-from .third_cryptography import AES
+from .third_cryptography import AES, RSAPrivate
 from .third_phonenumbers import parse_phone
 from .third_requests import OAuth2, SessionWithUrlPrefix, upload

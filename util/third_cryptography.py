@@ -1,12 +1,18 @@
 __all__ = (
     'AES',
+    'RSAPrivate',
 )
 
 import secrets
-from typing import Tuple
+from typing import TYPE_CHECKING, Optional, Tuple
+
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import padding
+from cryptography.hazmat.primitives import padding, serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+
+if TYPE_CHECKING:
+    from cryptography.hazmat.backends.openssl.rsa import _RSAPrivateKey
 
 backend = default_backend()
 
@@ -57,3 +63,54 @@ class AES:
     def generate_key(cls, key_size: int = 32) -> Tuple[bytes, bytes]:
         """生成 key 和 iv."""
         return secrets.token_bytes(key_size), secrets.token_bytes(cls.BLOCK_SIZE)
+
+
+class RSAPrivate:
+    """RSA 私钥相关的操作."""
+
+    def __init__(self, key: '_RSAPrivateKey'):
+        self.key = key
+
+    def _format_private_key(self, password: Optional[bytes] = None) -> bytes:
+        """生成 PEM 格式的私钥."""
+        if password is None:
+            algorithm = serialization.NoEncryption()
+        else:
+            algorithm = serialization.BestAvailableEncryption(password)
+
+        return self.key.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.TraditionalOpenSSL,
+            encryption_algorithm=algorithm
+        )
+
+    def _format_public_key(self) -> bytes:
+        """生成 PEM 格式的公钥."""
+        publick_key = self.key.public_key()
+        return publick_key.public_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PublicFormat.SubjectPublicKeyInfo,
+        )
+
+    @classmethod
+    def generate_key(cls, password: Optional[bytes] = None
+                     ) -> Tuple[bytes, bytes]:
+        """生成私钥和公钥."""
+        key = rsa.generate_private_key(
+            public_exponent=65537,
+            key_size=2048,
+            backend=backend,
+        )
+        private_key = cls(key)
+        return private_key._format_private_key(password), private_key._format_public_key()
+
+    @classmethod
+    def load(cls, content: bytes, password: Optional[bytes] = None
+             ) -> 'RSAPrivate':
+        """加载私钥."""
+        key = serialization.load_pem_private_key(
+            data=content,
+            password=password,
+            backend=backend,
+        )
+        return cls(key)
