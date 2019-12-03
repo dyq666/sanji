@@ -118,6 +118,7 @@ def test_aes(key_size, msg):
 
 class TestRSAPrivate:
 
+    @pytest.mark.skipif(True, reason='这个操作比较耗时, 如果需要测试要手动开启.')
     @pytest.mark.parametrize('password', (None, b'1'))
     def test_generate_key(self, password):
         private_pem, public_pem = RSAPrivate.generate_key(password)
