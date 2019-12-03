@@ -36,3 +36,14 @@ class TestRSAPrivate:
         msgs = (b'1', '谢谢'.encode())
         for msg in msgs:
             assert private.decrypt(public.encrypt(msg)) == msg
+
+    @pytest.mark.parametrize('password', (None, b'1'))
+    def test_encrypt_and_decrypt(self, password):
+        private_str, public_str = RSAPrivate.generate_key(password)
+        private = RSAPrivate.load(private_str, password)
+        public = RSAPublic.load(public_str)
+
+        msgs = (b'1', '谢谢'.encode())
+        for msg in msgs:
+            assert public.verify(private.sign(msg), msg)
+            assert not public.verify(private.sign(msg), msg + b'1')

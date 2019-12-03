@@ -7,6 +7,7 @@ __all__ = (
 import secrets
 from typing import TYPE_CHECKING, Optional, Tuple
 
+from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, padding, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa, padding as asy_padding
@@ -83,6 +84,17 @@ class RSAPrivate:
             ),
         )
 
+    def sign(self, msg: bytes) -> bytes:
+        """签名."""
+        return self.key.sign(
+            data=msg,
+            padding=asy_padding.PSS(
+                mgf=asy_padding.MGF1(hashes.SHA256()),
+                salt_length=asy_padding.PSS.MAX_LENGTH,
+            ),
+            algorithm=hashes.SHA256(),
+        )
+
     def _format_private_key(self, password: Optional[bytes] = None) -> bytes:
         """生成 PEM 格式的私钥."""
         if password is None:
@@ -144,6 +156,22 @@ class RSAPublic:
                 label=None,
             ),
         )
+
+    def verify(self, signature: bytes, msg: bytes) -> bool:
+        """验证签名."""
+        try:
+            self.key.verify(
+                signature=signature,
+                data=msg,
+                padding=asy_padding.PSS(
+                    mgf=asy_padding.MGF1(hashes.SHA256()),
+                    salt_length=asy_padding.PSS.MAX_LENGTH,
+                ),
+                algorithm=hashes.SHA256(),
+            )
+            return True
+        except InvalidSignature:
+            return False
 
     @classmethod
     def load(cls, msg: bytes) -> 'RSAPublic':
