@@ -118,8 +118,8 @@ def test_aes(key_size, msg):
 
 @pytest.mark.parametrize('msg', (b'1', b'1' * AES.BLOCK_SIZE))
 def test_hybrid_encryption(msg, private_pem, public_pem):
-    ciphermsg, cipherkey, cipheriv = HybridEncryption.encrypt(msg, public_pem)
-    assert HybridEncryption.decrypt(ciphermsg, private_pem, key=cipherkey, iv=cipheriv)
+    token, cipherkey = HybridEncryption.encrypt(msg, public_pem)
+    assert HybridEncryption.decrypt(token, private_pem, key=cipherkey)
 
 
 class TestRSAPrivate:
