@@ -1,6 +1,6 @@
 import pytest
 
-from util import AES, RSAPrivate
+from util import AES, RSAPrivate, RSAPublic
 
 
 @pytest.mark.parametrize('key_size', AES.KEY_SIZES)
@@ -26,3 +26,13 @@ class TestRSAPrivate:
         assert public_group[-1] == b'-----END PUBLIC KEY-----'
 
         assert RSAPrivate.load(private, password)._format_public_key() == public
+
+    @pytest.mark.parametrize('password', (None, b'1'))
+    def test_encrypt_and_decrypt(self, password):
+        private_str, public_str = RSAPrivate.generate_key(password)
+        private = RSAPrivate.load(private_str, password)
+        public = RSAPublic.load(public_str)
+
+        msgs = (b'1', '谢谢'.encode())
+        for msg in msgs:
+            assert private.decrypt(public.encrypt(msg)) == msg

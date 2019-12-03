@@ -1,18 +1,19 @@
 __all__ = (
     'AES',
     'RSAPrivate',
+    'RSAPublic',
 )
 
 import secrets
 from typing import TYPE_CHECKING, Optional, Tuple
 
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import padding, serialization
-from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives import hashes, padding, serialization
+from cryptography.hazmat.primitives.asymmetric import rsa, padding as asy_padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 if TYPE_CHECKING:
-    from cryptography.hazmat.backends.openssl.rsa import _RSAPrivateKey
+    from cryptography.hazmat.backends.openssl.rsa import _RSAPrivateKey, _RSAPublicKey
 
 backend = default_backend()
 
@@ -71,6 +72,17 @@ class RSAPrivate:
     def __init__(self, key: '_RSAPrivateKey'):
         self.key = key
 
+    def decrypt(self, msg: bytes) -> bytes:
+        """解密."""
+        return self.key.decrypt(
+            ciphertext=msg,
+            padding=asy_padding.OAEP(
+                mgf=asy_padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None
+            ),
+        )
+
     def _format_private_key(self, password: Optional[bytes] = None) -> bytes:
         """生成 PEM 格式的私钥."""
         if password is None:
@@ -105,12 +117,39 @@ class RSAPrivate:
         return private_key._format_private_key(password), private_key._format_public_key()
 
     @classmethod
-    def load(cls, content: bytes, password: Optional[bytes] = None
+    def load(cls, msg: bytes, password: Optional[bytes] = None
              ) -> 'RSAPrivate':
-        """加载私钥."""
+        """加载 PEM 格式的私钥."""
         key = serialization.load_pem_private_key(
-            data=content,
+            data=msg,
             password=password,
+            backend=backend,
+        )
+        return cls(key)
+
+
+class RSAPublic:
+    """RSA 公钥相关的操作."""
+
+    def __init__(self, key: '_RSAPublicKey'):
+        self.key = key
+
+    def encrypt(self, msg: bytes) -> bytes:
+        """加密."""
+        return self.key.encrypt(
+            plaintext=msg,
+            padding=asy_padding.OAEP(
+                mgf=asy_padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None,
+            ),
+        )
+
+    @classmethod
+    def load(cls, msg: bytes) -> 'RSAPublic':
+        """加载 PEM 格式的公钥."""
+        key = serialization.load_pem_public_key(
+            data=msg,
             backend=backend,
         )
         return cls(key)
