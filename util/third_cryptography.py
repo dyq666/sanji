@@ -1,7 +1,9 @@
 __all__ = (
     'AES',
+    'CryptoException',
     'RSAPrivate',
     'RSAPublic',
+    'SizeException',
 )
 
 import secrets

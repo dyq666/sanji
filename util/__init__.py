@@ -5,10 +5,12 @@ __all__ = (
     'Binary',
     'BitField',
     'CaseInsensitiveDict',
+    'CryptoException',
     'OAuth2',
     'RSAPrivate',
     'RSAPublic',
     'SessionWithUrlPrefix',
+    'SizeException',
     'chinese_num',
     'fill_seq',
     'import_object',
@@ -29,6 +31,6 @@ from .normal import (
     indent_data, round_half_up, seq_grouper, silent_remove, strip_blank,
     strip_control, strip_seq,
 )
-from .third_cryptography import AES, RSAPrivate, RSAPublic
+from .third_cryptography import AES, CryptoException, RSAPrivate, RSAPublic, SizeException
 from .third_phonenumbers import parse_phone
 from .third_requests import OAuth2, SessionWithUrlPrefix, upload
