@@ -17,6 +17,15 @@ if TYPE_CHECKING:
     from cryptography.hazmat.backends.openssl.rsa import _RSAPrivateKey, _RSAPublicKey
 
 backend = default_backend()
+rsa_sign_padding = asy_padding.PSS(
+    mgf=asy_padding.MGF1(hashes.SHA256()),
+    salt_length=asy_padding.PSS.MAX_LENGTH,
+)
+rsa_encrypt_padding = asy_padding.OAEP(
+    mgf=asy_padding.MGF1(hashes.SHA256()),
+    algorithm=hashes.SHA256(),
+    label=None,
+)
 
 
 class CryptoException(Exception):
@@ -77,21 +86,14 @@ class RSAPrivate:
         """解密."""
         return self.key.decrypt(
             ciphertext=msg,
-            padding=asy_padding.OAEP(
-                mgf=asy_padding.MGF1(algorithm=hashes.SHA256()),
-                algorithm=hashes.SHA256(),
-                label=None
-            ),
+            padding=rsa_encrypt_padding,
         )
 
     def sign(self, msg: bytes) -> bytes:
         """签名."""
         return self.key.sign(
             data=msg,
-            padding=asy_padding.PSS(
-                mgf=asy_padding.MGF1(hashes.SHA256()),
-                salt_length=asy_padding.PSS.MAX_LENGTH,
-            ),
+            padding=rsa_sign_padding,
             algorithm=hashes.SHA256(),
         )
 
@@ -143,11 +145,7 @@ class RSAPublic:
         """加密."""
         return self.key.encrypt(
             plaintext=msg,
-            padding=asy_padding.OAEP(
-                mgf=asy_padding.MGF1(algorithm=hashes.SHA256()),
-                algorithm=hashes.SHA256(),
-                label=None,
-            ),
+            padding=rsa_encrypt_padding,
         )
 
     def verify(self, signature: bytes, msg: bytes) -> bool:
@@ -156,10 +154,7 @@ class RSAPublic:
             self.key.verify(
                 signature=signature,
                 data=msg,
-                padding=asy_padding.PSS(
-                    mgf=asy_padding.MGF1(hashes.SHA256()),
-                    salt_length=asy_padding.PSS.MAX_LENGTH,
-                ),
+                padding=rsa_sign_padding,
                 algorithm=hashes.SHA256(),
             )
             return True
