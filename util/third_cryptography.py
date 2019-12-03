@@ -95,7 +95,7 @@ class RSAPrivate:
             algorithm=hashes.SHA256(),
         )
 
-    def _format_private_key(self, password: Optional[bytes] = None) -> bytes:
+    def format_pem(self, password: Optional[bytes] = None) -> bytes:
         """生成 PEM 格式的私钥."""
         if password is None:
             algorithm = serialization.NoEncryption()
@@ -104,33 +104,26 @@ class RSAPrivate:
 
         return self.key.private_bytes(
             encoding=serialization.Encoding.PEM,
-            format=serialization.PrivateFormat.TraditionalOpenSSL,
-            encryption_algorithm=algorithm
-        )
-
-    def _format_public_key(self) -> bytes:
-        """生成 PEM 格式的公钥."""
-        publick_key = self.key.public_key()
-        return publick_key.public_bytes(
-            encoding=serialization.Encoding.PEM,
-            format=serialization.PublicFormat.SubjectPublicKeyInfo,
+            format=serialization.PrivateFormat.PKCS8,
+            encryption_algorithm=algorithm,
         )
 
     @classmethod
     def generate_key(cls, password: Optional[bytes] = None
                      ) -> Tuple[bytes, bytes]:
-        """生成私钥和公钥."""
+        """生成 PEM 格式的私钥和公钥."""
         key = rsa.generate_private_key(
             public_exponent=65537,
             key_size=2048,
             backend=backend,
         )
         private_key = cls(key)
-        return private_key._format_private_key(password), private_key._format_public_key()
+        public_key = RSAPublic(key.public_key())
+        return private_key.format_pem(password), public_key.format_pem()
 
     @classmethod
-    def load(cls, msg: bytes, password: Optional[bytes] = None
-             ) -> 'RSAPrivate':
+    def load_pem(cls, msg: bytes, password: Optional[bytes] = None
+                 ) -> 'RSAPrivate':
         """加载 PEM 格式的私钥."""
         key = serialization.load_pem_private_key(
             data=msg,
@@ -173,10 +166,33 @@ class RSAPublic:
         except InvalidSignature:
             return False
 
+    def format_pem(self) -> bytes:
+        """生成 PEM 格式的公钥."""
+        return self.key.public_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PublicFormat.SubjectPublicKeyInfo,
+        )
+
+    def format_ssh(self) -> bytes:
+        """生成 SSH 格式的公钥."""
+        return self.key.public_bytes(
+            encoding=serialization.Encoding.OpenSSH,
+            format=serialization.PublicFormat.OpenSSH,
+        )
+
     @classmethod
-    def load(cls, msg: bytes) -> 'RSAPublic':
+    def load_pem(cls, msg: bytes) -> 'RSAPublic':
         """加载 PEM 格式的公钥."""
         key = serialization.load_pem_public_key(
+            data=msg,
+            backend=backend,
+        )
+        return cls(key)
+
+    @classmethod
+    def load_ssh(cls, msg: bytes) -> 'RSAPublic':
+        """加载 SSH 格式的公钥."""
+        key = serialization.load_ssh_public_key(
             data=msg,
             backend=backend,
         )

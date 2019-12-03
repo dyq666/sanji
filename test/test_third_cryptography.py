@@ -16,32 +16,36 @@ class TestRSAPrivate:
 
     @pytest.mark.parametrize('password', (None, b'1'))
     def test_generate_key(self, password):
-        private, public = RSAPrivate.generate_key(password)
+        private_pem, public_pem = RSAPrivate.generate_key(password)
 
-        private_group = [item for item in private.split(b'\n') if item]
-        assert private_group[0] == b'-----BEGIN RSA PRIVATE KEY-----'
-        assert private_group[-1] == b'-----END RSA PRIVATE KEY-----'
-        public_group = [item for item in public.split(b'\n') if item]
+        private_group = [item for item in private_pem.split(b'\n') if item]
+        if password is None:
+            assert private_group[0] == b'-----BEGIN PRIVATE KEY-----'
+            assert private_group[-1] == b'-----END PRIVATE KEY-----'
+        else:
+            assert private_group[0] == b'-----BEGIN ENCRYPTED PRIVATE KEY-----'
+            assert private_group[-1] == b'-----END ENCRYPTED PRIVATE KEY-----'
+        public_group = [item for item in public_pem.split(b'\n') if item]
         assert public_group[0] == b'-----BEGIN PUBLIC KEY-----'
         assert public_group[-1] == b'-----END PUBLIC KEY-----'
 
-        assert RSAPrivate.load(private, password)._format_public_key() == public
-
     @pytest.mark.parametrize('password', (None, b'1'))
     def test_encrypt_and_decrypt(self, password):
-        private_str, public_str = RSAPrivate.generate_key(password)
-        private = RSAPrivate.load(private_str, password)
-        public = RSAPublic.load(public_str)
+        private_pem, public_pem = RSAPrivate.generate_key(password)
+        private = RSAPrivate.load_pem(private_pem, password)
+        public = RSAPublic.load_pem(public_pem)
+        public_2 = RSAPublic.load_ssh(public.format_ssh())
 
         msgs = (b'1', '谢谢'.encode())
         for msg in msgs:
             assert private.decrypt(public.encrypt(msg)) == msg
+            assert private.decrypt(public_2.encrypt(msg)) == msg
 
     @pytest.mark.parametrize('password', (None, b'1'))
     def test_encrypt_and_decrypt(self, password):
-        private_str, public_str = RSAPrivate.generate_key(password)
-        private = RSAPrivate.load(private_str, password)
-        public = RSAPublic.load(public_str)
+        private_pem, public_pem = RSAPrivate.generate_key(password)
+        private = RSAPrivate.load_pem(private_pem, password)
+        public = RSAPublic.load_pem(public_pem)
 
         msgs = (b'1', '谢谢'.encode())
         for msg in msgs:
