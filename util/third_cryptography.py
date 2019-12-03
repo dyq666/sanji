@@ -29,6 +29,7 @@ rsa_encrypt_padding = asy_padding.OAEP(
     algorithm=hashes.SHA256(),
     label=None,
 )
+aes_padding = padding.PKCS7(algorithms.AES.block_size)
 
 
 class CryptoException(Exception):
@@ -55,21 +56,18 @@ class AES:
             mode=modes.CBC(iv),
             backend=backend,
         )
-        self.padding = padding.PKCS7(
-            block_size=self.BLOCK_SIZE * 8,
-        )
 
     def encrypt(self, msg: bytes) -> bytes:
         """加密."""
         encryptor = self.cipher.encryptor()
-        padder = self.padding.padder()
+        padder = aes_padding.padder()
         msg = padder.update(msg) + padder.finalize()
         return encryptor.update(msg) + encryptor.finalize()
 
     def decrypt(self, msg: bytes) -> bytes:
         """解密."""
         decryptor = self.cipher.decryptor()
-        unpadder = self.padding.unpadder()
+        unpadder = aes_padding.unpadder()
         plaintext = decryptor.update(msg) + decryptor.finalize()
         return unpadder.update(plaintext) + unpadder.finalize()
 
