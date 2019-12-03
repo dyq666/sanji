@@ -4,7 +4,7 @@
 
 import pytest
 
-from util import AES, RSAPrivate, RSAPublic
+from util import AES, HybridEncryption, RSAPrivate, RSAPublic
 
 
 @pytest.fixture
@@ -114,6 +114,12 @@ def test_aes(key_size, msg):
     aes = AES(key, iv)
     ciphertext = aes.encrypt(msg)
     assert msg == aes.decrypt(ciphertext)
+
+
+@pytest.mark.parametrize('msg', (b'1', b'1' * AES.BLOCK_SIZE))
+def test_hybrid_encryption(msg, private_pem, public_pem):
+    ciphermsg, cipherkey, cipheriv = HybridEncryption.encrypt(msg, public_pem)
+    assert HybridEncryption.decrypt(ciphermsg, private_pem, key=cipherkey, iv=cipheriv)
 
 
 class TestRSAPrivate:

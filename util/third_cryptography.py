@@ -1,6 +1,7 @@
 __all__ = (
     'AES',
     'CryptoException',
+    'HybridEncryption',
     'RSAPrivate',
     'RSAPublic',
     'SizeException',
@@ -76,6 +77,30 @@ class AES:
     def generate_key(cls, key_size: int = 32) -> Tuple[bytes, bytes]:
         """生成 key 和 iv."""
         return secrets.token_bytes(key_size), secrets.token_bytes(cls.BLOCK_SIZE)
+
+
+class HybridEncryption:
+    """RSA + AES 混合加密."""
+
+    @staticmethod
+    def encrypt(msg: bytes, public_pem: bytes) -> Tuple[bytes, bytes, bytes]:
+        public = RSAPublic.load_pem(public_pem)
+        key, iv = AES.generate_key()
+        aes = AES(key, iv)
+        ciphermsg = aes.encrypt(msg)
+        cipherkey = public.encrypt(key)
+        cipheriv = public.encrypt(iv)
+        return ciphermsg, cipherkey, cipheriv
+
+    @staticmethod
+    def decrypt(msg: bytes, private_pem: bytes, key: bytes, iv: bytes
+                ) -> bytes:
+        private = RSAPrivate.load_pem(private_pem)
+        iv = private.decrypt(iv)
+        key = private.decrypt(key)
+        aes = AES(key, iv)
+        msg = aes.decrypt(msg)
+        return msg
 
 
 class RSAPrivate:
