@@ -1,10 +1,8 @@
 __all__ = (
     'AES',
-    'CryptoException',
     'HybridEncryption',
     'RSAPrivate',
     'RSAPublic',
-    'SizeException',
 )
 
 import secrets
@@ -32,16 +30,6 @@ rsa_encrypt_padding = asy_padding.OAEP(
 aes_padding = padding.PKCS7(algorithms.AES.block_size)
 
 
-class CryptoException(Exception):
-    """所有密码学工具库的异常基类."""
-    pass
-
-
-class SizeException(CryptoException):
-    """密钥长度不符合要求."""
-    pass
-
-
 class AES:
     """AES_256_CBC 加密, 解密, PKCS7 填充."""
 
@@ -50,7 +38,7 @@ class AES:
 
     def __init__(self, key: bytes, iv: bytes):
         if len(key) not in self.KEY_SIZES or len(iv) != self.BLOCK_SIZE:
-            raise SizeException
+            raise ValueError
         self.cipher = Cipher(
             algorithm=algorithms.AES(key),
             mode=modes.CBC(iv),
