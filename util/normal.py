@@ -23,6 +23,7 @@ import io
 import json
 import math
 import re
+import struct
 from decimal import ROUND_HALF_UP, Decimal
 from functools import reduce
 from operator import or_
@@ -167,6 +168,14 @@ class Binary:
         return binascii.b2a_hex(b).decode()
 
     @staticmethod
+    def bytes_2_int(b: bytes) -> int:
+        """将长度为一的 bytes 转成 int."""
+        if len(b) != 1:
+            raise ValueError
+
+        return struct.unpack('>B', b)[0]
+
+    @staticmethod
     def int_2_str(i: int) -> str:
         """将 [0, 255] 之间的整数转为 1 字节的 8 位二进制字符串."""
         if not 0 <= i <= 255:
@@ -181,6 +190,14 @@ class Binary:
             raise ValueError
 
         return format(i, '02x')
+
+    @staticmethod
+    def int_2_bytes(i: int) -> bytes:
+        """将 [0, 255] 之间的整数转为 bytes."""
+        if not 0 <= i <= 255:
+            raise ValueError
+
+        return struct.pack('>B', i)
 
     @staticmethod
     def str_2_int(s: str) -> int:

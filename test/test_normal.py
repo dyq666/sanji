@@ -84,6 +84,22 @@ class TestBase64:
 
 class TestBinary:
 
+    def test_int_2_bytes(self):
+        with pytest.raises(ValueError):
+            Binary.int_2_bytes(-1)
+        with pytest.raises(ValueError):
+            Binary.int_2_bytes(256)
+
+        assert Binary.int_2_bytes(0) == b'\x00'
+        assert Binary.int_2_bytes(255) == b'\xff'
+
+    def test_bytes_2_int(self):
+        with pytest.raises(ValueError):
+            Binary.bytes_2_int(b'\x00\xff')
+
+        assert Binary.bytes_2_int(b'\x00') == 0
+        assert Binary.bytes_2_int(b'\xff') == 255
+
     def test_str_xor(self):
         with pytest.raises(KeyError):
             Binary.str_xor('1', '2')
