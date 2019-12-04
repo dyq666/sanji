@@ -43,7 +43,7 @@ class CSV:
         """从文件中读取 csv 格式的数据.
 
         `with_dict`: 返回的 `rows` 中的数据项类型是否为 `dict` ?
-        `file_path`: 如果传入字符串, 那么从此文件路径中读取数据, 否则从 `StringIO` 对象中读取数据.
+        `file_path`: 如果传入字符串, 那么从此文件路径中读取数据, 否则从 `io.StringIO` 对象中读取数据.
         """
         file = open(filepath, newline='') if isinstance(filepath, str) else filepath
 
@@ -62,12 +62,12 @@ class CSV:
         return header, rows
 
     @staticmethod
-    def write(header: Iterable[str], rows: Iterable[Iterable], with_dict: bool = False,
-              filepath: Optional[str] = None) -> Optional[io.StringIO]:
+    def write(header: Iterable[str], rows: Iterable[Iterable], filepath: Optional[str] = None,
+              with_dict: bool = False) -> Optional[io.StringIO]:
         """将数据按 csv 格式写入文件.
 
         `with_dict`: `rows` 中的数据项类型是否为 `dict` ?
-        `file_path`: 如果传入字符串, 那么将数据写入此文件路径, 否则返回 `StringIO` 对象.
+        `file_path`: 如果传入字符串, 那么将数据写入此文件路径, 否则返回 `io.StringIO` 对象.
         """
         file = io.StringIO() if filepath is None else open(filepath, 'w', newline='')
 
