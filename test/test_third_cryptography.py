@@ -125,7 +125,7 @@ def test_hybrid_encryption(msg, private_pem, public_pem):
 
 class TestRSAPrivate:
 
-    @pytest.mark.skipif(True, reason='这个操作比较耗时, 如果需要测试要手动开启.')
+    @pytest.mark.skipif(True, reason='生成 rsa-key 的操作比较耗时, 测试时要手动开启.')
     @pytest.mark.parametrize('password', (None, b'1'))
     def test_generate_key(self, password):
         private_pem, public_pem = RSAPrivate.generate_key(password)
@@ -142,8 +142,8 @@ class TestRSAPrivate:
         assert public_group[-1] == b'-----END PUBLIC KEY-----'
 
     @pytest.mark.parametrize('password', (None, b'1'))
-    def test_encrypt_and_decrypt(self, password, private_pem, public_pem,
-                                 private_pem_with_key, public_pem_with_key):
+    def test_encrypt_and_sign(self, password, private_pem, public_pem,
+                              private_pem_with_key, public_pem_with_key):
         if password is not None:
             private_pem = private_pem_with_key
             public_pem = public_pem_with_key
@@ -156,20 +156,6 @@ class TestRSAPrivate:
         for msg in msgs:
             assert private.decrypt(public.encrypt(msg)) == msg
             assert private.decrypt(public_2.encrypt(msg)) == msg
-
-    @pytest.mark.parametrize('password', (None, b'1'))
-    def test_sign_and_verify(self, password, private_pem, public_pem,
-                             private_pem_with_key, public_pem_with_key):
-        if password is not None:
-            private_pem = private_pem_with_key
-            public_pem = public_pem_with_key
-
-        private = RSAPrivate.load_pem(private_pem, password)
-        public = RSAPublic.load_pem(public_pem)
-        public_2 = RSAPublic.load_ssh(public.format_ssh())
-
-        msgs = (b'1', '谢谢'.encode())
-        for msg in msgs:
             assert public.verify(private.sign(msg), msg)
             assert not public.verify(private.sign(msg), msg + b'1')
             assert public_2.verify(private.sign(msg), msg)

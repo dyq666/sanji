@@ -22,7 +22,7 @@ rsa_sign_padding = asy_padding.PSS(
     mgf=asy_padding.MGF1(hashes.SHA256()),
     salt_length=asy_padding.PSS.MAX_LENGTH,
 )
-rsa_encrypt_padding = asy_padding.OAEP(
+rsa_padding = asy_padding.OAEP(
     mgf=asy_padding.MGF1(hashes.SHA256()),
     algorithm=hashes.SHA256(),
     label=None,
@@ -97,7 +97,7 @@ class RSAPrivate:
         """解密."""
         return self.key.decrypt(
             ciphertext=msg,
-            padding=rsa_encrypt_padding,
+            padding=rsa_padding,
         )
 
     def sign(self, msg: bytes) -> bytes:
@@ -156,7 +156,7 @@ class RSAPublic:
         """加密."""
         return self.key.encrypt(
             plaintext=msg,
-            padding=rsa_encrypt_padding,
+            padding=rsa_padding,
         )
 
     def verify(self, signature: bytes, msg: bytes) -> bool:
