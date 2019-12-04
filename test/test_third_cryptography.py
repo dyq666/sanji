@@ -112,8 +112,7 @@ def public_pem_with_key():
 def test_aes(key_size, msg):
     key, iv = AES.generate_key(key_size=key_size)
     aes = AES(key, iv)
-    ciphertext = aes.encrypt(msg)
-    assert msg == aes.decrypt(ciphertext)
+    assert aes.decrypt(aes.encrypt(msg)) == msg
 
 
 @pytest.mark.parametrize('msg', (b'1', b'1' * AES.BLOCK_SIZE))

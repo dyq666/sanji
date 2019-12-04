@@ -31,7 +31,7 @@ aes_padding = padding.PKCS7(algorithms.AES.block_size)
 
 
 class AES:
-    """AES_256_CBC 加密, 解密, PKCS7 填充."""
+    """AES_256_CBC, 填充方式: PKCS7."""
 
     KEY_SIZES = {16, 24, 32}
     BLOCK_SIZE = 16
@@ -56,12 +56,14 @@ class AES:
         """解密."""
         decryptor = self.cipher.decryptor()
         unpadder = aes_padding.unpadder()
-        plaintext = decryptor.update(msg) + decryptor.finalize()
-        return unpadder.update(plaintext) + unpadder.finalize()
+        msg = decryptor.update(msg) + decryptor.finalize()
+        return unpadder.update(msg) + unpadder.finalize()
 
     @classmethod
     def generate_key(cls, key_size: int = 32) -> Tuple[bytes, bytes]:
         """生成 key 和 iv."""
+        if key_size not in cls.KEY_SIZES:
+            raise ValueError
         return secrets.token_bytes(key_size), secrets.token_bytes(cls.BLOCK_SIZE)
 
 
