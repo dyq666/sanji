@@ -5,7 +5,7 @@ __all__ = (
     'Binary',
     'BitField',
     'CaseInsensitiveDict',
-    'HybridEncryption',
+    'Hybrid',
     'OAuth2',
     'RSAPrivate',
     'RSAPublic',
@@ -31,7 +31,7 @@ from .normal import (
     strip_control, strip_seq,
 )
 from .third_cryptography import (
-    AES, HybridEncryption, RSAPrivate, RSAPublic,
+    AES, Hybrid, RSAPrivate, RSAPublic,
 )
 from .third_phonenumbers import parse_phone
 from .third_requests import OAuth2, SessionWithUrlPrefix, upload

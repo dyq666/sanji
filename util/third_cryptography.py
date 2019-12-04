@@ -1,6 +1,6 @@
 __all__ = (
     'AES',
-    'HybridEncryption',
+    'Hybrid',
     'RSAPrivate',
     'RSAPublic',
 )
@@ -8,7 +8,6 @@ __all__ = (
 import secrets
 from typing import TYPE_CHECKING, Optional, Tuple
 
-from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, padding, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa, padding as asy_padding
@@ -67,23 +66,40 @@ class AES:
         return secrets.token_bytes(key_size), secrets.token_bytes(cls.BLOCK_SIZE)
 
 
-class HybridEncryption:
-    """RSA + AES 混合加密."""
+class Hybrid:
+    """RSA + AES 加密消息, RSA 签名.
+
+    通信双方各生成一对公钥, 并将公钥交给对方.
+    发送时用自己的私钥签名, 另一方的公钥加密.
+    接收时用自己的公钥验签, 另一方的私钥解密.
+    """
 
     @staticmethod
-    def encrypt(msg: bytes, public_key: 'RSAPublic') -> Tuple[bytes, bytes]:
+    def encrypt(msg: bytes, private_sign_key: 'RSAPrivate',
+                public_encrypt_key: 'RSAPublic') -> Tuple[bytes, bytes, bytes]:
+        """加密 & 签名."""
         key, iv = AES.generate_key()
         aes = AES(key, iv)
+
+        signature = private_sign_key.sign(msg)
         ciphermsg = aes.encrypt(msg)
-        cipherkey = public_key.encrypt(key)
-        return ciphermsg + iv, cipherkey
+        session_key = public_encrypt_key.encrypt(key)
+        return ciphermsg + iv, session_key, signature
 
     @staticmethod
-    def decrypt(token: bytes, private_key: 'RSAPrivate', key: bytes) -> bytes:
+    def decrypt(token: bytes, private_decrypt_key: 'RSAPrivate',
+                public_verify_key: 'RSAPublic', session_key: bytes,
+                signature: bytes) -> bytes:
+        """解密 & 验签.
+
+        如果验签失败会抛出 `cryptography.exceptions.InvalidSignature`.
+        """
         msg, iv = token[:-16], token[-16:]
-        key = private_key.decrypt(key)
+        key = private_decrypt_key.decrypt(session_key)
         aes = AES(key, iv)
+
         msg = aes.decrypt(msg)
+        public_verify_key.verify(msg, signature)
         return msg
 
 
@@ -159,18 +175,17 @@ class RSAPublic:
             padding=rsa_padding,
         )
 
-    def verify(self, signature: bytes, msg: bytes) -> bool:
-        """验证签名."""
-        try:
-            self.key.verify(
-                signature=signature,
-                data=msg,
-                padding=rsa_sign_padding,
-                algorithm=hashes.SHA256(),
-            )
-            return True
-        except InvalidSignature:
-            return False
+    def verify(self, msg: bytes, signature: bytes):
+        """验证签名.
+
+        如果验证失败会抛出 `cryptography.exceptions.InvalidSignature`.
+        """
+        self.key.verify(
+            signature=signature,
+            data=msg,
+            padding=rsa_sign_padding,
+            algorithm=hashes.SHA256(),
+        )
 
     def format_pem(self) -> bytes:
         """生成 PEM 格式的公钥."""

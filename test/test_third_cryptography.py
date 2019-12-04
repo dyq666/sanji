@@ -3,8 +3,9 @@
 """
 
 import pytest
+from cryptography.exceptions import InvalidSignature
 
-from util import AES, HybridEncryption, RSAPrivate, RSAPublic
+from util import AES, Hybrid, RSAPrivate, RSAPublic
 
 
 @pytest.fixture
@@ -116,11 +117,40 @@ def test_aes(key_size, msg):
 
 
 @pytest.mark.parametrize('msg', (b'1', b'1' * AES.BLOCK_SIZE))
-def test_hybrid_encryption(msg, private_pem, public_pem):
-    public_key = RSAPublic.load_pem(public_pem)
-    private_key = RSAPrivate.load_pem(private_pem)
-    token, cipherkey = HybridEncryption.encrypt(msg, public_key)
-    assert HybridEncryption.decrypt(token, private_key, key=cipherkey)
+def test_hybrid(msg, private_pem, public_pem,
+                private_pem_with_key, public_pem_with_key):
+    alice_private_key = RSAPrivate.load_pem(private_pem)
+    alice_public_key = RSAPublic.load_pem(public_pem)
+    bob_private_key = RSAPrivate.load_pem(private_pem_with_key, password=b'1')
+    bob_public_key = RSAPublic.load_pem(public_pem_with_key)
+
+    # alice 向 bob 发送消息
+    token, session_key, signature = Hybrid.encrypt(
+        msg,
+        private_sign_key=alice_private_key,
+        public_encrypt_key=bob_public_key,
+    )
+    assert msg == Hybrid.decrypt(
+        token,
+        public_verify_key=alice_public_key,
+        private_decrypt_key=bob_private_key,
+        session_key=session_key,
+        signature=signature,
+    )
+
+    # bob 向 alice 发送消息
+    token, session_key, signature = Hybrid.encrypt(
+        msg,
+        private_sign_key=bob_private_key,
+        public_encrypt_key=alice_public_key,
+    )
+    assert msg == Hybrid.decrypt(
+        token,
+        public_verify_key=bob_public_key,
+        private_decrypt_key=alice_private_key,
+        session_key=session_key,
+        signature=signature,
+    )
 
 
 class TestRSAPrivate:
@@ -156,7 +186,9 @@ class TestRSAPrivate:
         for msg in msgs:
             assert private.decrypt(public.encrypt(msg)) == msg
             assert private.decrypt(public_2.encrypt(msg)) == msg
-            assert public.verify(private.sign(msg), msg)
-            assert not public.verify(private.sign(msg), msg + b'1')
-            assert public_2.verify(private.sign(msg), msg)
-            assert not public_2.verify(private.sign(msg), msg + b'1')
+            assert public.verify(msg, private.sign(msg)) is None
+            with pytest.raises(InvalidSignature):
+                public.verify(msg + b'1', private.sign(msg))
+            assert public_2.verify(msg, private.sign(msg)) is None
+            with pytest.raises(InvalidSignature):
+                public_2.verify(msg + b'1', private.sign(msg))
