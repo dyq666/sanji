@@ -71,19 +71,17 @@ class HybridEncryption:
     """RSA + AES 混合加密."""
 
     @staticmethod
-    def encrypt(msg: bytes, public_pem: bytes) -> Tuple[bytes, bytes]:
-        public = RSAPublic.load_pem(public_pem)
+    def encrypt(msg: bytes, public_key: 'RSAPublic') -> Tuple[bytes, bytes]:
         key, iv = AES.generate_key()
         aes = AES(key, iv)
         ciphermsg = aes.encrypt(msg)
-        cipherkey = public.encrypt(key)
+        cipherkey = public_key.encrypt(key)
         return ciphermsg + iv, cipherkey
 
     @staticmethod
-    def decrypt(token: bytes, private_pem: bytes, key: bytes) -> bytes:
-        private = RSAPrivate.load_pem(private_pem)
+    def decrypt(token: bytes, private_key: 'RSAPrivate', key: bytes) -> bytes:
         msg, iv = token[:-16], token[-16:]
-        key = private.decrypt(key)
+        key = private_key.decrypt(key)
         aes = AES(key, iv)
         msg = aes.decrypt(msg)
         return msg
