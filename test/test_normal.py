@@ -7,7 +7,7 @@ import pytest
 
 from util import (
     CSV, Base64, Binary, BitField, chinese_num, fill_seq, import_object,
-    indent_data, round_half_up, seq_grouper, silent_remove, strip_blank,
+    indent_data, round_half_up, seq_grouper, strip_blank,
     strip_control, strip_seq,
 )
 
@@ -336,23 +336,6 @@ class TestSeqGrouper:
             [seq]
         assert list(seq_grouper(seq, size=11, filler=filler)) == \
             [seq + type_([filler])]
-
-
-def test_silent_remove():
-    col_list = list(range(10))
-    silent_remove(col_list, 100)
-    silent_remove(col_list, 5)
-    assert 5 not in col_list
-
-    col_dict = dict(zip(range(10), range(50, 60)))
-    silent_remove(col_dict, 100)
-    silent_remove(col_dict, 5)
-    assert 5 not in col_dict
-
-    col_set = set(range(10))
-    silent_remove(col_set, 100)
-    silent_remove(col_set, 5)
-    assert 5 not in col_set
 
 
 def test_strip_blank():

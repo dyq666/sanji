@@ -9,7 +9,6 @@ __all__ = (
     'indent_data',
     'round_half_up',
     'seq_grouper',
-    'silent_remove',
     'strip_blank',
     'strip_control',
     'strip_seq',
@@ -405,25 +404,6 @@ def seq_grouper(seq: Seq, size: int, filler: Optional[Any] = None) -> Iterable:
         seq = fill_seq(seq, size, filler)
     times = math.ceil(len(seq) / size)
     return (seq[i * size: (i + 1) * size] for i in range(times))
-
-
-def silent_remove(col: Union[list, dict, set], value: Any) -> None:
-    """从 set, dict, list 中移除数据, 如果失败不抛出异常."""
-    if isinstance(col, list):
-        try:
-            col.remove(value)
-        except ValueError:
-            pass
-    elif isinstance(col, dict):
-        try:
-            del col[value]
-        except KeyError:
-            pass
-    elif isinstance(col, set):
-        try:
-            col.remove(value)
-        except KeyError:
-            pass
 
 
 def strip_blank(value: str, keep_inline_space: bool = True
