@@ -1,5 +1,8 @@
 __all__ = (
     'AES',
+    'AES_BLOCK_SIZE',
+    'AES_CTR',
+    'AES_KEY_SIZES',
     'Hybrid',
     'RSAPrivate',
     'RSAPublic',
@@ -15,6 +18,9 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 if TYPE_CHECKING:
     from cryptography.hazmat.backends.openssl.rsa import _RSAPrivateKey, _RSAPublicKey
+
+AES_KEY_SIZES = {16, 24, 32}
+AES_BLOCK_SIZE = 16
 
 backend = default_backend()
 rsa_sign_padding = asy_padding.PSS(
@@ -32,11 +38,8 @@ aes_padding = padding.PKCS7(algorithms.AES.block_size)
 class AES:
     """AES_256_CBC, 填充方式: PKCS7."""
 
-    KEY_SIZES = {16, 24, 32}
-    BLOCK_SIZE = 16
-
     def __init__(self, key: bytes, iv: bytes):
-        if len(key) not in self.KEY_SIZES or len(iv) != self.BLOCK_SIZE:
+        if len(key) not in AES_KEY_SIZES or len(iv) != AES_BLOCK_SIZE:
             raise ValueError
         self.cipher = Cipher(
             algorithm=algorithms.AES(key),
@@ -58,12 +61,46 @@ class AES:
         msg = decryptor.update(msg) + decryptor.finalize()
         return unpadder.update(msg) + unpadder.finalize()
 
-    @classmethod
-    def generate_key(cls, key_size: int = 32) -> Tuple[bytes, bytes]:
-        """生成 key 和 iv."""
-        if key_size not in cls.KEY_SIZES:
+    @staticmethod
+    def generate_key(key_size: int = 32) -> bytes:
+        if key_size not in AES_KEY_SIZES:
             raise ValueError
-        return secrets.token_bytes(key_size), secrets.token_bytes(cls.BLOCK_SIZE)
+        return secrets.token_bytes(key_size)
+
+    @staticmethod
+    def generate_iv() -> bytes:
+        return secrets.token_bytes(AES_BLOCK_SIZE)
+
+
+class AES_CTR:
+    """AES_CTR."""
+
+    def __init__(self, key: bytes, nonce: bytes):
+        if len(key) not in AES_KEY_SIZES or len(nonce) != AES_BLOCK_SIZE:
+            raise ValueError
+        self.cipher = Cipher(
+            algorithm=algorithms.AES(key),
+            mode=modes.CTR(nonce),
+            backend=backend,
+        )
+
+    def encrypt(self, msg: bytes) -> bytes:
+        encryptor = self.cipher.encryptor()
+        return encryptor.update(msg) + encryptor.finalize()
+
+    def decrypt(self, msg: bytes) -> bytes:
+        decryptor = self.cipher.decryptor()
+        return decryptor.update(msg) + decryptor.finalize()
+
+    @staticmethod
+    def generate_key(key_size: int = 32) -> bytes:
+        if key_size not in AES_KEY_SIZES:
+            raise ValueError
+        return secrets.token_bytes(key_size)
+
+    @staticmethod
+    def generate_nonce() -> bytes:
+        return secrets.token_bytes(AES_BLOCK_SIZE)
 
 
 class Hybrid:
@@ -78,7 +115,8 @@ class Hybrid:
     def encrypt(msg: bytes, private_sign_key: 'RSAPrivate',
                 public_encrypt_key: 'RSAPublic') -> Tuple[bytes, bytes, bytes]:
         """加密 & 签名."""
-        key, iv = AES.generate_key()
+        key = AES.generate_key()
+        iv = AES.generate_iv()
         aes = AES(key, iv)
 
         signature = private_sign_key.sign(msg)

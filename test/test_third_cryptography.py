@@ -5,7 +5,10 @@
 import pytest
 from cryptography.exceptions import InvalidSignature
 
-from util import AES, Hybrid, RSAPrivate, RSAPublic
+from util import (
+    AES, AES_BLOCK_SIZE, AES_CTR, AES_KEY_SIZES, Hybrid,
+    RSAPrivate, RSAPublic,
+)
 
 
 @pytest.fixture
@@ -108,15 +111,25 @@ def public_pem_with_key():
     )
 
 
-@pytest.mark.parametrize('key_size', AES.KEY_SIZES)
-@pytest.mark.parametrize('msg', (b'1', b'1' * AES.BLOCK_SIZE))
+@pytest.mark.parametrize('key_size', AES_KEY_SIZES)
+@pytest.mark.parametrize('msg', (b'1', b'1' * AES_BLOCK_SIZE))
 def test_aes(key_size, msg):
-    key, iv = AES.generate_key(key_size=key_size)
+    key = AES.generate_key(key_size=key_size)
+    iv = AES.generate_iv()
     aes = AES(key, iv)
     assert aes.decrypt(aes.encrypt(msg)) == msg
 
 
-@pytest.mark.parametrize('msg', (b'1', b'1' * AES.BLOCK_SIZE))
+@pytest.mark.parametrize('key_size', AES_KEY_SIZES)
+@pytest.mark.parametrize('msg', (b'1', b'1' * AES_BLOCK_SIZE))
+def test_aes(key_size, msg):
+    key = AES_CTR.generate_key(key_size=key_size)
+    nonce = AES_CTR.generate_nonce()
+    aes_ctr = AES_CTR(key, nonce)
+    assert aes_ctr.decrypt(aes_ctr.encrypt(msg)) == msg
+
+
+@pytest.mark.parametrize('msg', (b'1', b'1' * AES_BLOCK_SIZE))
 def test_hybrid(msg, private_pem, public_pem,
                 private_pem_with_key, public_pem_with_key):
     alice_private_key = RSAPrivate.load_pem(private_pem)
