@@ -28,6 +28,10 @@ export FLASK_ENV=development
 flask run
 ```
 
+目前缺少单元测试的工具:
+
+  - util/third_peewee 所有工具.
+
 ## 一些相关的仓库
 
 有的工具不适合用函数或类来表现, 因此这些工具都单独有一个仓库.
