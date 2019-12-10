@@ -30,7 +30,7 @@ flask run
 
 目前缺少单元测试的工具:
 
-  - util/third_peewee 所有工具.
+  - `util/third_peewee` 所有工具.
 
 ## 一些相关的仓库
 
