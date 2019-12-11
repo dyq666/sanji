@@ -6,8 +6,8 @@ from functools import partial
 import pytest
 
 from util import (
-    CSV, Base64, Binary, BitField, chinese_num, fill_seq, import_object,
-    indent_data, round_half_up, seq_grouper, strip_blank,
+    CSV, Base64, Binary, BitField, camel2snake, chinese_num, fill_seq,
+    import_object, indent_data, round_half_up, seq_grouper, strip_blank,
     strip_control, strip_seq,
 )
 
@@ -196,6 +196,17 @@ def test_bit_field():
     assert bit_field.has(ID.HUMAN)
     assert bit_field.has(ID.MAMMALIA)
     assert bit_field.has(ID.OTHER)
+
+
+def test_camel2snake():
+    # test empty
+    assert camel2snake('') == ''
+    # test exception
+    with pytest.raises(ValueError):
+        camel2snake('_')
+        camel2snake('a')
+
+    assert camel2snake('UserGroup') == 'user_group'
 
 
 def test_chinese_num():

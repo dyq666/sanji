@@ -3,6 +3,7 @@ __all__ = (
     'Base64',
     'Binary',
     'BitField',
+    'camel2snake',
     'chinese_num',
     'fill_seq',
     'import_object',
@@ -297,6 +298,22 @@ class BitField:
     @classmethod
     def create(cls, ids: Iterable[int]) -> 'BitField':
         return cls(reduce(or_, ids))
+
+
+def camel2snake(s: str) -> str:
+    """camel case 转 snake case.
+
+    首字母必须是大写.
+
+    更好的方案应该是: peewee.py::make_snake_case.
+    """
+    if not s:
+        return ''
+    if not s[0].isupper():
+        raise ValueError
+
+    items = re.findall(r'[A-Z][_a-z]*', s)
+    return '_'.join(item for item in items).lower()
 
 
 def chinese_num(num: int) -> str:
