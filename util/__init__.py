@@ -14,6 +14,7 @@ __all__ = (
     'SessionWithUrlPrefix',
     'camel2snake',
     'chinese_num',
+    'format_rows',
     'fill_seq',
     'import_object',
     'indent_data',
@@ -28,9 +29,9 @@ __all__ = (
 
 from .demo import CaseInsensitiveDict
 from .normal import (
-    CSV, Base64, Binary, BitField, camel2snake, chinese_num, fill_seq,
-    import_object, indent_data, round_half_up, seq_grouper, strip_blank,
-    strip_control, strip_seq,
+    CSV, Base64, Binary, BitField, camel2snake, chinese_num, format_rows,
+    fill_seq, import_object, indent_data, round_half_up, seq_grouper,
+    strip_blank, strip_control, strip_seq,
 )
 from .third_cryptography import (
     AES, AES_BLOCK_SIZE, AES_CTR, AES_KEY_SIZES, Hybrid,

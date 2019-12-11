@@ -5,6 +5,7 @@ __all__ = (
     'BitField',
     'camel2snake',
     'chinese_num',
+    'format_rows',
     'fill_seq',
     'import_object',
     'indent_data',
@@ -24,6 +25,7 @@ import json
 import math
 import re
 import struct
+from collections import defaultdict
 from decimal import ROUND_HALF_UP, Decimal
 from functools import reduce
 from operator import or_
@@ -350,6 +352,28 @@ def fill_seq(seq: Seq, size: int, filler: Any) -> Seq:
         return seq + filler * num
     else:  # list or tuple
         return seq + type(seq)(filler for _ in range(num))
+
+
+def format_rows(data: List[dict]) -> str:
+    """用更可读的形式展示数据."""
+    # 计算每列的最大长度.
+    lens = defaultdict(int)
+    for row in data:
+        for k, v in row.items():
+            lens[k] = max(len(str(v)), lens[k])
+    lens = {k: max(len(k), v) for k, v in lens.items()}
+
+    # header
+    res = [
+        '  '.join('{:<{}}'.format(k, v) for k, v in lens.items()),
+        '  '.join('{:<{}}'.format('-' * v, v) for v in lens.values()),
+    ]
+
+    # data
+    for row in data:
+        s = '  '.join('{:<{}}'.format(str(v), lens[k]) for k, v in row.items())
+        res.append(s)
+    return '\n'.join(res)
 
 
 def import_object(object_path: str) -> Any:

@@ -6,9 +6,9 @@ from functools import partial
 import pytest
 
 from util import (
-    CSV, Base64, Binary, BitField, camel2snake, chinese_num, fill_seq,
-    import_object, indent_data, round_half_up, seq_grouper, strip_blank,
-    strip_control, strip_seq,
+    CSV, Base64, Binary, BitField, camel2snake, chinese_num, format_rows,
+    fill_seq, import_object, indent_data, round_half_up, seq_grouper,
+    strip_blank, strip_control, strip_seq,
 )
 
 
@@ -226,6 +226,28 @@ def test_chinese_num():
     )
     for num, chinese in fixtures:
         assert chinese_num(num) == chinese
+
+
+def test_format_rows():
+    rows = [
+        {'cust_name': 'Village Toys',
+         'cust_contact': 'John Smith',
+         'cust_email': 'sales@villagetoys.com'},
+        {'cust_name': 'Fun4All',
+         'cust_contact': 'Jim Jones',
+         'cust_email': 'jjones@fun4all.com'},
+        {'cust_name': 'The Toy Store',
+         'cust_contact': 'Kim Howard',
+         'cust_email': None}
+    ]
+    res = format_rows(rows)
+    assert res == (
+        'cust_name      cust_contact  cust_email           \n'
+        '-------------  ------------  ---------------------\n'
+        'Village Toys   John Smith    sales@villagetoys.com\n'
+        'Fun4All        Jim Jones     jjones@fun4all.com   \n'
+        'The Toy Store  Kim Howard    None                 '
+    )
 
 
 class TestFillSeq:
