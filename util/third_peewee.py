@@ -1,12 +1,20 @@
 __all__ = (
+    'count',
     'get_create_query',
     'query2sql',
 )
 
 from typing import TYPE_CHECKING
 
+from peewee import SQL, fn
+
 if TYPE_CHECKING:
-    from peewee import Model, ModelSelect, Database
+    from peewee import Model, ModelSelect, Database, Function
+
+
+def count() -> 'Function':
+    """返回 COUNT(*) 语句."""
+    return fn.count(SQL('*'))
 
 
 def get_create_query(model: 'Model') -> 'ModelSelect':
