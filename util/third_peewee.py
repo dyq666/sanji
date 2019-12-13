@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 from peewee import SQL, fn
 
 if TYPE_CHECKING:
-    from peewee import Model, ModelSelect, Function
+    from peewee import BaseQuery, Model, Function
 
 
 def count() -> 'Function':
@@ -17,7 +17,7 @@ def count() -> 'Function':
     return fn.count(SQL('*'))
 
 
-def get_create_table_sql(model: 'Model') -> 'ModelSelect':
+def get_create_table_sql(model: 'Model') -> str:
     """返回创建 table 的 sql 语句.
 
     copy from https://github.com/dyq666/sanji.
@@ -31,7 +31,7 @@ def get_create_table_sql(model: 'Model') -> 'ModelSelect':
     return sql % params
 
 
-def query2sql(query: 'ModelSelect') -> str:
+def query2sql(query: 'BaseQuery') -> str:
     """将 `query` 对象转为 sql 字符串."""
     sql, params = query.sql()
     params = tuple(f"'{p}'" for p in params)
