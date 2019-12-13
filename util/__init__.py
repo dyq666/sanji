@@ -7,6 +7,7 @@ __all__ = (
     'Binary',
     'BitField',
     'CaseInsensitiveDict',
+    'DictSerializer',
     'Hybrid',
     'OAuth2',
     'RSAPrivate',
@@ -27,7 +28,7 @@ __all__ = (
     'upload',
 )
 
-from .demo import CaseInsensitiveDict
+from .demo import CaseInsensitiveDict, DictSerializer
 from .normal import (
     CSV, Base64, Binary, BitField, camel2snake, chinese_num, format_rows,
     fill_seq, import_object, indent_data, round_half_up, seq_grouper,

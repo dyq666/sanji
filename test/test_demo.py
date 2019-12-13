@@ -1,7 +1,7 @@
 import string
 import pytest
 
-from util import CaseInsensitiveDict
+from util import CaseInsensitiveDict, DictSerializer
 
 
 class TestCaseInsensitiveDict:
@@ -55,3 +55,24 @@ class TestCaseInsensitiveDict:
         assert ''.join(d.keys()) == string.ascii_lowercase
         assert ''.join(d) == string.ascii_lowercase
         assert ''.join(d.values()) == '1' * len(d)
+
+
+class TestDictSerializer:
+
+    @pytest.mark.parametrize('key', ('a:b', 'a|b', 'a$b', 'a:b|c$d'))
+    @pytest.mark.parametrize('value', ('a', ['1', '2']))
+    def test_single_encode_and_decode(self, key, value):
+        data = {key: value}
+        assert DictSerializer.decode(DictSerializer.encode(data)) == data
+
+    def test_multi_encode_and_decode(self):
+        data = {
+            'a:b': 'a$b',
+            'a|b': '',
+            'a:b|c$d': ['A||%%A', '安$$安'],
+        }
+        assert DictSerializer.decode(DictSerializer.encode(data)) == data
+
+    def test_empty(self):
+        assert DictSerializer.encode({}) == ''
+        assert DictSerializer.decode('') == {}
