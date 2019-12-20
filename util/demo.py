@@ -1,6 +1,7 @@
 __all__ = (
     'CaseInsensitiveDict',
     'DictSerializer',
+    'MockName',
 )
 
 from collections import UserDict
@@ -85,3 +86,30 @@ class DictSerializer:
     @staticmethod
     def _decode_s(s: str) -> str:
         return s.replace('$;', '|').replace('$,', ':').replace('$$', '$')
+
+
+class MockName:
+    """mock 某个特定的属性. (本例中是 `name`)
+
+    注意这里必须使用 `__getattr__`, 而不是 `__getattribute__`.
+
+    假设 `__getattribute__` 的代码如下.
+
+    ```
+    def __getattribute__(self, name):
+        return getattr(self.real, name)
+    ```
+
+    调用 `mock.name` 时会触发 `__getattribute__`, 而 `self.real` 也会触发
+    `__getattribute__` 导致了无限递归.
+    """
+
+    def __init__(self, real):
+        self.real = real
+
+    def __getattr__(self, name):
+        return getattr(self.real, name)
+
+    @property
+    def name(self):
+        return 'mock'

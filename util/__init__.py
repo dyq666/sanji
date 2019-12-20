@@ -9,6 +9,7 @@ __all__ = (
     'CaseInsensitiveDict',
     'DictSerializer',
     'Hybrid',
+    'MockName',
     'OAuth2',
     'RSAPrivate',
     'RSAPublic',
@@ -28,7 +29,11 @@ __all__ = (
     'upload',
 )
 
-from .demo import CaseInsensitiveDict, DictSerializer
+from .demo import (
+    CaseInsensitiveDict,
+    DictSerializer,
+    MockName,
+)
 from .normal import (
     CSV, Base64, Binary, BitField, camel2snake, chinese_num, format_rows,
     fill_seq, import_object, indent_data, round_half_up, seq_grouper,

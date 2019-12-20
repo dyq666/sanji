@@ -1,7 +1,9 @@
 import string
+from collections import namedtuple
+
 import pytest
 
-from util import CaseInsensitiveDict, DictSerializer
+from util import CaseInsensitiveDict, DictSerializer, MockName
 
 
 class TestCaseInsensitiveDict:
@@ -76,3 +78,12 @@ class TestDictSerializer:
     def test_empty(self):
         assert DictSerializer.encode({}) == ''
         assert DictSerializer.decode('') == {}
+
+
+def test_mock_name():
+    People = namedtuple('People', 'name age')
+    people = People('bob', 18)
+    mock = MockName(people)
+
+    assert mock.name == 'mock'
+    assert mock.age == 18
