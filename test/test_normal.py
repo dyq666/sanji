@@ -7,8 +7,8 @@ import pytest
 
 from util import (
     CSV, Base64, Binary, BitField, camel2snake, chinese_num, format_rows,
-    fill_seq, import_object, indent_data, round_half_up, seq_grouper,
-    strip_blank, strip_control, strip_seq,
+    fill_seq, import_object, indent_data, round_half_up, percentage,
+    seq_grouper, strip_blank, strip_control, strip_seq,
 )
 
 
@@ -307,6 +307,19 @@ def test_indent_data():
         '    "\\u540d\\u5b57": "\\u5c0f\\u7ea2"\n'
         '}'
     )
+
+
+def test_percentage():
+    # 分母为 0 的情况
+    assert percentage(1, 0) == '0.00%'
+    assert percentage(1, 0, with_format=False) == 0.0
+    assert percentage(1, 0.0) == '0.00%'
+    assert percentage(1, 0.0, with_format=False) == 0.0
+
+    assert percentage(10, 100) == '10.00%'
+    assert percentage(10, 100, with_format=False) == 10.0
+    assert percentage(0.03, 4) == '0.75%'
+    assert percentage(0.03, 4, with_format=False) == 0.75
 
 
 def test_round_half_up():

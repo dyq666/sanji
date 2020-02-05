@@ -9,6 +9,7 @@ __all__ = (
     'fill_seq',
     'import_object',
     'indent_data',
+    'percentage',
     'round_half_up',
     'seq_grouper',
     'strip_blank',
@@ -401,6 +402,16 @@ def indent_data(data: Col, show_unicode: bool = True) -> str:
     if show_unicode:
         data = data.encode().decode('unicode_escape')
     return data
+
+
+def percentage(molecule: Num, denominator: Num, with_format: bool = True
+               ) -> Union[str, float]:
+    # 分母不能为 0
+    res = 0.0 if not denominator else molecule * 100 / denominator
+
+    if not with_format:
+        return res
+    return f'{res:.2f}%'
 
 
 def round_half_up(number: Num, ndigits: int = 0) -> Num:
