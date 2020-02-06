@@ -6,7 +6,8 @@ from functools import partial
 import pytest
 
 from util import (
-    CSV, Base64, Binary, BitField, camel2snake, chinese_num, format_rows,
+    CSV, Base64, Binary, BitField, Version,
+    camel2snake, chinese_num, format_rows,
     fill_seq, import_object, indent_data, round_half_up, percentage,
     seq_grouper, strip_blank, strip_control, strip_seq,
 )
@@ -196,6 +197,24 @@ def test_bit_field():
     assert bit_field.has(ID.HUMAN)
     assert bit_field.has(ID.MAMMALIA)
     assert bit_field.has(ID.OTHER)
+
+
+def test_version():
+    # 自动补全三位版本号
+    assert Version.parse('') is None
+    assert str(Version.parse('4')) == '4.0.0'
+    assert str(Version.parse('4.0')) == '4.0.0'
+    assert str(Version.parse('4.0.0')) == '4.0.0'
+
+    assert Version.parse('4.0.1') >= Version.parse('4.0.1')
+    assert Version.parse('4.0.2') >= Version.parse('4.0.1')
+
+    assert Version.parse('4.0.1') <= Version.parse('4.0.1')
+    assert Version.parse('4.0.1') <= Version.parse('4.0.2')
+
+    assert Version.parse('10.3.2') > Version.parse('10.2.3')
+    assert Version.parse('0') < Version.parse('321.3123.3123')
+    assert Version.parse('4') == Version.parse('4.0.0')
 
 
 def test_camel2snake():

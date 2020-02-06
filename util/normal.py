@@ -3,6 +3,7 @@ __all__ = (
     'Base64',
     'Binary',
     'BitField',
+    'Version',
     'camel2snake',
     'chinese_num',
     'format_rows',
@@ -28,7 +29,7 @@ import re
 import struct
 from collections import defaultdict
 from decimal import ROUND_HALF_UP, Decimal
-from functools import reduce
+from functools import reduce, total_ordering
 from operator import or_
 from typing import (
     Any, Iterable, List, Optional, Tuple, Union,
@@ -301,6 +302,52 @@ class BitField:
     @classmethod
     def create(cls, ids: Iterable[int]) -> 'BitField':
         return cls(reduce(or_, ids))
+
+
+@total_ordering
+class Version:
+
+    def __init__(self, major: int, minor: int, revision: int):
+        self.major = major
+        self.minor = minor
+        self.revision = revision
+
+    def __repr__(self):
+        return (
+            f'<{self.__class__.__name__}'
+            f' major={self.major!r}'
+            f' minor={self.minor!r}'
+            f' revision={self.revision!r}'
+            f'>'
+        )
+
+    def __str__(self):
+        return f'{self.major}.{self.minor}.{self.revision}'
+
+    def __eq__(self, other: 'Version'):
+        return (
+            self.major == other.major
+            and self.minor == other.minor
+            and self.revision == other.revision
+        )
+
+    def __gt__(self, other: 'Version'):
+        # 前一级版本号相等时, 再比后一级版本号.
+        res = (
+            self.major - other.major
+            or self.minor - other.minor
+            or self.revision - other.revision
+        )
+        return res > 0
+
+    @classmethod
+    def parse(cls, version_str: str) -> Optional['Version']:
+        if not version_str:
+            return
+
+        group = [int(i) for i in version_str.split('.')]
+        group = fill_seq(group, size=3, filler=0)
+        return Version(*group)
 
 
 def camel2snake(s: str) -> str:
