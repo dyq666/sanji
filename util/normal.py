@@ -11,9 +11,9 @@ __all__ = (
     'import_object',
     'indent_data',
     'percentage',
+    'rm_around_space',
     'round_half_up',
     'seq_grouper',
-    'strip_blank',
     'strip_control',
     'strip_seq',
 )
@@ -461,6 +461,16 @@ def percentage(molecule: Num, denominator: Num, with_format: bool = True
     return f'{res:.2f}%'
 
 
+def rm_around_space(value: str, keep_inline_space: bool = True
+                    ) -> Union[List[str], List[List[str]]]:
+    """清除字符串上下左右的空白字符.
+
+    `keep_inline_space`: 是否保留行内的空白字符
+    """
+    rows = [r.strip() for r in value.splitlines() if r and not r.isspace()]
+    return rows if keep_inline_space else [r.split() for r in rows]
+
+
 def round_half_up(number: Num, ndigits: int = 0) -> Num:
     """四舍五入.
 
@@ -503,16 +513,6 @@ def seq_grouper(seq: Seq, size: int, filler: Optional[Any] = None) -> Iterable:
         seq = fill_seq(seq, size, filler)
     times = math.ceil(len(seq) / size)
     return (seq[i * size: (i + 1) * size] for i in range(times))
-
-
-def strip_blank(value: str, keep_inline_space: bool = True
-                ) -> Union[List[str], List[List[str]]]:
-    """在字符串中获取数据.
-
-    `keep_inline_space`: 是否拆分一行中的数据
-    """
-    rows = [r.strip() for r in value.splitlines() if r and not r.isspace()]
-    return rows if keep_inline_space else [r.split() for r in rows]
 
 
 def strip_control(value: str) -> str:

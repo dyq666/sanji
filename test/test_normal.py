@@ -8,8 +8,8 @@ import pytest
 from util import (
     CSV, Base64, Binary, BitField, Version,
     camel2snake, chinese_num, format_rows,
-    fill_seq, import_object, indent_data, round_half_up, percentage,
-    seq_grouper, strip_blank, strip_control, strip_seq,
+    fill_seq, import_object, indent_data, rm_around_space,
+    round_half_up, percentage, seq_grouper, strip_control, strip_seq,
 )
 
 
@@ -403,7 +403,7 @@ class TestSeqGrouper:
             [seq + type_([filler])]
 
 
-def test_strip_blank():
+def test_rm_around_space():
     textarea = """
     1
 
@@ -411,7 +411,7 @@ def test_strip_blank():
     3
 
     """
-    assert strip_blank(textarea) == ['1', '2', '3']
+    assert rm_around_space(textarea) == ['1', '2', '3']
 
     textarea = """
     1 a
@@ -419,7 +419,7 @@ def test_strip_blank():
     \t
     3      c
     """
-    assert strip_blank(textarea, keep_inline_space=False) == \
+    assert rm_around_space(textarea, keep_inline_space=False) == \
         [['1', 'a'], ['2', 'b'], ['3', 'c']]
 
 

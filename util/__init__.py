@@ -23,9 +23,9 @@ __all__ = (
     'indent_data',
     'parse_phone',
     'percentage',
+    'rm_around_space',
     'round_half_up',
     'seq_grouper',
-    'strip_blank',
     'strip_control',
     'strip_seq',
     'upload',
@@ -39,7 +39,7 @@ from .demo import (
 from .normal import (
     CSV, Base64, Binary, BitField, Version, camel2snake, chinese_num,
     format_rows, fill_seq, import_object, indent_data, percentage,
-    round_half_up, seq_grouper, strip_blank, strip_control, strip_seq,
+    rm_around_space, round_half_up, seq_grouper, strip_control, strip_seq,
 )
 from .third_cryptography import (
     AES, AES_BLOCK_SIZE, AES_CTR, AES_KEY_SIZES, Hybrid,
