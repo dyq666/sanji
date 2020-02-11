@@ -17,6 +17,7 @@ __all__ = (
     'Version',
     'camel2snake',
     'chinese_num',
+    'date_range',
     'format_rows',
     'fill_seq',
     'import_object',
@@ -38,6 +39,7 @@ from .demo import (
 )
 from .normal import (
     CSV, Base64, Binary, BitField, Version, camel2snake, chinese_num,
+    date_range,
     format_rows, fill_seq, import_object, indent_data, percentage,
     rm_around_space, round_half_up, seq_grouper, strip_control, strip_seq,
 )
