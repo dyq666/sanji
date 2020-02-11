@@ -25,12 +25,12 @@ import importlib
 import io
 import json
 import math
+import operator
 import re
 import struct
 from collections import defaultdict
 from decimal import ROUND_HALF_UP, Decimal
 from functools import reduce, total_ordering
-from operator import or_
 from typing import (
     Any, Iterable, List, Optional, Tuple, Union,
 )
@@ -301,7 +301,7 @@ class BitField:
 
     @classmethod
     def create(cls, ids: Iterable[int]) -> 'BitField':
-        return cls(reduce(or_, ids))
+        return cls(reduce(operator.or_, ids))
 
 
 @total_ordering
