@@ -1,14 +1,13 @@
 import enum
 import os
 import tempfile
-from datetime import date, datetime, timedelta
 from functools import partial
 
 import pytest
 
 from util import (
     CSV, Base64, Binary, BitField, Version,
-    camel2snake, chinese_num, date_range, format_rows,
+    camel2snake, chinese_num, format_rows,
     fill_seq, import_object, indent_data, rm_around_space,
     round_half_up, percentage, seq_grouper, strip_control, strip_seq,
 )
@@ -246,30 +245,6 @@ def test_chinese_num():
     )
     for num, chinese in fixtures:
         assert chinese_num(num) == chinese
-
-
-@pytest.mark.parametrize('date_cls', (date, datetime))
-def test_date_range(date_cls):
-    with pytest.raises(ValueError):
-        list(date_range(date_cls(2019, 1, 1), date_cls(2019, 1, 1), timedelta(seconds=0)))
-
-    assert list(date_range(date_cls(2019, 1, 1), date_cls(2019, 1, 1))) == []
-    assert list(date_range(date_cls(2019, 1, 2), date_cls(2019, 1, 1))) == []
-
-    assert list(date_range(date_cls(2019, 1, 31), date_cls(2019, 2, 2))) == [
-        date_cls(2019, 1, 31),
-        date_cls(2019, 2, 1),
-    ]
-    assert list(date_range(date_cls(2019, 1, 31), date_cls(2019, 2, 2), timedelta(days=2))) == [
-        date_cls(2019, 1, 31),
-    ]
-    assert list(date_range(date_cls(2019, 2, 1), date_cls(2019, 1, 30), timedelta(days=-1))) == [
-        date_cls(2019, 2, 1),
-        date_cls(2019, 1, 31),
-    ]
-    assert list(date_range(date_cls(2019, 2, 2), date_cls(2019, 1, 31), timedelta(days=-2))) == [
-        date_cls(2019, 2, 2),
-    ]
 
 
 def test_format_rows():

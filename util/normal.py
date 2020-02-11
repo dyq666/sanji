@@ -28,7 +28,6 @@ import math
 import re
 import struct
 from collections import defaultdict
-from datetime import date, datetime, timedelta
 from decimal import ROUND_HALF_UP, Decimal
 from functools import reduce, total_ordering
 from operator import or_
@@ -37,7 +36,6 @@ from typing import (
 )
 
 Col = Union[list, tuple, dict]
-Date = Union[date, datetime]
 Num = Union[int, float]
 Seq = Union[list, tuple, str, bytes]
 
@@ -387,23 +385,6 @@ def chinese_num(num: int) -> str:
         return single[10] + single[num % 10]
     else:
         return single[num // 10] + single[10] + single[num % 10]
-
-
-def date_range(start: Date, stop: Date, step: timedelta = timedelta(days=1)
-               ) -> Iterable[Date]:
-    """以 1 天为间隔迭代时间, 不包含 `end` (和内置的 `range` 函数保持一致)."""
-    seconds = step.total_seconds()
-    if seconds == 0.0:
-        raise ValueError('step must not be zero timedelta')
-
-    if seconds > 0.0:
-        while start < stop:
-            yield start
-            start += step
-    else:
-        while start > stop:
-            yield start
-            start += step
 
 
 def fill_seq(seq: Seq, size: int, filler: Any) -> Seq:
