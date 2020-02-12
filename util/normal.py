@@ -388,10 +388,7 @@ def chinese_num(num: int) -> str:
 
 
 def fill_seq(seq: Seq, size: int, filler: Any) -> Seq:
-    """用 `filler` 填充序列使其能被 `size` 整除."""
-    if not isinstance(seq, (str, bytes, list, tuple)):
-        raise TypeError
-
+    """用 `filler` 填充序列使其能被 `size` 整除. (str, bytes, list, tuple)"""
     if len(seq) % size == 0:
         return seq
 
@@ -501,14 +498,11 @@ def round_half_up(number: Num, ndigits: int = 0) -> Num:
 
 
 def seq_grouper(seq: Seq, size: int, filler: Optional[Any] = None) -> Iterable:
-    """按组迭代序列.
+    """按组迭代序列. (str, bytes, list, tuple)
 
     `size`: 每组的大小.
     `filler`: 如果传入, 则用此值填充最后一组.
     """
-    if not isinstance(seq, (str, bytes, list, tuple)):
-        raise TypeError
-
     if filler is not None:
         seq = fill_seq(seq, size, filler)
     times = math.ceil(len(seq) / size)
@@ -522,10 +516,7 @@ def strip_control(value: str) -> str:
 
 
 def strip_seq(seq: Seq, size: int) -> Seq:
-    """从末尾移除序列使其能被 `size` 整除."""
-    if not isinstance(seq, (str, bytes, list, tuple)):
-        raise TypeError
-
+    """从末尾移除序列使其能被 `size` 整除. (str, bytes, list, tuple)"""
     if len(seq) % size == 0:
         return seq
 
