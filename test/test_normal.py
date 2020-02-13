@@ -6,7 +6,7 @@ from functools import partial
 import pytest
 
 from util import (
-    CSV, Base64, Binary, BitField, Version,
+    CSV, Base64, Binary, BitField, KindTree, Version,
     camel2snake, chinese_num, format_rows,
     fill_seq, import_object, indent_data, rm_around_space,
     round_half_up, percentage, seq_grouper, strip_control, strip_seq,
@@ -197,6 +197,37 @@ def test_bit_field():
     assert bit_field.has(ID.HUMAN)
     assert bit_field.has(ID.MAMMALIA)
     assert bit_field.has(ID.OTHER)
+
+
+class TestKindTree:
+    values = (
+        ('0', None, '电器'),
+        ('1', '0', '电脑'),
+        ('101', '1', '笔记本电脑'),
+        ('102', '1', '台式电脑'),
+    )
+    ElectricalKind = KindTree(values)
+
+    def test_basic_methods(self):
+        """测试 `get`, `gets`, `__iter__`."""
+        assert self.ElectricalKind.get('0').id == '0'
+        assert [k.id for k in self.ElectricalKind.gets(['0', '1', '2'])] == ['0', '1']
+        assert [k.id for k in list(self.ElectricalKind)] == ['0', '1', '101', '102']
+
+    def test_calculated_data(self):
+        # 分别测试根节点, 1 级节点, 2级节点.
+        kind1 = self.ElectricalKind.get('0')
+        assert [kind1.id, kind1.parent_id,
+                kind1.root_id, kind1.parent_ids,
+                kind1.name] == ['0', None, None, [], '电器']
+        kind2 = self.ElectricalKind.get('1')
+        assert [kind2.id, kind2.parent_id,
+                kind2.root_id, kind2.parent_ids,
+                kind2.name] == ['1', '0', '0', ['0'], '电脑']
+        kind3 = self.ElectricalKind.get('101')
+        assert [kind3.id, kind3.parent_id,
+                kind3.root_id, kind3.parent_ids,
+                kind3.name] == ['101', '1', '0', ['1', '0'], '笔记本电脑']
 
 
 def test_version():

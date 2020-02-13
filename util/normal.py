@@ -1,21 +1,10 @@
 __all__ = (
-    'CSV',
-    'Base64',
-    'Binary',
-    'BitField',
-    'Version',
-    'camel2snake',
-    'chinese_num',
-    'format_rows',
-    'fill_seq',
-    'import_object',
-    'indent_data',
-    'percentage',
-    'rm_around_space',
-    'round_half_up',
-    'seq_grouper',
-    'strip_control',
-    'strip_seq',
+    'CSV', 'Base64', 'Binary', 'BitField',
+    'KindTree', 'Version', 'camel2snake',
+    'chinese_num', 'format_rows', 'fill_seq',
+    'import_object', 'indent_data', 'percentage',
+    'rm_around_space', 'round_half_up', 'seq_grouper',
+    'strip_control', 'strip_seq',
 )
 
 import base64
@@ -35,7 +24,7 @@ from typing import (
     Any, Iterable, List, Optional, Tuple, Union,
 )
 
-Col = Union[list, tuple, dict]
+Col = Union[list, tuple]  # normal collections
 Num = Union[int, float]
 Seq = Union[list, tuple, str, bytes]
 
@@ -304,6 +293,100 @@ class BitField:
         return cls(reduce(operator.or_, ids))
 
 
+class KindTree:
+    """种类树.
+
+    用于有从属关系但不需要动态变化的数据, 例如一个常用功能 - 分类.
+    由于是静态的, 初始化时就计算了所有父节点和所有子节点, 牺牲空间减少运行时的计算时间.
+    """
+
+    def __init__(self, values: Tuple[Tuple[str, Optional[str], str], ...]):
+        data = {
+            id_: {'id': id_, 'parent_id': parent_id, 'name': name}
+            for id_, parent_id, name in values
+        }
+
+        new_data = {}
+        for id_, datum in data.items():
+            # 找到节点的所有父节点.
+            parent_ids = []
+            parent_id = datum['parent_id']
+            while parent_id is not None:
+                parent_ids.append(parent_id)
+                parent_id = data[parent_id]['parent_id']
+            # 根据所有父节点计算父节点和根节点.
+            if len(parent_ids) == 0:
+                root_id = None
+                parent_id = None
+            else:
+                root_id = parent_ids[-1]
+                parent_id = parent_ids[0]
+
+            # TODO 找到节点的所有子节点.
+
+            new_data[id_] = {
+                'id': datum['id'],
+                'parent_id': parent_id,
+                'root_id': root_id,
+                'parent_ids': parent_ids,
+                'name': datum['name'],
+            }
+
+        self.nodes = {
+            id_: KindNode(
+                id_=datum['id'],
+                parent_id=datum['parent_id'],
+                root_id=datum['root_id'],
+                parent_ids=datum['parent_ids'],
+                name=datum['name'],
+                tree=self,
+            )
+            for id_, datum in new_data.items()
+        }
+
+    def __iter__(self) -> Iterable['KindNode']:
+        return iter(self.nodes.values())
+
+    def get(self, kind_id: str) -> Optional['KindNode']:
+        return self.nodes.get(kind_id)
+
+    def gets(self, kind_ids: Union[Tuple[str, ...], List[str]]) -> List['KindNode']:
+        return [kind for id_ in kind_ids if (kind := self.nodes.get(id_)) is not None]
+
+
+class KindNode:
+    """种类树的每个节点."""
+
+    def __init__(self, id_: str, parent_id: Optional[str],
+                 root_id: Optional[str], parent_ids: List[str],
+                 name: str, tree: 'KindTree'):
+        self.id = id_
+        self.parent_id = parent_id
+        self.root_id = root_id
+        self.parent_ids = parent_ids  # 从子节点到父节点
+        self.name = name
+        self.tree = tree
+
+    def __repr__(self):
+        return (
+            f'<{self.__class__.__name__}'
+            f' id={self.id!r}'
+            f' parent_id={self.parent_id!r}'
+            f' root_id={self.root_id!r}'
+            f' elder_ids={self.parent_ids!r}'
+            f' name={self.name!r}'
+            f'>'
+        )
+
+    @property
+    def parent(self) -> Optional['KindNode']:
+        return self.tree.get(self.parent_id)
+
+    @property
+    def root(self) -> Optional['KindNode']:
+        return self.tree.get(self.root_id)
+
+
 @total_ordering
 class Version:
 
@@ -434,7 +517,7 @@ def import_object(object_path: str) -> Any:
         raise ImportError(f'Cannot import {object_path}')
 
 
-def indent_data(data: Col, show_unicode: bool = True) -> str:
+def indent_data(data: Union[Col, dict], show_unicode: bool = True) -> str:
     """将数据转换成四空格缩进的格式.
 
     `show_unicode`: 是否转化为 Python 中 unicode.
