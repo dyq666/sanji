@@ -21,7 +21,8 @@ from collections import defaultdict
 from decimal import ROUND_HALF_UP, Decimal
 from functools import reduce, total_ordering
 from typing import (
-    Any, Iterable, List, Optional, Tuple, Union,
+    Any, Iterable, List, Optional, Set,
+    Tuple, Union,
 )
 
 Col = Union[list, tuple]  # normal collections
@@ -301,19 +302,19 @@ class KindTree:
     """
 
     def __init__(self, values: Tuple[Tuple[str, Optional[str], str], ...]):
-        data = {
+        data1 = {
             id_: {'id': id_, 'parent_id': parent_id, 'name': name}
             for id_, parent_id, name in values
         }
 
-        new_data = {}
-        for id_, datum in data.items():
+        data2 = {}
+        for id_, datum in data1.items():
             # 找到节点的所有父节点.
             parent_ids = []
             parent_id = datum['parent_id']
             while parent_id is not None:
                 parent_ids.append(parent_id)
-                parent_id = data[parent_id]['parent_id']
+                parent_id = data1[parent_id]['parent_id']
             # 根据所有父节点计算父节点和根节点.
             if len(parent_ids) == 0:
                 root_id = None
@@ -322,9 +323,7 @@ class KindTree:
                 root_id = parent_ids[-1]
                 parent_id = parent_ids[0]
 
-            # TODO 找到节点的所有子节点.
-
-            new_data[id_] = {
+            data2[id_] = {
                 'id': datum['id'],
                 'parent_id': parent_id,
                 'root_id': root_id,
@@ -332,16 +331,23 @@ class KindTree:
                 'name': datum['name'],
             }
 
+        # 找到所有节点的所有子节点
+        childs = defaultdict(set)
+        for id_, datum in data2.items():
+            for parent_id in datum['parent_ids']:
+                childs[parent_id].add(id_)
+
         self.nodes = {
             id_: KindNode(
                 id_=datum['id'],
                 parent_id=datum['parent_id'],
                 root_id=datum['root_id'],
                 parent_ids=datum['parent_ids'],
+                child_ids=childs[id_],
                 name=datum['name'],
                 tree=self,
             )
-            for id_, datum in new_data.items()
+            for id_, datum in data2.items()
         }
 
     def __iter__(self) -> Iterable['KindNode']:
@@ -359,11 +365,12 @@ class KindNode:
 
     def __init__(self, id_: str, parent_id: Optional[str],
                  root_id: Optional[str], parent_ids: List[str],
-                 name: str, tree: 'KindTree'):
+                 child_ids: Set[str], name: str, tree: 'KindTree'):
         self.id = id_
         self.parent_id = parent_id
         self.root_id = root_id
         self.parent_ids = parent_ids  # 从子节点到父节点
+        self.child_ids = child_ids  # 无顺序
         self.name = name
         self.tree = tree
 

@@ -201,33 +201,57 @@ def test_bit_field():
 
 class TestKindTree:
     values = (
-        ('0', None, '电器'),
-        ('1', '0', '电脑'),
-        ('101', '1', '笔记本电脑'),
-        ('102', '1', '台式电脑'),
+        ('1', None, '电器'),
+        ('10', '1', '电脑'),
+        ('101', '10', '笔记本电脑'),
+        ('102', '10', '台式电脑'),
+
+        ('2', None, '水果'),
+        ('20', '2', '热带水果'),
+        ('201', '20', '芒果'),
     )
     ElectricalKind = KindTree(values)
 
-    def test_basic_methods(self):
+    def test_kind_tree_fields(self):
         """测试 `get`, `gets`, `__iter__`."""
-        assert self.ElectricalKind.get('0').id == '0'
-        assert [k.id for k in self.ElectricalKind.gets(['0', '1', '2'])] == ['0', '1']
-        assert [k.id for k in list(self.ElectricalKind)] == ['0', '1', '101', '102']
+        assert self.ElectricalKind.get('1').id == '1'
+        assert [k.id for k in self.ElectricalKind.gets(['1', '2', '3', '10'])] == ['1', '2', '10']
+        assert [k.id for k in self.ElectricalKind] == ['1', '10', '101', '102',
+                                                       '2', '20', '201']
 
-    def test_calculated_data(self):
-        # 分别测试根节点, 1 级节点, 2级节点.
-        kind1 = self.ElectricalKind.get('0')
+    def test_kind_node_fields(self):
+        """分别测试根节点, 1 级节点, 2级节点."""
+        kind1 = self.ElectricalKind.get('1')
         assert [kind1.id, kind1.parent_id,
                 kind1.root_id, kind1.parent_ids,
-                kind1.name] == ['0', None, None, [], '电器']
-        kind2 = self.ElectricalKind.get('1')
+                kind1.child_ids,
+                kind1.name] == ['1', None, None, [], {'10', '101', '102'}, '电器']
+        kind2 = self.ElectricalKind.get('10')
         assert [kind2.id, kind2.parent_id,
                 kind2.root_id, kind2.parent_ids,
-                kind2.name] == ['1', '0', '0', ['0'], '电脑']
+                kind2.child_ids,
+                kind2.name] == ['10', '1', '1', ['1'], {'101', '102'}, '电脑']
         kind3 = self.ElectricalKind.get('101')
         assert [kind3.id, kind3.parent_id,
                 kind3.root_id, kind3.parent_ids,
-                kind3.name] == ['101', '1', '0', ['1', '0'], '笔记本电脑']
+                kind3.child_ids,
+                kind3.name] == ['101', '10', '1', ['10', '1'], set(), '笔记本电脑']
+
+        kind4 = self.ElectricalKind.get('2')
+        assert [kind4.id, kind4.parent_id,
+                kind4.root_id, kind4.parent_ids,
+                kind4.child_ids,
+                kind4.name] == ['2', None, None, [], {'20', '201'}, '水果']
+        kind5 = self.ElectricalKind.get('20')
+        assert [kind5.id, kind5.parent_id,
+                kind5.root_id, kind5.parent_ids,
+                kind5.child_ids,
+                kind5.name] == ['20', '2', '2', ['2'], {'201'}, '热带水果']
+        kind6 = self.ElectricalKind.get('201')
+        assert [kind6.id, kind6.parent_id,
+                kind6.root_id, kind6.parent_ids,
+                kind6.child_ids,
+                kind6.name] == ['201', '20', '2', ['20', '2'], set(), '芒果']
 
 
 def test_version():
