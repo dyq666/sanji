@@ -1,6 +1,6 @@
 __all__ = (
     'AES', 'AES_BLOCK_SIZE', 'AES_KEY_SIZES',
-    'CSV', 'Base64', 'Binary',
+    'CSV', 'AttrGettingProxy', 'Base64', 'Binary',
     'BitField', 'CaseInsensitiveDict', 'DictSerializer',
     'Hybrid', 'MockName', 'OAuth2',
     'RSAPrivate', 'RSAPublic', 'SessionWithUrlPrefix',
@@ -12,9 +12,8 @@ __all__ = (
 )
 
 from .demo import (
-    CaseInsensitiveDict,
-    DictSerializer,
-    MockName,
+    AttrGettingProxy, CaseInsensitiveDict,
+    DictSerializer, MockName,
 )
 from .normal import (
     CSV, Base64, Binary, BitField, KindTree,

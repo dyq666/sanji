@@ -1,4 +1,5 @@
 __all__ = (
+    'AttrGettingProxy',
     'CaseInsensitiveDict',
     'DictSerializer',
     'MockName',
@@ -6,6 +7,20 @@ __all__ = (
 
 from collections import UserDict
 from itertools import chain
+from typing import Any
+
+
+class AttrGettingProxy:
+    """使被包裹的对象 `obj` 只向外暴露获取属性的功能.
+
+    这个类也可以稍作改动用于其他用处, 例如可以只实现 `__iter__`.
+    """
+
+    def __init__(self, obj: Any):
+        self._obj = obj
+
+    def __getattr__(self, item):
+        return getattr(self._obj, item)
 
 
 class CaseInsensitiveDict(UserDict):

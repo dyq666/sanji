@@ -3,7 +3,26 @@ from collections import namedtuple
 
 import pytest
 
-from util import CaseInsensitiveDict, DictSerializer, MockName
+from util import (
+    AttrGettingProxy, CaseInsensitiveDict,
+    DictSerializer, MockName,
+)
+
+
+def test_attr_getting_proxy():
+    # 被包裹一层的 tuple 只能获取属性.
+    a = (1, 2)
+    obj = AttrGettingProxy(a)
+    with pytest.raises(TypeError):
+        len(obj)
+    assert obj.index(1) == 0
+
+    # 被包裹一层的 list 只能获取属性.
+    b = [1, 2]
+    obj = AttrGettingProxy(b)
+    with pytest.raises(TypeError):
+        obj[1]
+    assert obj.index(1) == 0
 
 
 class TestCaseInsensitiveDict:
