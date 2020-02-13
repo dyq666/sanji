@@ -28,6 +28,9 @@ export FLASK_ENV=development
 flask run
 ```
 
+另一个类似的是 `test_third_cryptography` 中的一小部分测试用例. 由于密码学中 key 的生成
+需要耗费大量的计算力, 因此用 `test_third_cryptography.CLOSE` 标记是否开启这些耗时的测试.
+
 目前缺少单元测试的工具:
 
   - `util/third_peewee` 所有工具.

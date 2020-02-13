@@ -10,6 +10,8 @@ from util import (
     RSAPrivate, RSAPublic,
 )
 
+CLOSE = True
+
 
 @pytest.fixture
 def private_pem():
@@ -168,7 +170,7 @@ def test_hybrid(msg, private_pem, public_pem,
 
 class TestRSAPrivate:
 
-    @pytest.mark.skipif(True, reason='生成 rsa-key 的操作比较耗时, 测试时要手动开启.')
+    @pytest.mark.skipif(CLOSE, reason='生成 rsa-key 的操作比较耗时, 测试时要手动开启.')
     @pytest.mark.parametrize('password', (None, b'1'))
     def test_generate_key(self, password):
         private_pem, public_pem = RSAPrivate.generate_key(password)
