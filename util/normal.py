@@ -301,11 +301,20 @@ class KindTree:
     由于是静态的, 初始化时就计算了所有父节点和所有子节点, 牺牲空间减少运行时的计算时间.
     """
 
-    def __init__(self, values: Tuple[Tuple[str, Optional[str], str], ...]):
-        data1 = {
-            id_: {'id': id_, 'parent_id': parent_id, 'name': name}
-            for id_, parent_id, name in values
-        }
+    def __init__(self, values: Tuple[Tuple[str, Optional[str], str, Optional[str]], ...]):
+        data1 = {}
+        # 先记下所有的常量名, 下面再转为实例常量.
+        consts = {}
+        for id_, parent_id, name, const in values:
+            if id_ in data1:
+                raise ValueError
+            data1[id_] = {
+                'id': id_,
+                'parent_id': parent_id,
+                'name': name,
+            }
+            if const is not None:
+                consts[id_] = const
 
         data2 = {}
         childs = defaultdict(set)
@@ -334,8 +343,9 @@ class KindTree:
                 'name': datum['name'],
             }
 
-        self.nodes = {
-            id_: KindNode(
+        nodes = {}
+        for id_, datum in data2.items():
+            kind = KindNode(
                 id_=datum['id'],
                 parent_id=datum['parent_id'],
                 root_id=datum['root_id'],
@@ -344,8 +354,11 @@ class KindTree:
                 name=datum['name'],
                 tree=self,
             )
-            for id_, datum in data2.items()
-        }
+            nodes[id_] = kind
+            # 设置常量.
+            if id_ in consts:
+                setattr(self, consts[id_], kind)
+        self.nodes = nodes
 
     def __iter__(self) -> Iterable['KindNode']:
         return iter(self.nodes.values())

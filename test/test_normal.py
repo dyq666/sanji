@@ -201,16 +201,23 @@ def test_bit_field():
 
 class TestKindTree:
     values = (
-        ('1', None, '电器'),
-        ('10', '1', '电脑'),
-        ('101', '10', '笔记本电脑'),
-        ('102', '10', '台式电脑'),
+        ('1', None, '电器', None),
+        ('10', '1', '电脑', 'COMPUTER'),
+        ('101', '10', '笔记本电脑', None),
+        ('102', '10', '台式电脑', None),
 
-        ('2', None, '水果'),
-        ('20', '2', '热带水果'),
-        ('201', '20', '芒果'),
+        ('2', None, '水果', None),
+        ('20', '2', '热带水果', None),
+        ('201', '20', '芒果', 'MANGO'),
     )
     ElectricalKind = KindTree(values)
+
+    def test_exception(self):
+        with pytest.raises(ValueError):
+            KindTree((
+                ('1', None, '电器', None),
+                ('1', '1', '电脑', 'COMPUTER'),
+            ))
 
     def test_kind_tree_fields(self):
         """测试 `get`, `gets`, `__iter__`."""
@@ -220,7 +227,7 @@ class TestKindTree:
                                                        '2', '20', '201']
 
     def test_kind_node_fields(self):
-        """分别测试根节点, 1 级节点, 2级节点."""
+        # 分别测试根节点, 1 级节点, 2级节点.
         kind1 = self.ElectricalKind.get('1')
         assert [kind1.id, kind1.parent_id,
                 kind1.root_id, kind1.parent_ids,
@@ -236,7 +243,6 @@ class TestKindTree:
                 kind3.root_id, kind3.parent_ids,
                 kind3.child_ids,
                 kind3.name] == ['101', '10', '1', ['10', '1'], set(), '笔记本电脑']
-
         kind4 = self.ElectricalKind.get('2')
         assert [kind4.id, kind4.parent_id,
                 kind4.root_id, kind4.parent_ids,
@@ -252,6 +258,10 @@ class TestKindTree:
                 kind6.root_id, kind6.parent_ids,
                 kind6.child_ids,
                 kind6.name] == ['201', '20', '2', ['20', '2'], set(), '芒果']
+
+        # 测试常量
+        assert self.ElectricalKind.COMPUTER.id == '10'
+        assert self.ElectricalKind.MANGO.id == '201'
 
 
 def test_version():
