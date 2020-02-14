@@ -308,12 +308,15 @@ class KindTree:
         }
 
         data2 = {}
+        childs = defaultdict(set)
         for id_, datum in data1.items():
             # 找到节点的所有父节点.
             parent_ids = []
             parent_id = datum['parent_id']
             while parent_id is not None:
                 parent_ids.append(parent_id)
+                # 记录子节点.
+                childs[parent_id].add(id_)
                 parent_id = data1[parent_id]['parent_id']
             # 根据所有父节点计算父节点和根节点.
             if len(parent_ids) == 0:
@@ -330,12 +333,6 @@ class KindTree:
                 'parent_ids': parent_ids,
                 'name': datum['name'],
             }
-
-        # 找到所有节点的所有子节点
-        childs = defaultdict(set)
-        for id_, datum in data2.items():
-            for parent_id in datum['parent_ids']:
-                childs[parent_id].add(id_)
 
         self.nodes = {
             id_: KindNode(
