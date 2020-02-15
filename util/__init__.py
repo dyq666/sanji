@@ -4,7 +4,7 @@ __all__ = (
     'BitField', 'CaseInsensitiveDict', 'DictSerializer',
     'Hybrid', 'MockName', 'OAuth2',
     'RSAPrivate', 'RSAPublic', 'SessionWithUrlPrefix',
-    'Version', 'camel2snake', 'chinese_num',
+    'Version', 'base_conversion', 'camel2snake', 'chinese_num',
     'date_range', 'format_rows', 'fill_seq', 'import_object',
     'indent_data', 'parse_phone', 'percentage',
     'rm_around_space', 'round_half_up', 'seq_grouper',
@@ -13,7 +13,7 @@ __all__ = (
 
 from .demo import (
     AttrGettingProxy, CaseInsensitiveDict,
-    DictSerializer, MockName,
+    DictSerializer, MockName, base_conversion,
 )
 from .normal import (
     CSV, Base64, Binary, BitField, KindTree,

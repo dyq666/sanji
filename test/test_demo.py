@@ -5,7 +5,7 @@ import pytest
 
 from util import (
     AttrGettingProxy, CaseInsensitiveDict,
-    DictSerializer, MockName,
+    DictSerializer, MockName, base_conversion
 )
 
 
@@ -106,3 +106,20 @@ def test_mock_name():
 
     assert mock.name == 'mock'
     assert mock.age == 18
+
+
+def test_base_conversion():
+    with pytest.raises(ValueError):
+        base_conversion(-2)
+    with pytest.raises(ValueError):
+        base_conversion(1, base=0)
+    with pytest.raises(ValueError):
+        base_conversion(1, base=11)
+
+    assert ''.join(str(i) for i in reversed(base_conversion(0))) == '0'
+    assert ''.join(str(i) for i in reversed(base_conversion(0, base=3))) == '0'
+    assert ''.join(str(i) for i in reversed(base_conversion(0, base=10))) == '0'
+
+    assert ''.join(str(i) for i in reversed(base_conversion(10))) == '1010'
+    assert ''.join(str(i) for i in reversed(base_conversion(10, base=3))) == '101'
+    assert ''.join(str(i) for i in reversed(base_conversion(10, base=10))) == '10'

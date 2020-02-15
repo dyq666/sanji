@@ -3,11 +3,12 @@ __all__ = (
     'CaseInsensitiveDict',
     'DictSerializer',
     'MockName',
+    'base_conversion',
 )
 
 from collections import UserDict
 from itertools import chain
-from typing import Any
+from typing import Any, List
 
 
 class AttrGettingProxy:
@@ -119,3 +120,21 @@ class MockName:
     @property
     def name(self):
         return 'mock'
+
+
+def base_conversion(n: int, base: int = 2) -> List[int]:
+    """将十进制数转换成 1-10 进制.
+
+    思路:
+        1. 当前数字在进制下的余数.
+        2. 数字左移一位. (等价于除以进制)
+        3. 执行步骤 1.
+    """
+    if n < 0 or base > 10 or base <= 0:
+        raise ValueError
+
+    res = [n % base]
+    while n >= base:
+        n //= base
+        res.append(n % base)
+    return res
