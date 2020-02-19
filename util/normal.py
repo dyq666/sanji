@@ -1,5 +1,5 @@
 __all__ = (
-    'CSV', 'Base64', 'Binary', 'BitField',
+    'CSV', 'Base64', 'Binary', 'BitField', 'DefaultDict',
     'KindTree', 'Version', 'camel2snake',
     'chinese_num', 'format_rows', 'fill_seq',
     'import_object', 'indent_data', 'percentage',
@@ -17,7 +17,7 @@ import math
 import operator
 import re
 import struct
-from collections import defaultdict
+from collections import UserDict, defaultdict
 from decimal import ROUND_HALF_UP, Decimal
 from functools import reduce, total_ordering
 from typing import (
@@ -292,6 +292,16 @@ class BitField:
     @classmethod
     def create(cls, ids: Iterable[int]) -> 'BitField':
         return cls(reduce(operator.or_, ids))
+
+
+class DefaultDict(UserDict):
+
+    def __init__(self, default: Any, *args, **kwargs):
+        self.default = default
+        super().__init__(*args, **kwargs)
+
+    def __missing__(self, key):
+        return self.default
 
 
 class KindTree:

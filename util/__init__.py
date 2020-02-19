@@ -1,8 +1,8 @@
 __all__ = (
     'AES', 'AES_BLOCK_SIZE', 'AES_KEY_SIZES',
     'CSV', 'AttrGettingProxy', 'Base64', 'Binary',
-    'BitField', 'CaseInsensitiveDict', 'DictSerializer',
-    'Hybrid', 'MockName', 'OAuth2',
+    'BitField', 'CaseInsensitiveDict', 'DefaultDict',
+    'DictSerializer', 'Hybrid', 'MockName', 'OAuth2',
     'RSAPrivate', 'RSAPublic', 'SessionWithUrlPrefix',
     'Version', 'base_conversion', 'camel2snake', 'chinese_num',
     'date_range', 'format_rows', 'fill_seq', 'import_object',
@@ -16,7 +16,7 @@ from .demo import (
     DictSerializer, MockName, base_conversion,
 )
 from .normal import (
-    CSV, Base64, Binary, BitField, KindTree,
+    CSV, Base64, Binary, BitField, DefaultDict, KindTree,
     Version, camel2snake, chinese_num,
     format_rows, fill_seq, import_object, indent_data, percentage,
     rm_around_space, round_half_up, seq_grouper, strip_control, strip_seq,
