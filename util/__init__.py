@@ -26,5 +26,6 @@ from .third_cryptography import (
     RSAPrivate, RSAPublic,
 )
 from .third_dateutil import date_range
+from .third_numpy import weighted_choices
 from .third_phonenumbers import parse_phone
 from .third_requests import OAuth2, SessionWithUrlPrefix, upload
