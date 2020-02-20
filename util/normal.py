@@ -13,7 +13,6 @@ import csv
 import importlib
 import io
 import json
-import math
 import operator
 import re
 import struct
@@ -615,8 +614,7 @@ def seq_grouper(seq: Seq, size: int, filler: Optional[Any] = None) -> Iterable:
     """
     if filler is not None:
         seq = fill_seq(seq, size, filler)
-    times = math.ceil(len(seq) / size)
-    return (seq[i * size: (i + 1) * size] for i in range(times))
+    return (seq[i: i + size] for i in range(0, len(seq), size))
 
 
 def strip_control(value: str) -> str:
