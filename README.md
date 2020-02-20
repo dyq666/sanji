@@ -40,3 +40,16 @@ flask run
 有的工具不适合用函数或类来表现, 因此这些工具都单独有一个仓库.
 
 - [html 转 pdf](https://github.com/dyq666/sanji_pdf)
+
+## 一些有用的笔记
+
+1. 什么是 timestamp ?
+
+timestamp 是当前的 utc 时间与 1970-01-01 (即, epoch time 或 unix 时间) 相差的秒数 (浮点数).
+下例中 `time.time()` 是标准库提供的 timestamp, 而后面的式子是我们手动计算的 timestamp.
+
+```python
+import time
+from datetime import datetime
+time.time(), (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
+```
