@@ -1,6 +1,6 @@
 __all__ = (
     'CSV', 'Base64', 'Binary', 'BitField', 'DefaultDict',
-    'KindTree', 'Version', 'camel2snake',
+    'KindTree', 'Version', 'accessors', 'camel2snake',
     'chinese_num', 'format_rows', 'fill_seq',
     'import_object', 'indent_data', 'percentage',
     'rm_around_space', 'round_half_up', 'seq_grouper',
@@ -10,7 +10,9 @@ __all__ = (
 import base64
 import binascii
 import csv
+import enum
 import importlib
+import inspect
 import io
 import json
 import operator
@@ -18,7 +20,7 @@ import re
 import struct
 from collections import UserDict, defaultdict
 from decimal import ROUND_HALF_UP, Decimal
-from functools import reduce, total_ordering
+from functools import reduce, partial, total_ordering
 from typing import (
     Any, Iterable, List, Optional, Set,
     Tuple, Union,
@@ -457,6 +459,31 @@ class Version:
         group = [int(i) for i in version_str.split('.')]
         group = fill_seq(group, size=3, filler=0)
         return Version(*group)
+
+
+def accessors(enum_cls: enum.Enum, cls_func_name: str,
+              cls_property_prefix: str = 'is_') -> callable:
+    """批量给类增加 `property`, 用于便捷访问某种已有的属性.
+
+    `enum_cls`: 提供一组常量, 常量名将转化为新属性名的一部分, 常量值将作为新属性的参数.
+    `cls_func_name`: 类中已有的函数, 将作为新属性实际执行的逻辑 (func body).
+    `cls_property_prefix`: 新属性名的前缀.
+    """
+    def deco(cls: type):
+        func = getattr(cls, cls_func_name)
+        # 由于 `func` 是一个 method, 所以获取函数的第二个参数名用于下面的 `partial`, 避开 `self` 参数.
+        param_name = list(inspect.signature(func).parameters.keys())[1]
+
+        for name, value in enum_cls.__members__.items():
+            property_name = cls_property_prefix + name.lower()
+            if property_name in cls.__dict__:
+                raise ValueError
+            property_method = property(partial(func, **{param_name: value}))
+            # 注意这里不能使用 `partialmethod`, 它不是 `callable`.
+            setattr(cls, property_name, property_method)
+
+        return cls
+    return deco
 
 
 def camel2snake(s: str) -> str:

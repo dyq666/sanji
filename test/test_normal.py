@@ -7,7 +7,8 @@ import pytest
 
 from util import (
     CSV, Base64, Binary, BitField, DefaultDict,
-    KindTree, Version, camel2snake, chinese_num, format_rows,
+    KindTree, Version, accessors,
+    camel2snake, chinese_num, format_rows,
     fill_seq, import_object, indent_data, rm_around_space,
     round_half_up, percentage, seq_grouper, strip_control, strip_seq,
 )
@@ -332,6 +333,60 @@ def test_version():
     assert Version.parse('10.3.2') > Version.parse('10.2.3')
     assert Version.parse('0') < Version.parse('321.3123.3123')
     assert Version.parse('4') == Version.parse('4.0.0')
+
+
+class TestAccessors:
+    @enum.unique
+    class Status(enum.IntEnum):
+        DRAFT = 0
+        NORMAL = 1
+        REJECTED = 2
+
+    @accessors(enum_cls=Status, cls_func_name='_is_status')
+    class Contract:
+
+        def __init__(self, status: int):
+            self.status = status
+
+        def _is_status(self, status) -> bool:
+            return self.status == status
+
+    @accessors(enum_cls=Status, cls_func_name='_is_status',
+               cls_property_prefix='has_')
+    class Contract2:
+
+        def __init__(self, status: int):
+            self.status = status
+
+        def _is_status(self, status) -> bool:
+            return self.status == status
+
+    def test_property_prefix(self):
+        contract = self.Contract(self.Status.DRAFT)
+        assert contract.is_draft is True
+        assert contract.is_normal is False
+        assert contract.is_rejected is False
+
+        contract2 = self.Contract2(self.Status.NORMAL)
+        assert contract2.has_draft is False
+        assert contract2.has_normal is True
+        assert contract2.has_rejected is False
+        with pytest.raises(AttributeError):
+            contract2.is_draft
+
+    def test_repeated_property(self):
+        with pytest.raises(ValueError):
+            @accessors(enum_cls=self.Status, cls_func_name='_is_status')
+            class Contract:
+                def __init__(self, status: int):
+                    self.status = status
+
+                def _is_status(self, status) -> bool:
+                    return self.status == status
+
+                @property
+                def is_draft(self) -> bool:
+                    return self.status == self.Status.DRAFT
 
 
 def test_camel2snake():
