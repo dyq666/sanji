@@ -444,6 +444,14 @@ def test_format_rows():
 class TestFillSeq:
 
     @pytest.mark.parametrize(('seq', 'filler'), (
+        ('', '22'),
+        (b'', b'22'),
+    ))
+    def test_exception(self, seq, filler):
+        with pytest.raises(ValueError):
+            fill_seq(seq, size=4, filler=filler)
+
+    @pytest.mark.parametrize(('seq', 'filler'), (
         ('', '1'),
         (b'', b'1'),
         ([], 1),

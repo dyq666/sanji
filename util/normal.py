@@ -525,6 +525,9 @@ def chinese_num(num: int) -> str:
 
 def fill_seq(seq: Seq, size: int, filler: Any) -> Seq:
     """用 `filler` 填充序列使其能被 `size` 整除. (str, bytes, list, tuple)"""
+    if isinstance(seq, (str, bytes)) and len(filler) != 1:
+        raise ValueError
+
     if len(seq) % size == 0:
         return seq
 
