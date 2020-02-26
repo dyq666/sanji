@@ -652,8 +652,6 @@ def strip_control(value: str) -> str:
 
 def strip_seq(seq: Seq, size: int) -> Seq:
     """从末尾移除序列使其能被 `size` 整除. (str, bytes, list, tuple)"""
-    if len(seq) % size == 0:
-        return seq
-
-    num = len(seq) % size
-    return seq[:-num]
+    remainder = len(seq) % size
+    end = -remainder if remainder else None
+    return seq[:end]
