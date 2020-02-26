@@ -27,8 +27,7 @@ from typing import (
 )
 
 BuiltinSeq = Union[bytes, list, str, tuple]
-Col = Union[list, tuple]  # normal collections
-Num = Union[int, float]
+BuiltinNum = Union[int, float]
 
 no_value = object()
 
@@ -575,7 +574,7 @@ def import_object(object_path: str) -> Any:
         raise ImportError(f'Cannot import {object_path}')
 
 
-def indent_data(data: Union[Col, dict], show_unicode: bool = True) -> str:
+def indent_data(data: Union[list, tuple, dict], show_unicode: bool = True) -> str:
     """将数据转换成四空格缩进的格式.
 
     `show_unicode`: 是否转化为 Python 中 unicode.
@@ -589,7 +588,7 @@ def indent_data(data: Union[Col, dict], show_unicode: bool = True) -> str:
     return data
 
 
-def percentage(molecule: Num, denominator: Num, with_format: bool = True
+def percentage(molecule: BuiltinNum, denominator: BuiltinNum, with_format: bool = True
                ) -> Union[str, float]:
     # 分母不能为 0
     res = 0.0 if not denominator else molecule * 100 / denominator
@@ -609,7 +608,7 @@ def rm_around_space(value: str, keep_inline_space: bool = True
     return rows if keep_inline_space else [r.split() for r in rows]
 
 
-def round_half_up(number: Num, ndigits: int = 0) -> Num:
+def round_half_up(number: BuiltinNum, ndigits: int = 0) -> BuiltinNum:
     """四舍五入.
 
     `ndigits`: 与 ``round`` 的参数 ``ndigits`` 保持一样的逻辑:
