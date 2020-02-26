@@ -1,7 +1,7 @@
 __all__ = (
     'CSV', 'Base64', 'Binary', 'BitField', 'DefaultDict',
     'KindTree', 'Version', 'accessors', 'camel2snake',
-    'chinese_num', 'format_rows', 'fill_seq',
+    'chinese_num', 'format_rows', 'fill_seq', 'no_value',
     'import_object', 'indent_data', 'percentage',
     'rm_around_space', 'round_half_up', 'seq_grouper',
     'strip_control', 'strip_seq',
@@ -22,13 +22,15 @@ from collections import UserDict, defaultdict
 from decimal import ROUND_HALF_UP, Decimal
 from functools import reduce, partial, total_ordering
 from typing import (
-    Any, Iterable, List, Optional, Sequence,
+    Any, Iterable, List, Generator, Optional, Sequence,
     Set, Tuple, Union,
 )
 
+BuiltinSeq = Union[bytes, list, str, tuple]
 Col = Union[list, tuple]  # normal collections
 Num = Union[int, float]
-Seq = Union[list, tuple, str, bytes]
+
+no_value = object()
 
 
 class CSV:
@@ -523,8 +525,8 @@ def chinese_num(num: int) -> str:
         return single[num // 10] + single[10] + single[num % 10]
 
 
-def fill_seq(seq: Seq, size: int, filler: Any) -> Seq:
-    """用 `filler` 填充序列使其能被 `size` 整除. (str, bytes, list, tuple)"""
+def fill_seq(seq: BuiltinSeq, size: int, filler: Any) -> BuiltinSeq:
+    """用 `filler` 填充序列使其能被 `size` 整除."""
     if isinstance(seq, (str, bytes)) and len(filler) != 1:
         raise ValueError
 
@@ -636,13 +638,14 @@ def round_half_up(number: Num, ndigits: int = 0) -> Num:
     return float(decimal.quantize(position, rounding=ROUND_HALF_UP))
 
 
-def seq_grouper(seq: Seq, size: int, filler: Optional[Any] = None) -> Iterable:
-    """按组迭代序列. (str, bytes, list, tuple)
+def seq_grouper(seq: BuiltinSeq, size: int,
+                filler: Any = no_value) -> Generator:
+    """按组迭代序列.
 
     `size`: 每组的大小.
     `filler`: 如果传入, 则用此值填充最后一组.
     """
-    if filler is not None:
+    if filler is not no_value:
         seq = fill_seq(seq, size, filler)
     return (seq[i: i + size] for i in range(0, len(seq), size))
 
