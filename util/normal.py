@@ -22,8 +22,8 @@ from collections import UserDict, defaultdict
 from decimal import ROUND_HALF_UP, Decimal
 from functools import reduce, partial, total_ordering
 from typing import (
-    Any, Iterable, List, Optional, Set,
-    Tuple, Union,
+    Any, Iterable, List, Optional, Sequence,
+    Set, Tuple, Union,
 )
 
 Col = Union[list, tuple]  # normal collections
@@ -650,8 +650,8 @@ def strip_control(value: str) -> str:
     return re.sub(control_chars_reg, '', value)
 
 
-def strip_seq(seq: Seq, size: int) -> Seq:
-    """从末尾移除序列使其能被 `size` 整除. (str, bytes, list, tuple)"""
+def strip_seq(seq: Sequence, size: int) -> Sequence:
+    """从末尾移除序列使其能被 `size` 整除."""
     remainder = len(seq) % size
     end = -remainder if remainder else None
     return seq[:end]
