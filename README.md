@@ -53,3 +53,10 @@ import time
 from datetime import datetime
 time.time(), (datetime.utcnow() - datetime(1970, 1, 1)).total_seconds()
 ```
+
+2. 找一个 ua 解析库.
+
+需要知道以下信息:
+
+- 设备类型 (安卓 ios 等)
+- 当前 App 的版本号 ?
