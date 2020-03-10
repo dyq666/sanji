@@ -9,8 +9,9 @@ from util import (
     CSV, Base64, Binary, BitField, DefaultDict,
     KindTree, Version, accessors,
     camel2snake, chinese_num, format_rows,
-    fill_seq, import_object, indent_data, rm_around_space,
-    round_half_up, percentage, seq_grouper,
+    fill_seq, import_object, indent_data, merge_sorted_list,
+    percentage, rm_around_space,
+    round_half_up, seq_grouper,
     strip_control, strip_seq,
 )
 
@@ -507,6 +508,20 @@ def test_indent_data():
         '    "\\u540d\\u5b57": "\\u5c0f\\u7ea2"\n'
         '}'
     )
+
+
+def test_merge_sorted_list():
+    f = merge_sorted_list
+    # 列表都为空
+    assert list(f([], [])) == []
+    # 列表有一个为空
+    assert list(f([1], [])) == [1]
+    assert list(f([], [1])) == [1]
+    # 列表的所有元素都大于或小于另一个列表
+    assert list(f([1, 2], [3, 4])) == [1, 2, 3, 4]
+    assert list(f([3, 4], [1, 2])) == [1, 2, 3, 4]
+    # 正常情况
+    assert list(f([1, 4], [2, 3])) == [1, 2, 3, 4]
 
 
 def test_percentage():
