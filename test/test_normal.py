@@ -7,7 +7,7 @@ import pytest
 
 from util import (
     CSV, Base64, Binary, BitField, DefaultDict,
-    KindTree, Version, accessors,
+    KindTree, PrioQueue, Version, accessors,
     camel2snake, chinese_num, format_rows,
     fill_seq, import_object, indent_data, merge_sorted_list,
     percentage, rm_around_space,
@@ -317,6 +317,36 @@ class TestKindTree:
         # 测试常量
         assert self.ElectricalKind.COMPUTER.id == '10'
         assert self.ElectricalKind.MANGO.id == '201'
+
+
+def test_PrioQueue():
+    """
+    1. 测试最小优先级队列和最大优先级队列.
+    2. 测试相同优先级元素是否能正常比较, 是否按照入队顺序出队
+    """
+    # 1
+    pq = PrioQueue()
+    pq.put(1, 'a')
+    pq.put(2, 'b')
+    assert pq.get() == 'a'
+    assert pq.get() == 'b'
+    pq = PrioQueue(asc=False)
+    pq.put(1, 'a')
+    pq.put(2, 'b')
+    assert pq.get() == 'b'
+    assert pq.get() == 'a'
+
+    # 2
+    class A:
+        def __init__(self, val):
+            self.val = val
+
+    pq = PrioQueue()
+    pq.put(1, A('a'))
+    pq.put(2, A('b'))
+    assert pq.get().val == 'a'
+    assert pq.get().val == 'b'
+
 
 
 def test_version():

@@ -1,6 +1,6 @@
 __all__ = (
     'CSV', 'Base64', 'Binary', 'BitField', 'DefaultDict',
-    'KindTree', 'Version', 'accessors', 'camel2snake',
+    'KindTree', 'PrioQueue', 'Version', 'accessors', 'camel2snake',
     'chinese_num', 'format_rows', 'fill_seq', 'merge_sorted_list',
     'no_value',
     'import_object', 'indent_data', 'percentage',
@@ -12,6 +12,7 @@ import base64
 import binascii
 import csv
 import enum
+import heapq
 import importlib
 import inspect
 import io
@@ -415,6 +416,34 @@ class KindNode:
     @property
     def root(self) -> Optional['KindNode']:
         return self.tree.get(self.root_id)
+
+
+class PrioQueue:
+    """PriorityQueue, 优先级队列.
+
+    和 `queue.PriorityQueue` 的区别:
+
+      1. 内置一个 `index` 使得当 `priority` 相同时, 仍可比较. 而 `PriorityQueue` 中
+         需要 `item` 是可比较的. 此外, 相同 `priority` 的元素的出栈顺序和入栈顺序相同.
+      2. 参数 `asc` 决定是最大堆还是最小堆.
+      3. `get` 时只返回 `item`.
+    """
+
+    def __init__(self, asc: bool = True):
+        self._queue = []
+        self._index = 0
+        self._asc = asc
+
+    def __len__(self) -> int:
+        return len(self._queue)
+
+    def put(self, priority: int, item: Any):
+        priority = priority if self._asc else -priority
+        heapq.heappush(self._queue, (priority, self._index, item))
+        self._index += 1
+
+    def get(self):
+        return heapq.heappop(self._queue)[-1]
 
 
 @total_ordering

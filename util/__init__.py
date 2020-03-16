@@ -3,6 +3,7 @@ __all__ = (
     'CSV', 'AttrGettingProxy', 'Base64', 'Binary',
     'BitField', 'CaseInsensitiveDict', 'DefaultDict',
     'DictSerializer', 'Hybrid', 'MockName', 'OAuth2',
+    'PrioQueue',
     'RSAPrivate', 'RSAPublic', 'SessionWithUrlPrefix',
     'Version', 'accessors', 'base_conversion', 'camel2snake',
     'chinese_num',
@@ -19,7 +20,7 @@ from .demo import (
 )
 from .normal import (
     CSV, Base64, Binary, BitField, DefaultDict, KindTree,
-    Version, accessors, camel2snake, chinese_num,
+    PrioQueue, Version, accessors, camel2snake, chinese_num,
     format_rows, fill_seq, merge_sorted_list, no_value,
     import_object, indent_data, percentage,
     rm_around_space, round_half_up, seq_grouper, strip_control, strip_seq,
