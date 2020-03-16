@@ -322,19 +322,18 @@ class TestKindTree:
 def test_PrioQueue():
     """
     1. 测试最小优先级队列和最大优先级队列.
-    2. 测试相同优先级元素是否能正常比较, 是否按照入队顺序出队
+    2. 测试相同优先级元素是否能正常比较, 是否按照入队顺序出队.
     """
     # 1
-    pq = PrioQueue()
-    pq.put(1, 'a')
-    pq.put(2, 'b')
+    pairs = [(1, 'a'), (2, 'b')]
+    pq = PrioQueue.from_pairs(pairs, asc=True)
     assert pq.get() == 'a'
     assert pq.get() == 'b'
-    pq = PrioQueue(asc=False)
-    pq.put(1, 'a')
-    pq.put(2, 'b')
+    assert len(pq) == 0
+    pq = PrioQueue.from_pairs(pairs, asc=False)
     assert pq.get() == 'b'
     assert pq.get() == 'a'
+    assert len(pq) == 0
 
     # 2
     class A:
@@ -346,7 +345,7 @@ def test_PrioQueue():
     pq.put(2, A('b'))
     assert pq.get().val == 'a'
     assert pq.get().val == 'b'
-
+    assert len(pq) == 0
 
 
 def test_version():

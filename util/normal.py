@@ -445,6 +445,14 @@ class PrioQueue:
     def get(self):
         return heapq.heappop(self._queue)[-1]
 
+    @classmethod
+    def from_pairs(cls, pairs: Iterable[Tuple[int, Any]],
+                   asc: bool = True) -> 'PrioQueue':
+        q = cls(asc)
+        for priority, item in pairs:
+            q.put(priority, item)
+        return q
+
 
 @total_ordering
 class Version:
