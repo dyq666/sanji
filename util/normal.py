@@ -426,6 +426,7 @@ class PrioQueue:
       1. 内置一个 `index` 使得当 `priority` 相同时, 仍可比较.
       2. 参数 `asc` 决定先返回优先级小的还是大的, 默认先返回小的.
       3. `get` 时只返回 `item`.
+      4. 实现了更多方法, 命名和底层的 `heapq` 中的命名一致.
     """
 
     def __init__(self, asc: bool = True):
@@ -436,20 +437,31 @@ class PrioQueue:
     def __len__(self) -> int:
         return len(self._heap)
 
-    def put(self, priority: int, item: Any):
-        priority = priority if self._asc else -priority
-        heapq.heappush(self._heap, (priority, self._index, item))
+    def push(self, priority: int, item: Any):
         self._index += 1
+        heapq.heappush(self._heap, self._make_item(priority, item))
 
-    def get(self):
+    def pop(self) -> Any:
         return heapq.heappop(self._heap)[-1]
+
+    def pushpop(self, priority: int, item: Any) -> Any:
+        self._index += 1
+        return heapq.heappushpop(self._heap, self._make_item(priority, item))[-1]
+
+    def replace(self, priority: int, item: Any) -> Any:
+        self._index += 1
+        return heapq.heapreplace(self._heap, self._make_item(priority, item))[-1]
+
+    def _make_item(self, priority: int, item: Any):
+        priority = priority if self._asc else -priority
+        return priority, self._index, item
 
     @classmethod
     def from_pairs(cls, pairs: Iterable[Tuple[int, Any]],
                    asc: bool = True) -> 'PrioQueue':
         q = cls(asc)
         for priority, item in pairs:
-            q.put(priority, item)
+            q.push(priority, item)
         return q
 
 

@@ -327,12 +327,12 @@ def test_PrioQueue():
     # 1
     pairs = [(1, 'a'), (2, 'b')]
     pq = PrioQueue.from_pairs(pairs, asc=True)
-    assert pq.get() == 'a'
-    assert pq.get() == 'b'
+    assert pq.pop() == 'a'
+    assert pq.pop() == 'b'
     assert len(pq) == 0
     pq = PrioQueue.from_pairs(pairs, asc=False)
-    assert pq.get() == 'b'
-    assert pq.get() == 'a'
+    assert pq.pop() == 'b'
+    assert pq.pop() == 'a'
     assert len(pq) == 0
 
     # 2
@@ -341,10 +341,10 @@ def test_PrioQueue():
             self.val = val
 
     pq = PrioQueue()
-    pq.put(1, A('a'))
-    pq.put(2, A('b'))
-    assert pq.get().val == 'a'
-    assert pq.get().val == 'b'
+    pq.push(1, A('a'))
+    pq.push(2, A('b'))
+    assert pq.pop().val == 'a'
+    assert pq.pop().val == 'b'
     assert len(pq) == 0
 
 
