@@ -423,27 +423,26 @@ class PrioQueue:
 
     和 `queue.PriorityQueue` 的区别:
 
-      1. 内置一个 `index` 使得当 `priority` 相同时, 仍可比较. 而 `PriorityQueue` 中
-         需要 `item` 是可比较的. 此外, 相同 `priority` 的元素的出栈顺序和入栈顺序相同.
-      2. 参数 `asc` 决定是最大堆还是最小堆.
+      1. 内置一个 `index` 使得当 `priority` 相同时, 仍可比较.
+      2. 参数 `asc` 决定先返回优先级小的还是大的, 默认先返回小的.
       3. `get` 时只返回 `item`.
     """
 
     def __init__(self, asc: bool = True):
-        self._queue = []
+        self._heap = []
         self._index = 0
         self._asc = asc
 
     def __len__(self) -> int:
-        return len(self._queue)
+        return len(self._heap)
 
     def put(self, priority: int, item: Any):
         priority = priority if self._asc else -priority
-        heapq.heappush(self._queue, (priority, self._index, item))
+        heapq.heappush(self._heap, (priority, self._index, item))
         self._index += 1
 
     def get(self):
-        return heapq.heappop(self._queue)[-1]
+        return heapq.heappop(self._heap)[-1]
 
     @classmethod
     def from_pairs(cls, pairs: Iterable[Tuple[int, Any]],
