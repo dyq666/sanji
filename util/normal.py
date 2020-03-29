@@ -704,7 +704,7 @@ def strip_control(value: str) -> str:
 
 
 def strip_seq(seq: Sequence, size: int) -> Sequence:
-    """从末尾移除序列使其能被 `size` 整除."""
+    """从序列末尾移除元素, 使序列的大小是 `size` 的倍数."""
     remainder = len(seq) % size
     end = -remainder if remainder else None
     return seq[:end]
