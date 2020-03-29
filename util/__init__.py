@@ -3,13 +3,10 @@ __all__ = (
     'CSV', 'AttrGettingProxy', 'Base64', 'Binary',
     'BitField', 'CaseInsensitiveDict', 'DefaultDict',
     'DictSerializer', 'Hybrid', 'MockName', 'OAuth2',
-    'PrioQueue',
-    'RSAPrivate', 'RSAPublic', 'SessionWithUrlPrefix',
+    'PrioQueue', 'RSAPrivate', 'RSAPublic', 'SessionWithUrlPrefix',
     'Version', 'accessors', 'base_conversion', 'camel2snake',
-    'chinese_num',
-    'date_range', 'format_rows', 'fill_seq', 'merge_sorted_list',
-    'no_value', 'import_object',
-    'indent_data', 'parse_phone', 'percentage',
+    'chinese_num', 'date_range', 'format_rows', 'fill_seq',
+    'no_value', 'import_object', 'indent_data', 'parse_phone', 'percentage',
     'rm_around_space', 'round_half_up', 'seq_grouper',
     'strip_control', 'strip_seq', 'upload',
 )
@@ -21,7 +18,7 @@ from .demo import (
 from .normal import (
     CSV, Base64, Binary, BitField, DefaultDict, KindTree,
     PrioQueue, Version, accessors, camel2snake, chinese_num,
-    format_rows, fill_seq, merge_sorted_list, no_value,
+    format_rows, fill_seq, no_value,
     import_object, indent_data, percentage,
     rm_around_space, round_half_up, seq_grouper, strip_control, strip_seq,
 )

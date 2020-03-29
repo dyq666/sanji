@@ -1,8 +1,7 @@
 __all__ = (
     'CSV', 'Base64', 'Binary', 'BitField', 'DefaultDict',
     'KindTree', 'PrioQueue', 'Version', 'accessors', 'camel2snake',
-    'chinese_num', 'format_rows', 'fill_seq', 'merge_sorted_list',
-    'no_value',
+    'chinese_num', 'format_rows', 'fill_seq', 'no_value',
     'import_object', 'indent_data', 'percentage',
     'rm_around_space', 'round_half_up', 'seq_grouper',
     'strip_control', 'strip_seq',
@@ -635,21 +634,6 @@ def indent_data(data: Union[list, tuple, dict], show_unicode: bool = True) -> st
     if show_unicode:
         data = data.encode().decode('unicode_escape')
     return data
-
-
-def merge_sorted_list(a1: list, a2: list) -> Iterable:
-    """合并两个有序列表."""
-    idx1, idx2 = 0, 0
-
-    for _ in range(len(a1) + len(a2)):
-        # 如果某个数组遍历结束了, 就用无穷大代替当前数组的值.
-        v1 = a1[idx1] if idx1 < len(a1) else float('inf')
-        v2 = a2[idx2] if idx2 < len(a2) else float('inf')
-        if v1 < v2:
-            idx1 += 1
-        else:
-            idx2 += 1
-        yield min(v1, v2)
 
 
 def percentage(molecule: BuiltinNum, denominator: BuiltinNum, with_format: bool = True
