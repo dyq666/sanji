@@ -6,7 +6,7 @@ from functools import partial
 import pytest
 
 from util import (
-    CSV, Base64, Binary, BitField, DefaultDict,
+    CSV, Base64, Binary, BitField,
     KindTree, PrioQueue, Version, accessors,
     camel2snake, chinese_num, format_rows,
     fill_seq, import_object, indent_data,
@@ -200,58 +200,6 @@ def test_bit_field():
     assert bit_field.has(ID.HUMAN)
     assert bit_field.has(ID.MAMMALIA)
     assert bit_field.has(ID.OTHER)
-
-
-class TestDefaultDict:
-    """测试了下面的 11 个字典的方法
-
-    ```
-    __getitem__
-    __setitem__
-    __delitem__
-    __len__
-    __iter__
-    __contains__
-    get
-    items
-    values
-    keys
-    fromkeys
-    ```
-    """
-
-    @pytest.fixture
-    def d(self):
-        return DefaultDict('default')
-
-    def test_get_and_getitem(self, d):
-        d['c'] = 2
-        assert d.get('c') == 2
-        assert d['c'] == 2
-        assert d.get('d') == 'default'
-        assert d['d'] == 'default'
-
-    def test_setitem_and_len_and_items_and_contains_and_del(self, d):
-        """访问不存在的 key 之后, 并不会把此 key 放入字典中."""
-        d['c'] = 2
-        assert d['d'] == 'default'
-
-        assert 'c' in d
-        assert 'd' not in d
-        assert dict(d.items()) == {'c': 2}
-        assert len(d) == 1
-
-        with pytest.raises(KeyError):
-            del d['d']
-        del d['c']
-        assert len(d) == 0
-
-    def test_keys_and_values_and_iter(self, d):
-        keys = ''.join(str(i) for i in range(10))
-        d.update(zip(keys, range(10)))
-        assert ''.join(d) == keys
-        assert ''.join(d.keys()) == keys
-        assert list(d.values()) == list(range(10))
 
 
 class TestKindTree:

@@ -1,6 +1,7 @@
 __all__ = (
     'AttrGettingProxy',
     'CaseInsensitiveDict',
+    'DefaultDict',
     'DictSerializer',
     'MockName',
     'base_conversion',
@@ -45,6 +46,24 @@ class CaseInsensitiveDict(UserDict):
 
     def __contains__(self, key):
         return isinstance(key, str) and super().__contains__(key.lower())
+
+
+class DefaultDict(UserDict):
+    """提供默认值给不存在的 key.
+
+    和标准库 `defaultdict` 的区别:
+      1. `defaultdict` 会先给不存在的 key 赋默认值, 再返回, 而本类只返回默认值.
+      2. `defaultdict` 不会影响 `get` 中的 `default` 参数, 而本类会.
+
+    最好还是用标准库 :)
+    """
+
+    def __init__(self, default: Any, *args, **kwargs):
+        self.default = default
+        super().__init__(*args, **kwargs)
+
+    def __missing__(self, key):
+        return self.default
 
 
 class DictSerializer:

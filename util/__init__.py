@@ -12,11 +12,11 @@ __all__ = (
 )
 
 from .demo import (
-    AttrGettingProxy, CaseInsensitiveDict,
+    AttrGettingProxy, CaseInsensitiveDict, DefaultDict,
     DictSerializer, MockName, base_conversion,
 )
 from .normal import (
-    CSV, Base64, Binary, BitField, DefaultDict, KindTree,
+    CSV, Base64, Binary, BitField, KindTree,
     PrioQueue, Version, accessors, camel2snake, chinese_num,
     format_rows, fill_seq, no_value,
     import_object, indent_data, percentage,

@@ -1,5 +1,5 @@
 __all__ = (
-    'CSV', 'Base64', 'Binary', 'BitField', 'DefaultDict',
+    'CSV', 'Base64', 'Binary', 'BitField',
     'KindTree', 'PrioQueue', 'Version', 'accessors', 'camel2snake',
     'chinese_num', 'format_rows', 'fill_seq', 'no_value',
     'import_object', 'indent_data', 'percentage',
@@ -295,16 +295,6 @@ class BitField:
     @classmethod
     def create(cls, ids: Iterable[int]) -> 'BitField':
         return cls(reduce(operator.or_, ids))
-
-
-class DefaultDict(UserDict):
-
-    def __init__(self, default: Any, *args, **kwargs):
-        self.default = default
-        super().__init__(*args, **kwargs)
-
-    def __missing__(self, key):
-        return self.default
 
 
 class KindTree:
