@@ -9,7 +9,7 @@ from util import (
 )
 
 
-def test_attr_getting_proxy():
+def test_AttrGettingProxy():
     # 被包裹一层的 tuple 只能获取属性.
     a = (1, 2)
     obj = AttrGettingProxy(a)
@@ -99,7 +99,7 @@ class TestDictSerializer:
         assert DictSerializer.decode('') == {}
 
 
-def test_mock_name():
+def test_MockName():
     People = namedtuple('People', 'name age')
     people = People('bob', 18)
     mock = MockName(people)
