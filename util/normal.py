@@ -1,3 +1,4 @@
+
 __all__ = (
     'CSV', 'Base64', 'Binary', 'BitField',
     'KindTree', 'PrioQueue', 'Version', 'accessors', 'camel2snake',
@@ -19,9 +20,10 @@ import json
 import operator
 import re
 import struct
-from collections import UserDict, defaultdict
+from collections import defaultdict
 from decimal import ROUND_HALF_UP, Decimal
 from functools import reduce, partial, total_ordering
+from itertools import chain
 from typing import (
     Any, Iterable, List, Generator, Optional, Sequence,
     Set, Tuple, Union,
@@ -687,10 +689,14 @@ def seq_grouper(seq: BuiltinSeq, size: int,
     return (seq[i: i + size] for i in range(0, len(seq), size))
 
 
-def strip_control(value: str) -> str:
-    """去除字符串中的控制字符."""
-    control_chars_reg = r'[\x00-\x1f\x7f]'
-    return re.sub(control_chars_reg, '', value)
+def strip_control(s: str) -> str:
+    """去除字符串中的控制字符.
+
+    可以通过以下代码知道哪些字符串是控制字符
+    `unicodedata.category(char) == 'Cc'`
+    """
+    controls = {chr(i) for i in chain(range(32), range(127, 128))}
+    return ''.join(c for c in s if c not in controls)
 
 
 def strip_seq(seq: Sequence, size: int) -> Sequence:

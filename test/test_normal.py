@@ -581,8 +581,7 @@ def test_rm_around_space():
 
 
 def test_strip_control():
-    assert strip_control('带\x00带\x1f我\x7f') == '带带我'
-    assert strip_control('带\u0000带\u001f我\u007f') == '带带我'
+    assert strip_control('带\x00带\x1e\x1f我\x7f') == '带带我'
 
 
 class TestStripSeq:
