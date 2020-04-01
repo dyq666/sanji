@@ -1,7 +1,7 @@
 __all__ = (
     'AES', 'AES_BLOCK_SIZE', 'AES_KEY_SIZES',
     'CSV', 'AttrGettingProxy', 'Base64', 'Binary',
-    'BitField', 'CaseInsensitiveDict', 'DefaultDict',
+    'BitField', 'CaseInsensitiveDict',
     'DictSerializer', 'Hybrid', 'MockName', 'OAuth2',
     'PrioQueue', 'RSAPrivate', 'RSAPublic', 'SessionWithUrlPrefix',
     'Version', 'accessors', 'base_conversion', 'camel2snake',
@@ -12,7 +12,7 @@ __all__ = (
 )
 
 from .demo import (
-    AttrGettingProxy, CaseInsensitiveDict, DefaultDict,
+    AttrGettingProxy, CaseInsensitiveDict,
     DictSerializer, MockName, base_conversion,
 )
 from .normal import (
