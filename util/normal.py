@@ -477,6 +477,9 @@ class Version:
         return f'{self.major}.{self.minor}.{self.revision}'
 
     def __eq__(self, other: 'Version'):
+        # https://stevenloria.com/python-best-practice/#gist5895758
+        if not isinstance(other, self.__class__):
+            return NotImplemented
         return (
             self.major == other.major
             and self.minor == other.minor
