@@ -38,12 +38,16 @@ no_value = object()
 class CSV:
 
     @staticmethod
-    def read(filepath: Union[str, io.StringIO], with_dict: bool = False) -> Tuple[list, list]:
-        """从文件中读取 csv 格式的数据.
+    def read(filepath: Union[str, io.StringIO],
+             with_dict: bool = False
+             ) -> Tuple[list, list]:
+        # TODO 怎么表达返回 list[list] 或 list[dict]
+        """按 csv 格式从文件中读取数据.
 
-        `with_dict`: 返回的 `rows` 中的数据项类型是否为 `dict` ?
-        `file_path`: 如果传入字符串, 那么从此文件路径中读取数据, 否则从 `io.StringIO` 对象中读取数据.
+        `filepath`: 如果传入字符串, 那么从此文件路径中读取数据, 否则从 `io.StringIO` 对象中读取数据.
+        `with_dict`: 返回的每行数据是 dict 还是 list 类型 ?
         """
+        # TODO newline 要解释下!
         file = open(filepath, newline='') if isinstance(filepath, str) else filepath
 
         if with_dict:
@@ -55,9 +59,7 @@ class CSV:
             header = next(f_csv)
             rows = list(f_csv)
 
-        if isinstance(filepath, str):
-            file.close()
-
+        file.close()
         return header, rows
 
     @staticmethod
