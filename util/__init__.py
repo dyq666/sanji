@@ -8,7 +8,7 @@ __all__ = (
     'chinese_num', 'date_range', 'format_rows', 'fill_seq',
     'no_value', 'import_object', 'indent_data', 'parse_phone', 'percentage',
     'rm_around_space', 'round_half_up',
-    'strip_control', 'strip_seq', 'upload',
+    'strip_control', 'upload',
 )
 
 from .demo import (
@@ -20,7 +20,7 @@ from .normal import (
     PrioQueue, Version, accessors, camel2snake, chinese_num,
     format_rows, fill_seq, no_value,
     import_object, indent_data, percentage,
-    rm_around_space, round_half_up, strip_control, strip_seq,
+    rm_around_space, round_half_up, strip_control,
 )
 from .third_cryptography import (
     AES, AES_BLOCK_SIZE, AES_CTR, AES_KEY_SIZES, Hybrid,

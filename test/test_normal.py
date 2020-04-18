@@ -11,7 +11,7 @@ from util import (
     camel2snake, chinese_num, format_rows,
     fill_seq, import_object, indent_data,
     percentage, rm_around_space,
-    round_half_up, strip_control, strip_seq,
+    round_half_up, strip_control,
 )
 
 
@@ -541,25 +541,3 @@ def test_rm_around_space():
 
 def test_strip_control():
     assert strip_control('带\x00带\x1e\x1f我\x7f') == '带带我'
-
-
-class TestStripSeq:
-
-    @pytest.mark.parametrize('seq', ('', b'', [], ()))
-    def test_empty(self, seq):
-        assert strip_seq(seq, size=9) == seq
-
-    @pytest.mark.parametrize('item', ('1', b'1'))
-    def test_text_type_not_empty(self, item):
-        for i in range(4, 8):
-            seq = item * i
-            assert strip_seq(seq, size=4) == item * 4
-
-    @pytest.mark.parametrize(('cls', 'item'), (
-        (list, 1),
-        (tuple, 2),
-    ))
-    def test_collection_type_not_empty(self, cls, item):
-        for i in range(4, 8):
-            seq = cls(item for _ in range(i))
-            assert strip_seq(seq, size=4) == seq[:4]

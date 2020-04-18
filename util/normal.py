@@ -5,7 +5,7 @@ __all__ = (
     'chinese_num', 'format_rows', 'fill_seq', 'no_value',
     'import_object', 'indent_data', 'percentage',
     'rm_around_space', 'round_half_up',
-    'strip_control', 'strip_seq',
+    'strip_control',
 )
 
 import base64
@@ -692,10 +692,3 @@ def strip_control(s: str) -> str:
     """
     controls = {chr(i) for i in chain(range(32), range(127, 128))}
     return ''.join(c for c in s if c not in controls)
-
-
-def strip_seq(seq: Sequence, size: int) -> Sequence:
-    """从序列末尾移除元素, 使序列的大小是 `size` 的倍数."""
-    remainder = len(seq) % size
-    end = -remainder if remainder else None
-    return seq[:end]
