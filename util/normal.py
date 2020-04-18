@@ -4,7 +4,7 @@ __all__ = (
     'KindTree', 'PrioQueue', 'Version', 'accessors', 'camel2snake',
     'chinese_num', 'format_rows', 'fill_seq', 'no_value',
     'import_object', 'indent_data', 'percentage',
-    'rm_around_space', 'round_half_up', 'seq_grouper',
+    'rm_around_space', 'round_half_up',
     'strip_control', 'strip_seq',
 )
 
@@ -25,9 +25,11 @@ from decimal import ROUND_HALF_UP, Decimal
 from functools import reduce, partial, total_ordering
 from itertools import chain
 from typing import (
-    Any, Iterable, List, Generator, Optional, Sequence,
+    Any, Iterable, List, Optional, Sequence,
     Set, Tuple, Union,
 )
+
+from more_itertools import sliced
 
 BuiltinSeq = Union[bytes, list, str, tuple]
 BuiltinNum = Union[int, float]
@@ -147,7 +149,7 @@ class Binary:
         if len(s) % 8 != 0:
             raise ValueError
 
-        return bytes(cls.str_2_int(item) for item in seq_grouper(s, 8))
+        return bytes(cls.str_2_int(item) for item in sliced(s, 8))
 
     @classmethod
     def hexstr_2_bytes(cls, s: str) -> bytes:
@@ -680,18 +682,6 @@ def round_half_up(number: BuiltinNum, ndigits: int = 0) -> BuiltinNum:
     decimal = Decimal(str(number))
     position = Decimal('0.{}1'.format('0' * (abs(ndigits) - 1)))
     return float(decimal.quantize(position, rounding=ROUND_HALF_UP))
-
-
-def seq_grouper(seq: BuiltinSeq, size: int,
-                filler: Any = no_value) -> Generator:
-    """按组迭代序列.
-
-    `size`: 每组的大小.
-    `filler`: 如果传入, 则用此值填充最后一组.
-    """
-    if filler is not no_value:
-        seq = fill_seq(seq, size, filler)
-    return (seq[i: i + size] for i in range(0, len(seq), size))
 
 
 def strip_control(s: str) -> str:

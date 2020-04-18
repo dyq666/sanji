@@ -11,8 +11,7 @@ from util import (
     camel2snake, chinese_num, format_rows,
     fill_seq, import_object, indent_data,
     percentage, rm_around_space,
-    round_half_up, seq_grouper,
-    strip_control, strip_seq,
+    round_half_up, strip_control, strip_seq,
 )
 
 
@@ -518,46 +517,6 @@ def test_round_half_up():
     assert round(0.375, 2) == 0.38
     assert round_half_up(0.125, 2) == 0.13
     assert round_half_up(0.375, 2) == 0.38
-
-
-class TestSeqGrouper:
-
-    @pytest.mark.parametrize(('seq', 'filler'), (
-        ('', '1'),
-        (b'', b'1'),
-        ([], 1),
-        ((), 1),
-    ))
-    def test_empty(self, seq, filler):
-        assert list(seq_grouper(seq, size=9)) == []
-        assert list(seq_grouper(seq, size=9, filler=filler)) == []
-
-    @pytest.mark.parametrize(('seq', 'filler'), (
-        ('0123456789', '1'),
-        (b'0123456789', b'1'),
-    ))
-    def test_text_type_not_empty(self, seq, filler):
-        assert list(seq_grouper(seq, size=9)) == [seq[:9], seq[9:10]]
-        assert list(seq_grouper(seq, size=10)) == [seq]
-        assert list(seq_grouper(seq, size=11)) == [seq]
-        assert list(seq_grouper(seq, size=9, filler=filler)) == \
-            [seq[:9], seq[9:] + filler * 8]
-        assert list(seq_grouper(seq, size=10, filler=filler)) == [seq]
-        assert list(seq_grouper(seq, size=11, filler=filler)) == [seq + filler]
-
-    @pytest.mark.parametrize(('seq', 'filler'), (
-        ([0, 1, 2, 3, 4, 5, 6, 7, 8, 9], None),  # 检测了 `None` 用做填充值的情况.
-        ((0, 1, 2, 3, 4, 5, 6, 7, 8, 9), 1),
-    ))
-    def test_collection_type_not_empty(self, seq, filler):
-        type_ = type(seq)
-        assert list(seq_grouper(seq, size=9)) == [seq[:9], seq[9:10]]
-        assert list(seq_grouper(seq, size=10)) == [seq]
-        assert list(seq_grouper(seq, size=11)) == [seq]
-        assert list(seq_grouper(seq, size=9, filler=filler)) == \
-            [seq[:9], seq[9:] + type_(filler for _ in range(8))]
-        assert list(seq_grouper(seq, size=10, filler=filler)) == [seq]
-        assert list(seq_grouper(seq, size=11, filler=filler)) == [seq + type_([filler])]
 
 
 def test_rm_around_space():
