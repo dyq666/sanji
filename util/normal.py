@@ -1,4 +1,3 @@
-
 __all__ = (
     'CSV', 'Base64', 'Binary', 'BitField',
     'KindTree', 'PrioQueue', 'Version', 'accessors', 'camel2snake',
@@ -46,10 +45,11 @@ class CSV:
         # TODO 怎么表达返回 list[list] 或 list[dict]
         """按 csv 格式从文件中读取数据.
 
-        `filepath`: 如果传入字符串, 那么从此文件路径中读取数据, 否则从 `io.StringIO` 对象中读取数据.
-        `with_dict`: 返回的每行数据是 dict 还是 list 类型 ?
+        `filepath`: 如果传入字符串, 那么从此文件路径中读取数据, 读完后关闭文件.
+                    否则从 `io.StringIO` 对象中读取数据, 读完后不关闭此对象.
+        `with_dict`: 返回的每行数据是 dict 还是 list 类型? 默认为 list.
         """
-        # TODO newline 要解释下!
+        # 官网中要求用 `newline=''` 的方式打开文件.
         file = open(filepath, newline='') if isinstance(filepath, str) else filepath
 
         if with_dict:
@@ -61,18 +61,24 @@ class CSV:
             header = next(f_csv)
             rows = list(f_csv)
 
-        file.close()
+        if isinstance(filepath, str):
+            file.close()
         return header, rows
 
     @staticmethod
-    def write(header: Iterable[str], rows: Iterable[Iterable], filepath: Optional[str] = None,
-              with_dict: bool = False) -> Optional[io.StringIO]:
-        """将数据按 csv 格式写入文件.
+    def write(header: Iterable[str],
+              rows: Iterable[Iterable],
+              filepath: Optional[str] = None,
+              with_dict: bool = False
+              ) -> Optional[io.StringIO]:
+        """按 csv 格式将数据写入文件.
 
-        `with_dict`: `rows` 中的数据项类型是否为 `dict` ?
-        `file_path`: 如果传入字符串, 那么将数据写入此文件路径, 否则返回 `io.StringIO` 对象.
+        `file_path`: 如果传入字符串, 那么将数据写入此文件路径, 写入后关闭文件.
+                     否则返回一个写入数据的 `io.StringIO` 对象, 且重置文件描述符的位置, 便于后续操作.
+        `with_dict`: `rows` 中的数据是 dict 还是 list 类型? 默认为 list.
         """
-        file = io.StringIO() if filepath is None else open(filepath, 'w', newline='')
+        # 官网中要求用 `newline=''` 的方式打开文件.
+        file = open(filepath, 'w', newline='') if filepath is not None else io.StringIO()
 
         if with_dict:
             f_csv = csv.DictWriter(file, header)

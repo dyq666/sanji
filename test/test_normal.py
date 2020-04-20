@@ -57,7 +57,7 @@ class TestCSV:
     def test_read_without_path(self):
         f = CSV.write(self.header, self.rows)
         assert CSV.read(f) == (self.header, self.rows)
-        f = CSV.write(self.header, self.rows)
+        f.seek(0)
         assert CSV.read(f, with_dict=True) == (self.header, self.dict_rows)
 
 
